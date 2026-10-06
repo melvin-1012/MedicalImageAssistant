@@ -16,7 +16,9 @@ class VisionModelOutput(BaseModel):
     modality: str = Field(..., description="The imaging modality used (e.g., 'X-Ray', 'CT Scan')")
 
 class ClinicalContext(BaseModel):
-    patient_notes: Optional[str] = Field(None, description="Raw clinical notes or symptoms reported by the patient")
+    raw_notes: Optional[str] = Field(None, description="Original raw clinical notes provided by the patient or doctor")
+    extracted_symptoms: List[str] = Field(default_factory=list, description="Symptoms explicitly mentioned in the notes")
+    extracted_history: List[str] = Field(default_factory=list, description="Relevant medical history or supplied test results")
 
 class GenAIInput(BaseModel):
     vision_output: VisionModelOutput

@@ -35,7 +35,7 @@ class EvidenceValidator:
                 errors.append(f"Altered region_id for '{ai_finding.finding}': Expected {original_finding.region_id}, but AI reported {ai_finding.image_region_id}.")
                 
             # 4. Check for appropriate status based on uncertainty/notes
-            if not ai_finding.supporting_notes and original_inputs.clinical_context.patient_notes:
+            if not ai_finding.supporting_notes and original_inputs.clinical_context.raw_notes:
                 warnings.append(f"Warning: Finding '{ai_finding.finding}' has no supporting notes linked, but clinical context was provided.")
 
         return {

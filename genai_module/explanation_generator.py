@@ -43,7 +43,9 @@ Modality: {inputs.vision_output.modality}
 Findings: {[f.model_dump() for f in inputs.vision_output.findings]}
 
 --- CLINICAL CONTEXT ---
-Patient Notes: {inputs.clinical_context.patient_notes if inputs.clinical_context.patient_notes else "None provided"}
+Raw Notes: {inputs.clinical_context.raw_notes if inputs.clinical_context.raw_notes else "None provided"}
+Symptoms: {', '.join(inputs.clinical_context.extracted_symptoms) if inputs.clinical_context.extracted_symptoms else "None"}
+History: {', '.join(inputs.clinical_context.extracted_history) if inputs.clinical_context.extracted_history else "None"}
 
 Generate the JSON response matching the required schema. Ensure you preserve the exact model_score and image_region_id for every finding.
 """

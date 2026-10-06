@@ -21,7 +21,9 @@ def run_mock_demo():
     
     # 2. Create mock input from the Patient/Backend (Person 2)
     mock_clinical_context = ClinicalContext(
-        patient_notes="Patient reports a persistent cough for 2 weeks and mild fever."
+        raw_notes="Patient reports a persistent cough for 2 weeks and mild fever.",
+        extracted_symptoms=["persistent cough", "mild fever"],
+        extracted_history=[]
     )
     
     # 3. Combine them into the GenAI input
