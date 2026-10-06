@@ -79,6 +79,7 @@ class Detection:
 class VisualizationResult:
     overlay_path: Optional[str] = None
     processed_path: Optional[str] = None
+    comparison_path: Optional[str] = None
     heatmap_path: Optional[str] = None
     mask_path: Optional[str] = None
 
@@ -110,9 +111,11 @@ class LoadedImage:
 
 @dataclass
 class PreprocessedImage:
-    image: np.ndarray            # model-ready copy
+    image: np.ndarray            # display-safe uint8 copy
     transform: "ResizeTransform"  # type: ignore[name-defined]  # noqa: F821
     steps: List[str] = field(default_factory=list)
+    model_input: Optional[np.ndarray] = None  # normalized float32 [0, 1] array
+
 
 
 def _enum_default(obj: Any) -> Any:

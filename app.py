@@ -17,9 +17,9 @@ from cv.pipeline import MedicalCVPipeline
 
 PHASES = [
     (0, "Project foundation", True),
-    (1, "Image loading + validation", False),
-    (2, "OpenCV preprocessing", False),
-    (3, "Image quality assessment", False),
+    (1, "Image loading + validation", True),
+    (2, "OpenCV preprocessing", True),
+    (3, "Image quality assessment", True),
     (4, "Model integration", False),
     (5, "Bounding-box localization", False),
     (6, "Heatmap / Grad-CAM", False),
@@ -27,6 +27,7 @@ PHASES = [
     (8, "Confidence + evidence", False),
     (9, "Structured JSON output", False),
 ]
+
 
 st.set_page_config(page_title=config.PROJECT_NAME, page_icon="🩻", layout="wide")
 
@@ -91,9 +92,23 @@ tabs = st.tabs(["Original", "Processed", "Quality", "Detections",
 
 with tabs[0]:
     if upload is not None:
-        st.image(upload, use_container_width=True)
+        if upload.name.lower().endswith(".dcm"):
+            with tempfile.NamedTemporaryFile(suffix=".dcm", delete=False) as tmp:
+                tmp.write(upload.getvalue())
+                tmp_path = Path(tmp.name)
+            try:
+                loaded = pipeline.loader.load(tmp_path)
+                st.image(loaded.image, caption=f"Original DICOM: {upload.name}", use_container_width=True)
+            except Exception as e:
+                st.error(f"Failed to display DICOM: {e}")
+            finally:
+                if tmp_path.exists():
+                    tmp_path.unlink()
+        else:
+            st.image(upload, use_container_width=True)
     else:
         st.caption("Upload an image to begin.")
+
 
 with tabs[1]:
     show_image(result.visualization.processed_path if result and result.visualization else None,

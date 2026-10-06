@@ -1,13 +1,14 @@
-# Core (Phase 0)
+# Core
 numpy>=1.24
 opencv-python>=4.8
+pydicom>=2.4
 streamlit>=1.32   # minimal dev UI (app.py)
 
 # Dev
 pytest>=7.4
 
 # Future phases (install only when needed)
-# pydicom>=2.4          # Phase 1+: DICOM loading
 # torch>=2.1            # Phase 4+: model inference
 # torchvision>=0.16
 # ultralytics>=8.0      # Phase 4/5: YOLO detection
+

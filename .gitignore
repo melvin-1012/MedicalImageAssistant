@@ -10,3 +10,14 @@ venv/
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Pipeline generated outputs
+output/processed/*
+!output/processed/.gitkeep
+output/overlays/*
+!output/overlays/.gitkeep
+output/heatmaps/*
+!output/heatmaps/.gitkeep
+output/masks/*
+!output/masks/.gitkeep
+
