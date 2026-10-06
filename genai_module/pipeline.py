@@ -1,3 +1,6 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
 from typing import Dict, Any, Optional
 from .ai_response_schema import VisionModelOutput, GenAIInput
 from .notes_processor import NotesProcessor
