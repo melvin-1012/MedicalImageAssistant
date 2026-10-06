@@ -49,7 +49,7 @@ Raw Notes: {inputs.clinical_context.raw_notes if inputs.clinical_context.raw_not
 Symptoms: {', '.join(inputs.clinical_context.extracted_symptoms) if inputs.clinical_context.extracted_symptoms else "None"}
 History: {', '.join(inputs.clinical_context.extracted_history) if inputs.clinical_context.extracted_history else "None"}
 
-Generate the JSON response matching the required schema. Ensure you preserve the exact model_score and image_region_id for every finding.
+Generate the JSON response matching the required schema. Ensure you preserve the exact confidence and location for every finding.
 """
         
         # Call the Gemini API enforcing the Pydantic schema

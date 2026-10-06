@@ -12,9 +12,16 @@ def run_mock_demo():
         "modality": "X-Ray",
         "findings": [
             {
-                "label": "possible_lung_opacity",
-                "score": 0.82,
-                "region_id": "region_1"
+                "finding": "possible_abnormal_opacity",
+                "confidence": 0.82,
+                "location": {
+                    "x1": 320,
+                    "y1": 240,
+                    "x2": 610,
+                    "y2": 520
+                },
+                "heatmap_available": True,
+                "requires_physician_review": True
             }
         ]
     }

@@ -5,10 +5,18 @@ from typing import List, Optional, Union
 # INPUT SCHEMAS (What you expect from Person 2 & 3)
 # ---------------------------------------------------------
 
+class BoundingBox(BaseModel):
+    x1: float
+    y1: float
+    x2: float
+    y2: float
+
 class VisionFinding(BaseModel):
-    label: str = Field(..., description="The name of the finding identified by the vision model (e.g., 'opacity')")
-    score: float = Field(..., description="The confidence score from the vision model, typically 0.0 to 1.0")
-    region_id: Optional[str] = Field(None, description="Identifier for the localized region (e.g., 'region_1')")
+    finding: str = Field(..., description="The standardized finding label or code (e.g., 'possible_abnormal_opacity')")
+    confidence: float = Field(..., description="The confidence score from the vision model, typically 0.0 to 1.0")
+    location: Optional[BoundingBox] = Field(None, description="Bounding box coordinates of the finding")
+    heatmap_available: Optional[bool] = Field(False)
+    requires_physician_review: Optional[bool] = Field(True)
 
 class VisionModelOutput(BaseModel):
     status: str = Field(..., description="Status of the image analysis ('success', 'poor_quality', 'unsupported', 'inconclusive')")
@@ -34,9 +42,9 @@ class SupportingNote(BaseModel):
     source: str = Field(default="patient_notes", description="Where this evidence came from")
 
 class ExplainedFinding(BaseModel):
-    finding: str = Field(..., description="The name of the finding from the vision model")
-    image_region_id: Optional[str] = Field(None, description="The corresponding region_id from the vision model")
-    model_score: float = Field(..., description="The exact score provided by the vision model")
+    finding: str = Field(..., description="The standardized code from the vision model")
+    location: Optional[Dict[str, float]] = Field(None, description="The bounding box coordinates precisely preserved")
+    confidence: float = Field(..., description="The exact confidence score provided by the vision model")
     supporting_notes: List[SupportingNote] = Field(default_factory=list, description="Relevant clinical context extracted from notes")
     explanation: str = Field(..., description="Evidence-grounded explanation. Must be cautious and link finding to notes without diagnosing.")
     uncertainty: List[str] = Field(default_factory=list, description="Statements regarding limitations or uncertainty for this finding")

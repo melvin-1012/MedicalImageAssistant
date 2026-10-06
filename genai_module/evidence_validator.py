@@ -12,8 +12,8 @@ class EvidenceValidator:
         warnings: List[str] = []
         errors: List[str] = []
         
-        # Extract valid vision finding labels and region IDs for checking
-        valid_findings = {f.label: f for f in original_inputs.vision_output.findings}
+        # Extract valid vision finding labels for checking
+        valid_findings = {f.finding: f for f in original_inputs.vision_output.findings}
         
         for ai_finding in ai_report.findings:
             # 1. Check if the finding label actually exists in the vision output
@@ -25,14 +25,15 @@ class EvidenceValidator:
             original_finding = valid_findings[ai_finding.finding]
             
             # 2. Check if the score was preserved exactly
-            if ai_finding.model_score != original_finding.score:
+            if ai_finding.confidence != original_finding.confidence:
                 is_valid = False
-                errors.append(f"Altered score for '{ai_finding.finding}': Expected {original_finding.score}, but AI reported {ai_finding.model_score}.")
+                errors.append(f"Altered confidence for '{ai_finding.finding}': Expected {original_finding.confidence}, but AI reported {ai_finding.confidence}.")
                 
-            # 3. Check if the region ID was preserved exactly
-            if ai_finding.image_region_id != original_finding.region_id:
+            # 3. Check if the location was preserved exactly
+            original_loc = original_finding.location.model_dump() if original_finding.location else None
+            if ai_finding.location != original_loc:
                 is_valid = False
-                errors.append(f"Altered region_id for '{ai_finding.finding}': Expected {original_finding.region_id}, but AI reported {ai_finding.image_region_id}.")
+                errors.append(f"Altered location for '{ai_finding.finding}': Expected {original_loc}, but AI reported {ai_finding.location}.")
                 
             # 4. Check for appropriate status based on uncertainty/notes
             if not ai_finding.supporting_notes and original_inputs.clinical_context.raw_notes:

@@ -12,9 +12,16 @@ MOCK_SCENARIOS = {
             "modality": "X-Ray",
             "findings": [
                 {
-                    "label": "possible_lung_opacity",
-                    "score": 0.82,
-                    "region_id": "region_1"
+                    "finding": "possible_abnormal_opacity",
+                    "confidence": 0.82,
+                    "location": {
+                        "x1": 320,
+                        "y1": 240,
+                        "x2": 610,
+                        "y2": 520
+                    },
+                    "heatmap_available": True,
+                    "requires_physician_review": True
                 }
             ]
         },
@@ -28,9 +35,16 @@ MOCK_SCENARIOS = {
             "modality": "CT Scan",
             "findings": [
                 {
-                    "label": "suspected_fracture",
-                    "score": 0.95,
-                    "region_id": "box_42"
+                    "finding": "suspected_fracture",
+                    "confidence": 0.95,
+                    "location": {
+                        "x1": 100,
+                        "y1": 150,
+                        "x2": 200,
+                        "y2": 250
+                    },
+                    "heatmap_available": False,
+                    "requires_physician_review": True
                 }
             ]
         },
