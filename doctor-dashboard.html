@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Workspace — MediSight AI Clinical Decision Support</title>
+  <meta name="description" content="MediSight AI Doctor Clinical Workspace — Assistive diagnostic decision support for patient imaging, clinical reviews, and PACS reports.">
+
+  <!-- Inter & JetBrains Mono Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Core & Dashboard Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/doctor-dashboard.css">
+</head>
+<body style="background-color: var(--color-bg-subtle);">
+
+  <!-- ======================================================================
+       DOCTOR DASHBOARD NAVBAR
+       ====================================================================== -->
+  <header class="site-header" role="banner">
+    <div class="nav-container">
+
+      <!-- MediSight AI Logo / Brand -->
+      <a href="index.html" class="brand-group" aria-label="Return to MediSight AI Landing Page">
+        <div class="brand-logo" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M2 12h20"></path>
+            <circle cx="12" cy="12" r="5" stroke-width="1.8" stroke-dasharray="2 2"></circle>
+          </svg>
+        </div>
+        <div class="brand-text-wrapper">
+          <div class="brand-name">MediSight <span>AI</span></div>
+          <span class="brand-subtext">Doctor Workspace</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Links (Patients, Patient Status, Reports, Doctor Profile) -->
+      <nav aria-label="Dashboard Navigation">
+        <ul class="nav-links">
+          <li><a href="#patients" class="dash-nav-tab active" data-tab="patients">Patients</a></li>
+          <li><a href="#patient-status" class="dash-nav-tab" data-tab="patient-status">Patient Status</a></li>
+          <li><a href="#reports" class="dash-nav-tab" data-tab="reports">Reports</a></li>
+          <li><a href="#profile" class="dash-nav-tab" data-tab="profile">Doctor Profile</a></li>
+        </ul>
+      </nav>
+
+      <!-- Doctor Profile Pill & Logout -->
+      <div class="nav-actions">
+        <button type="button" class="doctor-profile-badge dash-nav-tab" data-tab="profile" style="cursor: pointer; background: none;" title="View Doctor Team Profiles">
+          <div class="doctor-avatar" aria-hidden="true">DJ</div>
+          <div class="doctor-profile-info" style="text-align: left;">
+            <span class="doctor-name">Dr. Joison, MD</span>
+            <span class="doctor-role-tag">MediSight Doctor Team</span>
+          </div>
+        </button>
+
+        <button type="button" class="btn btn-outline btn-sm btn-doctor-logout" title="Sign out of Doctor Workspace">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Logout
+        </button>
+      </div>
+
+      <!-- Mobile Hamburger Menu Button -->
+      <button type="button" class="mobile-menu-btn" id="doctor-mobile-toggle" aria-label="Toggle navigation drawer" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-nav-panel" id="doctor-mobile-panel">
+      <ul class="mobile-nav-links">
+        <li><a href="#patients" class="mobile-nav-link" data-tab="patients">Patients</a></li>
+        <li><a href="#patient-status" class="mobile-nav-link" data-tab="patient-status">Patient Status</a></li>
+        <li><a href="#reports" class="mobile-nav-link" data-tab="reports">Reports</a></li>
+        <li><a href="#profile" class="mobile-nav-link" data-tab="profile">Doctor Profile</a></li>
+      </ul>
+      <div class="mobile-nav-actions">
+        <button type="button" class="btn btn-outline btn-doctor-logout" style="width: 100%;">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================
+       DASHBOARD SUBHEADER & ACTIVE CONTEXT STRIP
+       ====================================================================== -->
+  <section class="doctor-header-strip" aria-label="Clinical Context Header">
+    <div class="container doctor-header-container">
+      <div class="doctor-context-group">
+        <h1 class="doctor-context-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+            <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+          </svg>
+          Clinical Decision Support Workspace
+        </h1>
+        <p class="doctor-context-subtitle">
+          Department of Radiology &amp; Thoracic Medicine &bull; MediSight Memorial Hospital
+        </p>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+        <span class="badge badge-primary">
+          <span class="badge-dot" aria-hidden="true"></span>
+          AI Model v4.2 Active
+        </span>
+        <span class="badge badge-teal">
+          Hospital PACS Synced
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       DASHBOARD SECONDARY TAB BAR (QUICK TAB SELECTOR)
+       ====================================================================== -->
+  <nav class="dashboard-nav-bar" aria-label="Section Tabs">
+    <div class="container">
+      <div class="dashboard-tabs-list" role="tablist">
+        <button type="button" class="dash-nav-tab active" data-tab="patients" role="tab" aria-selected="true">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          Patients
+        </button>
+        <button type="button" class="dash-nav-tab" data-tab="patient-status" role="tab" aria-selected="false">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          Patient Status
+        </button>
+        <button type="button" class="dash-nav-tab" data-tab="reports" role="tab" aria-selected="false">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          Reports
+        </button>
+        <button type="button" class="dash-nav-tab" data-tab="profile" role="tab" aria-selected="false">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          Doctor Profile
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ======================================================================
+       MAIN CONTENT CONTAINER
+       ====================================================================== -->
+  <main class="dash-main-content">
+    <div class="container">
+
+      <!-- ==================================================================
+           SECTION 1: PATIENTS DIRECTORY TABLE
+           ================================================================== -->
+      <section class="dash-view-panel active" id="view-patients" aria-labelledby="heading-patients">
+        <div class="card-table-wrapper">
+          <div class="card-table-header">
+            <div>
+              <h2 class="table-header-title" id="heading-patients">Assigned Patients Directory</h2>
+              <p class="table-header-sub">Review incoming patient episodes, symptoms, and diagnostic triage.</p>
+            </div>
+            <span class="badge badge-primary">3 Active Patients</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="clinical-table">
+              <thead>
+                <tr>
+                  <th>MR No</th>
+                  <th>Patient Name</th>
+                  <th>Age</th>
+                  <th>Gender</th>
+                  <th>Symptoms</th>
+                  <th class="text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="patients-tbody">
+                <tr>
+                  <td class="font-mono text-primary font-bold">MR001</td>
+                  <td>
+                    <div class="patient-name-cell">
+                      <span class="patient-avatar-letter">A</span>
+                      <span class="font-semibold">Arun Kumar</span>
+                    </div>
+                  </td>
+                  <td>45</td>
+                  <td>Male</td>
+                  <td><span class="badge badge-subtle">Chest pain</span></td>
+                  <td class="text-right">
+                    <div class="patient-actions-group">
+                      <button type="button" class="btn btn-outline-primary btn-sm btn-view-patient" data-mrno="MR001" onclick="window.openPatientDetails &amp;&amp; window.openPatientDetails('MR001')">View</button>
+                      <a href="specialist-imaging.html?mrNo=MR001" class="btn btn-teal btn-sm btn-refer-specialist-link" data-mrno="MR001" title="Refer Arun Kumar to Specialist Imaging">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="8.5" cy="7" r="4"></circle>
+                          <polyline points="17 11 19 13 23 9"></polyline>
+                        </svg>
+                        Refer to Specialist
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="font-mono text-primary font-bold">MR002</td>
+                  <td>
+                    <div class="patient-name-cell">
+                      <span class="patient-avatar-letter">P</span>
+                      <span class="font-semibold">Priya Devi</span>
+                    </div>
+                  </td>
+                  <td>32</td>
+                  <td>Female</td>
+                  <td><span class="badge badge-subtle">Persistent cough</span></td>
+                  <td class="text-right">
+                    <div class="patient-actions-group">
+                      <button type="button" class="btn btn-outline-primary btn-sm btn-view-patient" data-mrno="MR002" onclick="window.openPatientDetails &amp;&amp; window.openPatientDetails('MR002')">View</button>
+                      <a href="specialist-imaging.html?mrNo=MR002" class="btn btn-teal btn-sm btn-refer-specialist-link" data-mrno="MR002" title="Refer Priya Devi to Specialist Imaging">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="8.5" cy="7" r="4"></circle>
+                          <polyline points="17 11 19 13 23 9"></polyline>
+                        </svg>
+                        Refer to Specialist
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="font-mono text-primary font-bold">MR003</td>
+                  <td>
+                    <div class="patient-name-cell">
+                      <span class="patient-avatar-letter">R</span>
+                      <span class="font-semibold">Rahul S</span>
+                    </div>
+                  </td>
+                  <td>58</td>
+                  <td>Male</td>
+                  <td><span class="badge badge-subtle">Shortness of breath</span></td>
+                  <td class="text-right">
+                    <div class="patient-actions-group">
+                      <button type="button" class="btn btn-outline-primary btn-sm btn-view-patient" data-mrno="MR003" onclick="window.openPatientDetails &amp;&amp; window.openPatientDetails('MR003')">View</button>
+                      <a href="specialist-imaging.html?mrNo=MR003" class="btn btn-teal btn-sm btn-refer-specialist-link" data-mrno="MR003" title="Refer Rahul S to Specialist Imaging">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="8.5" cy="7" r="4"></circle>
+                          <polyline points="17 11 19 13 23 9"></polyline>
+                        </svg>
+                        Refer to Specialist
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           SECTION 2: PATIENT STATUS TABLE
+           ================================================================== -->
+      <section class="dash-view-panel" id="view-patient-status" aria-labelledby="heading-patient-status">
+        <div class="card-table-wrapper">
+          <div class="card-table-header">
+            <div>
+              <h2 class="table-header-title" id="heading-patient-status">Patient Investigation Status</h2>
+              <p class="table-header-sub">Track real-time clinical review status across active imaging orders.</p>
+            </div>
+            <span class="badge badge-teal">Status Tracker</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="clinical-table">
+              <thead>
+                <tr>
+                  <th>MR No</th>
+                  <th>Patient Name</th>
+                  <th>Age</th>
+                  <th>Gender</th>
+                  <th>Status</th>
+                  <th class="text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="patient-status-tbody">
+                <tr>
+                  <td class="font-mono text-primary font-bold">MR001</td>
+                  <td>
+                    <div class="patient-name-cell">
+                      <span class="patient-avatar-letter">A</span>
+                      <span class="font-semibold">Arun Kumar</span>
+                    </div>
+                  </td>
+                  <td>45</td>
+                  <td>Male</td>
+                  <td>
+                    <span class="badge badge-warning">
+                      <span class="badge-dot"></span>
+                      Pending
+                    </span>
+                  </td>
+                  <td class="text-right">
+                    <span class="text-muted text-sm font-medium">Pending Review</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="font-mono text-primary font-bold">MR002</td>
+                  <td>
+                    <div class="patient-name-cell">
+                      <span class="patient-avatar-letter">P</span>
+                      <span class="font-semibold">Priya Devi</span>
+                    </div>
+                  </td>
+                  <td>32</td>
+                  <td>Female</td>
+                  <td>
+                    <span class="badge badge-success">
+                      <span class="badge-dot"></span>
+                      Completed
+                    </span>
+                  </td>
+                  <td class="text-right">
+                    <button type="button" class="btn btn-primary btn-sm btn-status-view-report" data-mrno="MR002">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                      </svg>
+                      View Report
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="font-mono text-primary font-bold">MR003</td>
+                  <td>
+                    <div class="patient-name-cell">
+                      <span class="patient-avatar-letter">R</span>
+                      <span class="font-semibold">Rahul S</span>
+                    </div>
+                  </td>
+                  <td>58</td>
+                  <td>Male</td>
+                  <td>
+                    <span class="badge badge-warning">
+                      <span class="badge-dot"></span>
+                      Pending
+                    </span>
+                  </td>
+                  <td class="text-right">
+                    <span class="text-muted text-sm font-medium">Pending Review</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           SECTION 3: REPORTS SECTION
+           ================================================================== -->
+      <section class="dash-view-panel" id="view-reports" aria-labelledby="heading-reports">
+        
+        <!-- Search by MR No Form -->
+        <div class="report-search-card">
+          <form class="report-search-form" id="report-search-form">
+            <div class="report-search-input-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input 
+                type="text" 
+                class="report-search-input" 
+                id="search-mrno-input" 
+                placeholder="Search by MR No (e.g. MR001, MR002, MR003)..." 
+                value="MR001"
+                aria-label="Search by Medical Record Number"
+              >
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Search</button>
+          </form>
+
+          <!-- Quick Select Pills -->
+          <div class="quick-select-wrap">
+            <span class="quick-select-label">Quick Select:</span>
+            <button type="button" class="mr-quick-btn active" data-mrno="MR001">MR001 - Arun Kumar</button>
+            <button type="button" class="mr-quick-btn" data-mrno="MR002">MR002 - Priya Devi</button>
+            <button type="button" class="mr-quick-btn" data-mrno="MR003">MR003 - Rahul S</button>
+          </div>
+        </div>
+
+        <!-- Report Sheet Display Container -->
+        <div id="report-display-container">
+          <div class="clinical-report-sheet">
+            
+            <!-- Letterhead -->
+            <div class="report-letterhead">
+              <div class="report-letterhead-left">
+                <div class="brand-group">
+                  <div class="brand-logo" style="width: 34px; height: 34px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <path d="M12 2v20M2 12h20"></path>
+                      <circle cx="12" cy="12" r="5" stroke-width="1.8" stroke-dasharray="2 2"></circle>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="brand-name" style="font-size: 1.1rem;">MediSight <span>AI</span></div>
+                    <div class="text-xs text-muted uppercase">Hospital Diagnostic Decision-Support Report</div>
+                  </div>
+                </div>
+              </div>
+              <div class="report-letterhead-right">
+                <div class="font-mono text-sm font-bold text-primary">REPORT REF: REP-MR001-2026</div>
+                <div class="text-xs text-muted">Status: <span class="text-warning font-semibold">PRELIMINARY REVIEW</span></div>
+              </div>
+            </div>
+
+            <!-- Mandatory Safety Notice -->
+            <div class="clinical-safety-alert-banner" role="alert">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              <div>
+                <strong>AI Preliminary Analysis – Requires Physician Review</strong>
+                <p class="mb-0 text-sm">
+                  This report is generated as an assistive clinical decision-support tool. Algorithmic outputs are non-definitive observations and do not replace professional physician diagnosis or clinical judgment.
+                </p>
+              </div>
+            </div>
+
+            <!-- Demographics Grid -->
+            <div class="report-patient-meta-grid">
+              <div class="meta-item">
+                <span class="meta-label">Patient Name</span>
+                <span class="meta-value font-bold">Arun Kumar</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">MR No</span>
+                <span class="meta-value font-mono font-bold text-primary">MR001</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Age / Gender</span>
+                <span class="meta-value">45 Y / Male</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Investigation Type</span>
+                <span class="meta-value">Digital Chest Radiography (PA View)</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">AI Preliminary Report Status</span>
+                <span class="meta-value"><span class="badge badge-teal">AI Preliminary Analysis Available</span></span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Doctor Review Status</span>
+                <span class="meta-value"><span class="badge badge-primary">In Review by Attending Physician</span></span>
+              </div>
+              <div class="meta-item col-span-2">
+                <span class="meta-label">Final Report Status</span>
+                <span class="meta-value"><span class="badge badge-warning">Pending Final Physician Approval</span></span>
+              </div>
+            </div>
+
+            <!-- AI Findings & Confidence -->
+            <div class="report-section-block">
+              <h4 class="report-section-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                AI Findings &amp; Confidence
+              </h4>
+              <div class="report-findings-card">
+                <div class="flex-between">
+                  <span class="font-semibold text-main">&ldquo;Possible mild cardiomegaly with subtle perihilar vascular prominence. No acute pneumothorax or focal consolidations detected.&rdquo;</span>
+                  <span class="badge badge-primary font-mono">Confidence: 86% (Uncertainty margin: &plusmn;3%)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Evidence / Explanation -->
+            <div class="report-section-block">
+              <h4 class="report-section-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                Evidence / Explanation
+              </h4>
+              <div class="report-text-box">
+                Cardiothoracic ratio calculated at ~0.52. Correlated with clinical presentation of exertional chest discomfort and borderline hypertension. Suggestive of early hypertensive cardiac strain.
+              </div>
+            </div>
+
+            <!-- Section Divider: Clearly Separate AI Analysis from Doctor's Review -->
+            <div class="review-section-divider">
+              <span>Doctor's Final Review &bull; Physician Sign-Off</span>
+            </div>
+
+            <div class="doctor-review-form" style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: var(--radius-lg); padding: 1.5rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span class="badge badge-primary font-mono text-xs">Attending Reviewer: Dr. Joison, MD</span>
+                <span class="badge badge-warning text-xs">Physician Final Decision Authority</span>
+              </div>
+
+              <!-- 1. Doctor Conclusion -->
+              <div class="doctor-review-group">
+                <label class="doctor-review-label" for="doctor-conclusion-field">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                  1. Doctor Conclusion <span class="required-star">*</span>
+                </label>
+                <textarea class="doctor-review-textarea" id="doctor-conclusion-field" rows="3" placeholder="Enter clinical conclusion and diagnostic synthesis...">Findings suggestive of hypertensive cardiac strain. Advised 2D Echocardiogram, serial troponin-I monitoring, and immediate cardiology consultation.</textarea>
+              </div>
+
+              <!-- 2. Medications -->
+              <div class="doctor-review-group">
+                <label class="doctor-review-label" for="doctor-medications-field">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                  2. Prescribed Medications &amp; Dosage <span class="required-star">*</span>
+                </label>
+                <textarea class="doctor-review-textarea" id="doctor-medications-field" rows="2" placeholder="Enter prescribed medications and dosage...">Tab. Amlodipine 5mg OD (morning), Tab. Aspirin 75mg OD (post-meal), Tab. Sorbitrate 5mg SL PRN for acute chest discomfort.</textarea>
+              </div>
+
+              <!-- 3. Recommendations -->
+              <div class="doctor-review-group">
+                <label class="doctor-review-label" for="doctor-recommendations-field">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                  3. Clinical Recommendations &amp; Lifestyle Advice
+                </label>
+                <textarea class="doctor-review-textarea" id="doctor-recommendations-field" rows="2" placeholder="Enter follow-up investigations, dietary advice, activity limits...">2D Echocardiogram with Doppler study within 48 hours, Low sodium cardiac diet, Continuous ambulatory Holter monitoring for 24 hours.</textarea>
+              </div>
+
+              <!-- 4. Additional Clinical Notes -->
+              <div class="doctor-review-group">
+                <label class="doctor-review-label" for="doctor-notes-field">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                  4. Additional Clinical Notes &amp; Escalation Criteria
+                </label>
+                <textarea class="doctor-review-textarea" id="doctor-notes-field" rows="2" placeholder="Enter additional clinical notes for patient records...">Patient instructed to report to emergency immediately if retrosternal pain exceeds 15 minutes or radiates to jaw/arm.</textarea>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="report-footer-actions">
+              <div class="report-approval-meta">
+                <span class="text-muted text-sm">
+                  Final physician review required before transmitting to patient records.
+                </span>
+              </div>
+              <div>
+                <button type="button" class="btn btn-primary btn-lg" id="btn-send-final-report" data-mrno="MR001">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
+                  Send Final Report to Patient
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================================================================
+           SECTION 4: DOCTOR PROFILE
+           ================================================================== -->
+      <section class="dash-view-panel" id="view-profile" aria-labelledby="heading-doctor-profile">
+        <div id="doctor-profile-container">
+          <div class="profile-card-wrapper" style="max-width: 1040px;">
+            <!-- Header Banner -->
+            <div class="card-table-header" style="background: #ffffff; padding: 1.5rem 1.75rem; border-radius: var(--radius-xl); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm);">
+              <div>
+                <h2 class="table-header-title" id="heading-doctor-profile">MediSight AI Clinical Doctor Team</h2>
+                <p class="table-header-sub">Board-certified clinical specialists and diagnostic AI review panel for MediSight Hospital.</p>
+              </div>
+              <span class="badge badge-teal">4 Attending Physicians Active</span>
+            </div>
+
+            <!-- Team Doctor 4-Card Grid -->
+            <div class="team-doctors-grid">
+
+              <!-- Doctor 1: Dr. Joison -->
+              <div class="team-doctor-card">
+                <div class="team-doctor-header">
+                  <div class="team-doctor-avatar">DJ</div>
+                  <div class="team-doctor-info">
+                    <h3 class="team-doctor-name">Dr. Joison, MD</h3>
+                    <span class="team-doctor-role">Chief Medical Officer &amp; Radiologist</span>
+                    <span class="team-doctor-dept">Division of Diagnostic Imaging</span>
+                  </div>
+                </div>
+                <div class="team-doctor-details">
+                  <div class="team-doctor-detail-row">
+                    <span class="team-doctor-detail-label">License</span>
+                    <span class="team-doctor-detail-val font-mono text-primary">MED-REG-84920-KA</span>
+                  </div>
+                  <div class="team-doctor-detail-row">
+                    <span class="team-doctor-detail-label">Experience</span>
+                    <span class="team-doctor-detail-val">16 Years Clinical Practice</span>
+                  </div>
+                  <div class="team-doctor-detail-row">
+                    <span class="team-doctor-detail-label">Specialization</span>
+                    <span class="team-doctor-detail-val">Thoracic CT &amp; X-Ray Diagnostics</span>
+                  </div>
+                </div>
+                <p class="team-doctor-specialization">
+                  Leads multimodal clinical verification, institutional safety protocol compliance, and primary radiology sign-offs.
+                </p>
+                <div class="team-doctor-badge-strip">
+                  <span class="badge badge-success"><span class="badge-dot"></span>Attending Physician</span>
+                  <span class="badge badge-subtle font-mono text-xs">MediSight AI</span>
+                </div>
+              </div>
+
+              <!-- Doctor 2: Dr. Melvin -->
+              <div class="team-doctor-card">
+                <div class="team-doctor-header">
+                  <div class="team-doctor-avatar" style="background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);">DM</div>
+                  <div class="team-doctor-info">
+                    <h3 class="team-doctor-name">Dr. Melvin, MD</h3>
+                    <span class="team-doctor-role">Consultant Pulmonologist</span>
+                    <span class="team-doctor-dept">Division of Pulmonary &amp; Critical Care</span>
+                  </div>
+                </div>
+                <div class="team-doctor-details">
+                  <div class="team-doctor-detail-row">
+                    <span class="team-doctor-detail-label">License</span>
+                    <span class="team-doctor-detail-val font-mono text-primary">MED-REG-91042-KA</span>
+                  </div>
+                  <div class="team-doctor-detail-row">
+                    <span class="team-doctor-detail-label">Experience</span>
+                    <span class="team-doctor-detail-val">14 Years Clinical Practice</span>
+                  </div>
+                  <div class="team-doctor-detail-row">
+                    <span class="team-doctor-detail-label">Specialization</span>
+                    <span class="team-doctor-detail-val">High-Resolution Chest CT &amp; COPD</span>
+                  </div>
+                </div>
+                <p class="team-doctor-specialization">
+                  Specializes in inflammatory lung disease, chronic airway diagnostics, bronchitic pattern matching, and therapeutic triage.
+                </p>
+                <div class="team-doctor-badge-strip">
+                  <span class="badge badge-success"><span class="badge-dot"></span>Attending Physician</span>
+                  <span class="badge badge-subtle font-mono text-xs">MediSight AI</span>
+                </div>
+              </div>
+
+              <!-- Doctor 3: Dr. Joseph -->
+              <div class="team-doctor-card">
+                <div class="team-doctor-header">
+                  <div class="team-doctor-avatar" style="background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);">DJ</div>
+                  <div class="team-doctor-info">
+                    <h3 class="team-doctor-name">Dr. Joseph, MD</h3>
+                    <span class="team-doctor-role">Consultant Cardiologist</span>
+                    <span class="team-doctor-dept">Division of Cardiovascular Medicine</span>
+                  </div>
+                </div>
+                <div class="team-doctor-details">
+                  <div class="team-doctor-detail-row">
+                    <span class="team-doctor-detail-label">License</span>
+                    <span class="team-doctor-detail-val font-mono text-primary">MED-REG-77419-KA</span>
+                  </div>
+                  <div class="team-doctor-detail-row">
+                    <span class="team-doctor-detail-label">Experience</span>
+                    <span class="team-doctor-detail-val">15 Years Clinical Practice</span>
+                  </div>
+                  <div class="team-doctor-detail-row">
+                    <span class="team-doctor-detail-label">Specialization</span>
+                    <span class="team-doctor-detail-val">Cardiac Imaging &amp; Cardiomegaly</span>
+                  </div>
+                </div>
+                <p class="team-doctor-specialization">
+                  Expert in cardiothoracic ratio radiomics, ischemic cardiac risk triage, and emergency chest discomfort differential protocols.
+                </p>
+                <div class="team-doctor-badge-strip">
+                  <span class="badge badge-success"><span class="badge-dot"></span>Attending Physician</span>
+                  <span class="badge badge-subtle font-mono text-xs">MediSight AI</span>
+                </div>
+              </div>
+
+              <!-- Doctor 4: Dr. Ilakkiya -->
+              <div class="team-doctor-card">
+                <div class="team-doctor-header">
+                  <div class="team-doctor-avatar" style="background: linear-gradient(135deg, #0284c7 0%, #10b981 100%);">DI</div>
+                  <div class="team-doctor-info">
+                    <h3 class="team-doctor-name">Dr. Ilakkiya, MD</h3>
+                    <span class="team-doctor-role">Consultant Diagnostic AI Specialist</span>
+                    <span class="team-doctor-dept">Division of Medical Intelligence</span>
+                  </div>
+                </div>
+                <div class="team-doctor-details">
+                  <div class="team-doctor-detail-row">
+                    <span class="team-doctor-detail-label">License</span>
+                    <span class="team-doctor-detail-val font-mono text-primary">MED-REG-63851-KA</span>
+                  </div>
+                  <div class="team-doctor-detail-row">
+                    <span class="team-doctor-detail-label">Experience</span>
+                    <span class="team-doctor-detail-val">12 Years Clinical Practice</span>
+                  </div>
+                  <div class="team-doctor-detail-row">
+                    <span class="team-doctor-detail-label">Specialization</span>
+                    <span class="team-doctor-detail-val">Deep Learning ROI &amp; Explainability</span>
+                  </div>
+                </div>
+                <p class="team-doctor-specialization">
+                  Pioneers neural radiomic localization, confidence calibration metrics, and physician-in-the-loop decision-support governance.
+                </p>
+                <div class="team-doctor-badge-strip">
+                  <span class="badge badge-success"><span class="badge-dot"></span>Attending Physician</span>
+                  <span class="badge badge-subtle font-mono text-xs">MediSight AI</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ======================================================================
+       PATIENT DETAILS MODAL / CARD DIALOG
+       ====================================================================== -->
+  <div class="modal-backdrop" id="patient-detail-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 620px;">
+      <div id="patient-detail-content">
+        <div class="patient-detail-card">
+          <div class="detail-header-strip">
+            <div>
+              <span class="badge badge-primary font-mono">MR001</span>
+              <h3 class="detail-title">Arun Kumar</h3>
+              <p class="detail-sub">45 yrs • Male</p>
+            </div>
+            <span class="badge badge-warning">Pending</span>
+          </div>
+          <div class="detail-grid">
+            <div class="detail-field">
+              <span class="detail-label">Reported Symptoms</span>
+              <div class="detail-value text-strong">Chest pain</div>
+            </div>
+            <div class="detail-field">
+              <span class="detail-label">Investigation Status</span>
+              <div class="detail-value">Digital Chest Radiography (PA View) Indexed</div>
+            </div>
+            <div class="detail-field">
+              <span class="detail-label">Assigned Specialist</span>
+              <div class="detail-value text-primary font-semibold">Dr. Joseph (Cardiology)</div>
+            </div>
+            <div class="detail-field">
+              <span class="detail-label">AI Analysis Status</span>
+              <div class="detail-value">
+                <span class="badge badge-teal">AI Preliminary Analysis Complete • Requires Physician Review</span>
+              </div>
+            </div>
+            <div class="detail-field col-span-2">
+              <span class="detail-label">Clinical Notes</span>
+              <div class="detail-notes-box">
+                Patient presents with acute retrosternal chest pain radiating to left shoulder on moderate exertion. BP: 138/86 mmHg, Pulse: 82 bpm. Resting ECG shows sinus rhythm without acute ST changes.
+              </div>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <a href="specialist-imaging.html?mrNo=MR001" class="btn btn-teal btn-refer-specialist" id="modal-refer-btn" data-mrno="MR001">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <polyline points="17 11 19 13 23 9"></polyline>
+              </svg>
+              Refer to Specialist
+            </a>
+            <button type="button" class="btn btn-outline" id="btn-close-detail" onclick="window.closePatientDetails &amp;&amp; window.closePatientDetails()">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       TOAST NOTIFICATION CONTAINER (FRONTEND FEEDBACK)
+       ====================================================================== -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- ======================================================================
+       FOOTER
+       ====================================================================== -->
+  <footer class="site-footer" style="padding-top: 2.5rem; padding-bottom: 2rem;">
+    <div class="container">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div class="brand-group">
+          <div class="brand-logo" style="width: 28px; height: 28px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M12 2v20M2 12h20"></path>
+              <circle cx="12" cy="12" r="5" stroke-width="1.8" stroke-dasharray="2 2"></circle>
+            </svg>
+          </div>
+          <span style="color: #ffffff; font-weight: 700; font-size: 0.95rem;">MediSight AI</span>
+          <span style="color: #94a3b8; font-size: 0.82rem;">&bull; Doctor Clinical Decision-Support Portal</span>
+        </div>
+        <div style="font-size: 0.8125rem; color: #94a3b8;">
+          Clinical Decision Support System &bull; Version 1.0 &bull; Licensed Hospital Personnel Only
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/doctor-dashboard.js"></script>
+</body>
+</html>
