@@ -12,7 +12,7 @@ class ExplanationGenerator:
         # Initialize the Gemini client. It automatically picks up GEMINI_API_KEY from the environment.
         self.client = genai.Client()
         # We use a model that supports structured outputs well.
-        self.model_name = 'gemini-2.5-flash'
+        self.model_name = 'gemini-3.8-flash'
         
         self.system_instruction = """
 You are a medical AI assistant designed to help doctors interpret medical imaging results alongside patient clinical notes.
