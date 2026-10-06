@@ -1,4 +1,3 @@
-import os
 from typing import Dict, Any, Optional
 from .ai_response_schema import VisionModelOutput, GenAIInput
 from .notes_processor import NotesProcessor
@@ -11,7 +10,6 @@ class GenAIPipeline:
     This is the only class Person 2 (Backend) needs to interact with.
     """
     def __init__(self):
-        self.use_mock = os.getenv("USE_MOCK_LLM", "False").lower() == "true"
         self.notes_processor = NotesProcessor()
         self.generator = ExplanationGenerator()
         self.validator = EvidenceValidator()
@@ -41,31 +39,6 @@ class GenAIPipeline:
                     "Please upload a suitable medical image."
                 ],
                 "validation_status": {"is_valid": True, "errors": [], "warnings": ["Aborted before LLM generation."]}
-            }
-
-        # Demo Safety Net
-        if self.use_mock:
-            print("[INFO] MOCK MODE ENABLED: Returning pre-written safe response to bypass API issues.")
-            return {
-              "summary": "The vision model identified a possible finding that warrants clinician review alongside the reported symptoms.",
-              "findings": [
-                {
-                  "finding": vision_output.findings[0].label if vision_output.findings else "possible_finding",
-                  "image_region_id": vision_output.findings[0].region_id if vision_output.findings else "unknown",
-                  "model_score": vision_output.findings[0].score if vision_output.findings else 0.0,
-                  "supporting_notes": [
-                    {
-                      "text": raw_notes or "No notes provided",
-                      "source": "Raw Notes"
-                    }
-                  ],
-                  "explanation": f"The vision model identified a possible finding with a score of {vision_output.findings[0].score if vision_output.findings else 0.0}. Clinical correlation is required.",
-                  "uncertainty": ["The model score represents an automated probability and is not definitive proof of pathology."],
-                  "status": "review_required"
-                }
-              ],
-              "limitations": ["This system is an assistive decision-support tool."],
-              "validation_status": {"is_valid": True, "errors": [], "warnings": ["Generated in MOCK mode."]}
             }
 
         # 3. Process the clinical notes to extract structured symptoms/history
