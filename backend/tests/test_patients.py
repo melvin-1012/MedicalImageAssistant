@@ -35,7 +35,7 @@ def _mock_db_with_patient(patient_id: str, mr_number: str = "MR-2024-0001"):
 @pytest.mark.asyncio
 async def test_patient_can_view_own_profile(client):
     db = _mock_db_with_patient("patient-db-id-001")
-    with patch("app.database.get_supabase_admin", return_value=db):
+    with patch("app.database._override_admin", db):
         resp = await client.get("/patients/me", headers=PATIENT_HEADERS)
     assert resp.status_code in (200, 404)  # 404 if no DB row, 200 if found
 
@@ -44,7 +44,7 @@ async def test_patient_can_view_own_profile(client):
 async def test_patient_can_view_own_records(client):
     db = _mock_db_with_patient("patient-db-id-001")
     db.table.return_value.select.return_value.eq.return_value.order.return_value.execute.return_value.data = []
-    with patch("app.database.get_supabase_admin", return_value=db):
+    with patch("app.database._override_admin", db):
         resp = await client.get("/patients/me/records", headers=PATIENT_HEADERS)
     assert resp.status_code in (200, 404)
 
@@ -53,7 +53,7 @@ async def test_patient_can_view_own_records(client):
 async def test_patient_can_view_own_reports(client):
     db = _mock_db_with_patient("patient-db-id-001")
     db.table.return_value.select.return_value.eq.return_value.eq.return_value.order.return_value.execute.return_value.data = []
-    with patch("app.database.get_supabase_admin", return_value=db):
+    with patch("app.database._override_admin", db):
         resp = await client.get("/patients/me/reports", headers=PATIENT_HEADERS)
     assert resp.status_code in (200, 404)
 
@@ -87,7 +87,7 @@ async def test_patient_cannot_access_other_patients_report(client):
             mock.select.return_value.eq.return_value.single.return_value.execute.return_value.data = own_patient_row
         return mock
     db.table.side_effect = side_effect_table
-    with patch("app.database.get_supabase_admin", return_value=db):
+    with patch("app.database._override_admin", db):
         resp = await client.get("/reports/report-001", headers=PATIENT_HEADERS)
     assert resp.status_code == 403
 
@@ -98,7 +98,7 @@ async def test_doctor_can_search_by_mr_number(client):
     patient_row = {"id": "patient-db-id-001", "mr_number": "MR-2024-0001"}
     db.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value.data = patient_row
     db.table.return_value.select.return_value.eq.return_value.order.return_value.execute.return_value.data = []
-    with patch("app.database.get_supabase_admin", return_value=db):
+    with patch("app.database._override_admin", db):
         resp = await client.get("/reports/search/MR-2024-0001", headers=DOCTOR_HEADERS)
     assert resp.status_code in (200, 404)
 
@@ -112,7 +112,7 @@ async def test_patient_cannot_search_by_mr_number_of_other(client):
     db.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value.data = other_patient
     # Reports filtered to available_to_patient will be empty
     db.table.return_value.select.return_value.eq.return_value.eq.return_value.order.return_value.execute.return_value.data = []
-    with patch("app.database.get_supabase_admin", return_value=db):
+    with patch("app.database._override_admin", db):
         resp = await client.get("/reports/search/MR-2024-0099", headers=PATIENT_HEADERS)
     # Should return empty list (patient sees empty) or access denied
     assert resp.status_code in (200, 403, 404)

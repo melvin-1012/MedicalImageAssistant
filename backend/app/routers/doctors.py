@@ -5,6 +5,7 @@ from app.database import get_supabase_admin
 router = APIRouter()
 
 
+@router.get("")
 @router.get("/")
 async def list_doctors(user: dict = Depends(get_current_user)):
     db = get_supabase_admin()

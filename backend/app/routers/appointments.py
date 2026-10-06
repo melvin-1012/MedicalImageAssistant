@@ -7,6 +7,7 @@ from datetime import date
 router = APIRouter()
 
 
+@router.post("")
 @router.post("/")
 async def create_appointment(body: AppointmentCreate, user_id: str = Depends(get_current_user_id), user: dict = Depends(get_current_user)):
     """Book an appointment. Can be created by patient or doctor."""
@@ -53,6 +54,7 @@ async def create_appointment(body: AppointmentCreate, user_id: str = Depends(get
     return resp.data[0]
 
 
+@router.get("")
 @router.get("/")
 async def list_appointments(user_id: str = Depends(get_current_user_id), user: dict = Depends(get_current_user)):
     db = get_supabase_admin()
