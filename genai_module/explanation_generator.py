@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from tenacity import retry, stop_after_attempt, wait_exponential
 from .ai_response_schema import GenAIInput, AIAnalysisReport
 
 # Load environment variables
@@ -27,6 +28,7 @@ CRITICAL RULES:
 6. Link patient symptoms to the vision findings only as supporting context, not as absolute proof.
 """
 
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
     def generate_explanation(self, inputs: GenAIInput) -> AIAnalysisReport:
         """
         Takes the combined vision model output and clinical context and generates
