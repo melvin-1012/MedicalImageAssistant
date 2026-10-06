@@ -1,0 +1,82 @@
+:root {
+  /* Primary Clinical Palette */
+  --color-primary: #0284c7;        /* Medical Sky Blue */
+  --color-primary-dark: #0369a1;   /* Deep Clinical Blue */
+  --color-primary-darker: #075985;
+  --color-primary-light: #e0f2fe;  /* Soft Blue Tint */
+  --color-primary-subtle: #f0f9ff;
+
+  /* Secondary Clinical Teal Palette */
+  --color-teal: #0d9488;           /* Hospital Teal */
+  --color-teal-dark: #0f766e;
+  --color-teal-light: #ccfbf1;
+  --color-teal-subtle: #f0fdfa;
+
+  /* Neutral Clinical Palette */
+  --color-bg-main: #ffffff;
+  --color-bg-subtle: #f8fafc;
+  --color-bg-muted: #f1f5f9;
+  --color-bg-card: #ffffff;
+  --color-border: #e2e8f0;
+  --color-border-subtle: #edf2f7;
+  --color-border-strong: #cbd5e1;
+
+  /* Typography Colors */
+  --color-text-main: #0f172a;       /* Slate 900 */
+  --color-text-muted: #475569;      /* Slate 600 */
+  --color-text-light: #64748b;      /* Slate 500 */
+  --color-text-subtle: #94a3b8;     /* Slate 400 */
+  --color-text-inverse: #ffffff;
+
+  /* Status and Clinical Alert Tones */
+  --color-warning: #d97706;         /* Clinical amber alert */
+  --color-warning-bg: #fef3c7;
+  --color-warning-border: #fcd34d;
+  --color-success: #059669;         /* Verified / Normal green */
+  --color-success-bg: #d1fae5;
+  --color-success-border: #6ee7b7;
+  --color-info: #2563eb;
+  --color-info-bg: #eff6ff;
+
+  /* Radiography Dark HUD */
+  --color-hud-bg: #090d16;
+  --color-hud-surface: #111827;
+  --color-hud-border: #1f2937;
+  --color-hud-text: #f3f4f6;
+  --color-hud-accent: #38bdf8;
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4.5rem;
+  --spacing-4xl: 6rem;
+
+  /* Container */
+  --container-max-width: 1240px;
+  --container-padding: 1.5rem;
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.09), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
