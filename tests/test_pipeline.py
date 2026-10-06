@@ -9,6 +9,7 @@ import pydicom
 from pydicom.dataset import FileDataset, FileMetaDataset
 from pydicom.uid import ExplicitVRLittleEndian, SecondaryCaptureImageStorage, generate_uid
 
+from cv.detector import NullDetector
 from cv.pipeline import MedicalCVPipeline
 from cv.schemas import AnalysisStatus, CVAnalysisResult, QualityLevel
 
@@ -40,9 +41,15 @@ def _create_test_dicom(path: Path, array: np.ndarray | None = None) -> None:
 
 
 def test_pipeline_initializes_without_model():
-    p = MedicalCVPipeline()
+    p = MedicalCVPipeline(detector=NullDetector())
     p.initialize()
     assert p.detector.is_loaded is False
+
+
+def test_pipeline_initializes_with_auto_loaded_model():
+    p = MedicalCVPipeline()
+    p.initialize()
+    assert p.detector.is_loaded is True
 
 
 def test_result_serialises_to_json():
@@ -55,7 +62,7 @@ def test_pipeline_run_phases_1_to_3(tmp_path):
     dcm_path = tmp_path / "valid_test.dcm"
     _create_test_dicom(dcm_path)
 
-    pipeline = MedicalCVPipeline()
+    pipeline = MedicalCVPipeline(detector=NullDetector())
     pipeline.initialize()
 
     # Pass tmp_path so outputs stay in temp directory

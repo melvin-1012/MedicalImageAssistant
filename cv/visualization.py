@@ -1,16 +1,25 @@
-"""Visual output: comparison renderer, overlays, and heatmaps."""
+"""Visual output: comparison renderer, bounding box overlays, and heatmap blending (Phases 1-6).
+
+All rendering functions preserve array immutability and never mutate input buffers.
+Annotations use medically conservative wording (never claiming diagnostic certainty).
+"""
 from __future__ import annotations
 
+from pathlib import Path
 from typing import List, Optional
 import cv2
 import numpy as np
 
+from cv.heatmap import BaseHeatmapGenerator
 from cv.image_loader import scale_to_8bit
 from cv.schemas import Detection, VisualizationResult
+from utils.logger import get_logger
+
+logger = get_logger("visualization")
 
 
 class Visualizer:
-    """Renders results; comparison renderer active in Batch 1; heatmaps/masks in later phases."""
+    """Renders visual artifacts: comparisons, bounding box overlays, and heatmaps."""
 
     name = "Visualization engine"
 
@@ -68,6 +77,73 @@ class Visualizer:
         comparison = np.hstack([orig_view, separator, proc_view])
         return comparison
 
+    def draw_detections(
+        self,
+        image: np.ndarray,
+        detections: List[Detection],
+        box_color: tuple[int, int, int] = (0, 165, 255),  # High-contrast amber/orange
+        thickness: int = 2,
+    ) -> np.ndarray:
+        """Render localized bounding boxes and confidence labels onto image copy."""
+        if image is None:
+            raise ValueError("Input image cannot be None")
+
+        img_copy = image.copy()
+        if img_copy.dtype != np.uint8:
+            img_copy = scale_to_8bit(img_copy)
+
+        if img_copy.ndim == 2:
+            canvas = cv2.cvtColor(img_copy, cv2.COLOR_GRAY2BGR)
+        elif img_copy.shape[2] == 3:
+            canvas = img_copy
+        else:
+            canvas = cv2.cvtColor(img_copy[:, :, 0], cv2.COLOR_GRAY2BGR)
+
+        h, w = canvas.shape[:2]
+
+        for idx, det in enumerate(detections, start=1):
+            if det.bbox is None:
+                continue
+
+            x1 = int(round(max(0, min(w - 1, det.bbox.x_min))))
+            y1 = int(round(max(0, min(h - 1, det.bbox.y_min))))
+            x2 = int(round(max(0, min(w - 1, det.bbox.x_max))))
+            y2 = int(round(max(0, min(h - 1, det.bbox.y_max))))
+
+            # 1. Draw bounding box rectangle
+            cv2.rectangle(canvas, (x1, y1), (x2, y2), box_color, thickness)
+
+            # 2. Format clinically cautious label (e.g. "Possible abnormal opacity (87%)")
+            conf_pct = int(round(det.confidence * 100))
+            label_text = f"{det.label} ({conf_pct}%)"
+
+            # 3. Draw text background banner for high-contrast legibility
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            font_scale = 0.5
+            font_thick = 1
+            (text_w, text_h), baseline = cv2.getTextSize(label_text, font, font_scale, font_thick)
+
+            text_bg_y1 = max(0, y1 - text_h - baseline - 4)
+            text_bg_y2 = y1
+            text_bg_x2 = min(w, x1 + text_w + 6)
+
+            cv2.rectangle(canvas, (x1, text_bg_y1), (text_bg_x2, text_bg_y2), (20, 20, 20), -1)
+            cv2.rectangle(canvas, (x1, text_bg_y1), (text_bg_x2, text_bg_y2), box_color, 1)
+
+            # 4. Draw label text inside banner
+            cv2.putText(
+                canvas,
+                label_text,
+                (x1 + 3, y1 - baseline - 2),
+                font,
+                font_scale,
+                (255, 255, 255),
+                font_thick,
+                cv2.LINE_AA,
+            )
+
+        return canvas
+
     def render(
         self,
         original: np.ndarray,
@@ -75,6 +151,39 @@ class Visualizer:
         detections: List[Detection],
         heatmap: Optional[np.ndarray] = None,
         mask: Optional[np.ndarray] = None,
+        output_dir: Optional[Path | str] = None,
+        stem: str = "scan",
     ) -> VisualizationResult:
-        """Draw and save outputs. Implemented progressively in Phases 5-7."""
-        raise NotImplementedError("Visualizer.render: Phase 5")
+        """Render all active visual outputs and save to output directory."""
+        out_dir = Path(output_dir) if output_dir else Path(".")
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        res = VisualizationResult()
+
+        # 1. Processed scan
+        if processed is not None:
+            proc_path = out_dir / f"{stem}_processed.png"
+            cv2.imwrite(str(proc_path), processed)
+            res.processed_path = str(proc_path)
+
+            # Comparison side-by-side
+            comp_img = self.create_comparison(original, processed)
+            comp_path = out_dir / f"{stem}_comparison.png"
+            cv2.imwrite(str(comp_path), comp_img)
+            res.comparison_path = str(comp_path)
+
+        # 2. Phase 5: Detection bounding-box overlay
+        if detections:
+            overlay_img = self.draw_detections(original, detections)
+            overlay_path = out_dir / f"{stem}_overlay.png"
+            cv2.imwrite(str(overlay_path), overlay_img)
+            res.overlay_path = str(overlay_path)
+
+        # 3. Phase 6: Heatmap / explainability overlay
+        if heatmap is not None:
+            heatmap_img = BaseHeatmapGenerator.create_overlay(original, heatmap)
+            heat_path = out_dir / f"{stem}_heatmap.png"
+            cv2.imwrite(str(heat_path), heatmap_img)
+            res.heatmap_path = str(heat_path)
+
+        return res

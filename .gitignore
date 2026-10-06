@@ -11,13 +11,22 @@ venv/
 .coverage
 htmlcov/
 
-# Pipeline generated outputs
-output/processed/*
-!output/processed/.gitkeep
-output/overlays/*
-!output/overlays/.gitkeep
-output/heatmaps/*
-!output/heatmaps/.gitkeep
-output/masks/*
-!output/masks/.gitkeep
+# Datasets and raw data (lives outside repository or large binaries)
+datasets/
+rsna_dataset/
+*.dcm
 
+# Model weights & training artifacts (large binaries)
+models/*.pt
+models/pneumonia_yolo/
+!models/README.md
+!models/.gitkeep
+yolo11n.pt
+*.pt
+runs/
+
+# Pipeline generated outputs
+output/*
+output/**/*
+!output/**/.gitkeep
+output/batch2_verification/

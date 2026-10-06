@@ -1,7 +1,8 @@
 """Dataset inspection and quality threshold calibration script.
 
-Given a folder of .dcm files, prints:
-- DICOM file count
+Given a folder or dataset directory, prints:
+- RSNA Annotation CSV summary (positive vs negative cases, bounding box counts)
+- DICOM file count and matching with labels
 - Size/resolution distribution
 - Bit-depth / dtype distribution
 - View positions (PA / AP)
@@ -27,35 +28,34 @@ if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
 import config
+from cv.dataset import RSNADatasetInspector
 from cv.image_loader import ImageLoader
 from cv.quality import QualityAnalyzer
 from cv.schemas import QualityLevel
 
 
 def inspect_dataset(target_dir: Path, max_samples: int | None = None) -> None:
-    """Inspect a directory of DICOM files and report metrics and quality distribution."""
+    """Inspect a directory of DICOM files and annotations, reporting completeness and quality."""
     target_dir = Path(target_dir)
-    print("=" * 65)
-    print(f"RSNA / DICOM DATASET INSPECTION & QUALITY CALIBRATION")
-    print(f"Target Directory: {target_dir.resolve()}")
-    print("=" * 65)
+
+    # 1. First run RSNA annotation & integrity inspection
+    ds_report = RSNADatasetInspector.inspect(target_dir)
+    print(ds_report.summary())
 
     if not target_dir.exists():
-        print(f"Error: Target directory does not exist: {target_dir}")
         return
 
-    # Find all .dcm files
+    # 2. Find all .dcm files for image quality calibration
     dcm_files = list(target_dir.glob("*.dcm"))
     if not dcm_files:
         dcm_files = list(target_dir.rglob("*.dcm"))
 
     if not dcm_files:
-        print(f"No .dcm files found in {target_dir}.")
-        print("Please specify a directory containing DICOM files or set DATASET_DIR.")
+        print("\nNo .dcm files found in target directory for image quality calibration.")
         return
 
     total_files = len(dcm_files)
-    print(f"Total DICOM files located: {total_files}")
+    print(f"\nEvaluating image quality on {total_files} DICOM files...")
 
     if max_samples and max_samples < total_files:
         print(f"Sampling {max_samples} files for evaluation...")
@@ -173,26 +173,16 @@ def inspect_dataset(target_dir: Path, max_samples: int | None = None) -> None:
             pct = (count / processed_count) * 100
             print(f"  - {issue}: {count} ({pct:.1f}%)")
 
-    print("\n--- 8. Threshold Calibration Analysis ---")
-    if good_pct > 95.0:
-        print("  [ALERT] Miscalibrated: Nearly all images (>95%) are classified as GOOD.")
-        print("  Recommendation: Raise blur or contrast thresholds or increase stringency.")
-    elif poor_pct > 90.0:
-        print("  [ALERT] Miscalibrated: Nearly all images (>90%) are classified as POOR.")
-        print("  Recommendation: Lower blur threshold or adjust exposure ranges.")
-    else:
-        print("  [SUCCESS] Thresholds appear well-calibrated across this sample set.")
-        print(f"  Distribution: {good_pct:.1f}% Good, {mod_pct:.1f}% Moderate, {poor_pct:.1f}% Poor.")
     print("=" * 65)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Inspect DICOM dataset and calibrate quality.")
+    parser = argparse.ArgumentParser(description="Inspect RSNA dataset and calibrate image quality.")
     parser.add_argument(
         "folder",
         nargs="?",
         default=None,
-        help="Folder containing .dcm files (default: DATASET_DIR or input/sample_images)",
+        help="Folder containing dataset (default: DATASET_DIR or input/sample_images)",
     )
     parser.add_argument(
         "--max-samples",

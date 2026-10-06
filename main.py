@@ -36,7 +36,7 @@ def main(argv: list[str] | None = None) -> int:
         print("No medical model loaded.")
 
     if args.image is None:
-        print("Phase 3 complete / Ready for Batch 2: Model Integration.")
+        print("Batch 2 active: Phases 1 through 6 initialized (Loading, Preprocessing, Quality, Model, Localization, Heatmap).")
         return 0
 
     result = pipeline.run(args.image)
@@ -45,7 +45,7 @@ def main(argv: list[str] | None = None) -> int:
         print(result.to_json())
         return 0 if result.status == AnalysisStatus.OK else 1
 
-    # Minimal human-readable summary
+    # Human-readable summary
     print(f"\nAnalysis Summary:")
     print(f"  Status       : {result.status.value.upper()}")
     if result.metadata:
@@ -67,20 +67,36 @@ def main(argv: list[str] | None = None) -> int:
         if q.issues:
             print(f"    - Issues   : {'; '.join(q.issues)}")
 
+    if result.model_loaded:
+        if result.detections:
+            print(f"  Detections   : {len(result.detections)} finding(s) identified")
+            for idx, det in enumerate(result.detections, start=1):
+                box_str = (
+                    f"[{det.bbox.x_min}, {det.bbox.y_min}, {det.bbox.x_max}, {det.bbox.y_max}]"
+                    if det.bbox else "None"
+                )
+                print(f"    - Finding {idx:02d}: {det.label} (Conf: {det.confidence * 100:.1f}%) | Original BBox: {box_str}")
+        else:
+            print("  Detections   : No model-detected abnormality above configured threshold.")
+    else:
+        print("  Model        : No medical model loaded (NullDetector).")
+
     if result.visualization:
         v = result.visualization
         if v.processed_path:
             print(f"  Processed img: {v.processed_path}")
         if v.comparison_path:
             print(f"  Comparison   : {v.comparison_path}")
+        if v.overlay_path:
+            print(f"  Overlay (BBox): {v.overlay_path}")
+        if v.heatmap_path:
+            print(f"  Heatmap      : {v.heatmap_path}")
 
     if result.warnings:
         print(f"  Warnings     : {'; '.join(result.warnings)}")
 
     if result.errors:
         print(f"  Errors       : {'; '.join(result.errors)}")
-
-    print("  Model        : No medical model loaded.")
 
     return 0 if result.status == AnalysisStatus.OK else 1
 

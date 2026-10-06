@@ -1,18 +1,29 @@
-"""Pipeline orchestration. Connects stages; contains no stage logic."""
+"""Pipeline orchestration for the Medical Computer Vision Engine (Batch 1 + Batch 2).
+
+Connects:
+Load (Phase 1)
+-> Validate (Phase 1)
+-> Quality (Phase 3 on original)
+-> Preprocess (Phase 2)
+-> Model Inference (Phase 4)
+-> Localization (Phase 5)
+-> Heatmap / Explainability (Phase 6)
+-> Visualization artifacts
+-> CVAnalysisResult
+"""
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Optional
-import cv2
 
 import config
-from cv.detector import BaseDetector, NullDetector
-from cv.heatmap import BaseHeatmapGenerator, NullHeatmapGenerator
+from cv.detector import BaseDetector, NullDetector, create_detector
+from cv.heatmap import BaseHeatmapGenerator, ModelHeatmapGenerator, NullHeatmapGenerator
 from cv.image_loader import ImageLoader
 from cv.localization import Localizer
 from cv.preprocessing import Preprocessor
 from cv.quality import QualityAnalyzer
-from cv.schemas import AnalysisStatus, CVAnalysisResult, VisualizationResult
+from cv.schemas import AnalysisStatus, CVAnalysisResult
 from cv.segmentation import BaseSegmenter, NullSegmenter
 from cv.validator import ImageValidator
 from cv.visualization import Visualizer
@@ -23,7 +34,7 @@ logger = get_logger("pipeline")
 
 
 class MedicalCVPipeline:
-    """load -> validate -> quality (on original) -> preprocess -> save outputs -> return CVAnalysisResult."""
+    """Orchestrates image intake, validation, quality, preprocessing, inference, and explainability."""
 
     def __init__(
         self,
@@ -38,11 +49,13 @@ class MedicalCVPipeline:
         self.validator = ImageValidator(app_config.validation)
         self.quality = QualityAnalyzer(app_config.quality)
         self.preprocessor = Preprocessor(app_config.preprocess)
-        # 2. Model inference (swappable, untouched in Batch 1)
-        self.detector: BaseDetector = detector or NullDetector()
-        # 3. Visual explainability
+        # 2. Model inference (Phase 4): auto-detect weights or safe NullDetector fallback
+        self.detector: BaseDetector = detector or create_detector(app_config.detector.model_path)
+        # 3. Visual explainability (Phases 5-6)
         self.localizer = Localizer()
-        self.heatmap = heatmap or NullHeatmapGenerator()
+        self.heatmap: BaseHeatmapGenerator = heatmap or (
+            ModelHeatmapGenerator(is_available=True) if self.detector.is_loaded else NullHeatmapGenerator()
+        )
         self.segmenter = segmenter or NullSegmenter()
         self.visualizer = Visualizer()
 
@@ -56,6 +69,7 @@ class MedicalCVPipeline:
             self.preprocessor,
             self.quality,
             self.detector,
+            self.localizer,
             self.visualizer,
         ):
             if not comp.ready:
@@ -63,14 +77,14 @@ class MedicalCVPipeline:
             logger.info("%s ready", comp.name)
 
     def run(self, image_path: Path | str, output_dir: Optional[Path | str] = None) -> CVAnalysisResult:
-        """Analyze one medical image through active pipeline phases 1-3.
+        """Analyze one medical image through active pipeline phases 1-6.
 
         Args:
             image_path: Path to input image or DICOM file.
             output_dir: Optional directory to save output artifacts (defaults to config.PROCESSED_DIR).
 
         Returns:
-            CVAnalysisResult containing metadata, quality evaluation, and visualization paths.
+            CVAnalysisResult containing metadata, quality evaluation, detections, and visualization paths.
         """
         path = Path(image_path)
         out_dir = Path(output_dir) if output_dir else config.PROCESSED_DIR
@@ -107,25 +121,47 @@ class MedicalCVPipeline:
             if quality_result.issues:
                 result.warnings.extend(quality_result.issues)
 
-            # 5. Phase 2: OpenCV Preprocessing
+            # 5. Phase 2: OpenCV Preprocessing (produces display uint8 + normalized float32 model input)
             preprocessed = self.preprocessor.preprocess(loaded.image)
 
-            # 6. Save visual artifacts (processed image and side-by-side comparison)
-            processed_file = out_dir / f"{path.stem}_processed.png"
-            cv2.imwrite(str(processed_file), preprocessed.image)
+            # 6. Phase 4: Model Inference
+            orig_size = (loaded.metadata.width, loaded.metadata.height)
+            raw_model_detections = []
+            if self.detector.is_loaded:
+                raw_model_detections = self.detector.predict(preprocessed.image)
+                result.model_loaded = True
+            else:
+                result.model_loaded = False
 
-            comparison_img = self.visualizer.create_comparison(loaded.image, preprocessed.image)
-            comparison_file = out_dir / f"{path.stem}_comparison.png"
-            cv2.imwrite(str(comparison_file), comparison_img)
+            # 7. Phase 5: Localization (map model-space boxes to original image coordinates)
+            if raw_model_detections:
+                localized_detections = self.localizer.localize(
+                    raw_model_detections, preprocessed.transform, orig_size
+                )
+            else:
+                localized_detections = []
 
-            result.visualization = VisualizationResult(
-                processed_path=str(processed_file),
-                comparison_path=str(comparison_file),
+            result.detections = localized_detections
+
+            # 8. Phase 6: Heatmap / Model-grounded explainability
+            aligned_heatmap = None
+            if self.heatmap.is_available and raw_model_detections:
+                model_heatmap = self.heatmap.generate(preprocessed.image, detections=raw_model_detections)
+                if model_heatmap is not None:
+                    aligned_heatmap = BaseHeatmapGenerator.align_to_original(
+                        model_heatmap, preprocessed.transform, orig_size
+                    )
+
+            # 9. Visualization: Render outputs (processed, comparison, detection overlay, heatmap)
+            vis_res = self.visualizer.render(
+                original=loaded.image,
+                processed=preprocessed.image,
+                detections=localized_detections,
+                heatmap=aligned_heatmap,
+                output_dir=out_dir,
+                stem=path.stem,
             )
-
-            # 7. Model inference placeholder (NullDetector, no predict called in Batch 1)
-            result.model_loaded = False
-            result.detections = []
+            result.visualization = vis_res
 
             result.status = AnalysisStatus.OK
             logger.info("Pipeline completed successfully for %s", path.name)
