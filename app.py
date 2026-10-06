@@ -52,14 +52,36 @@ def show_image(path: str | None, phase: int, text: str) -> None:
 
 pipeline = get_pipeline()
 
+def get_component_status(comp: Any) -> tuple[bool, str]:
+    """Safely determines the active status and display name for any pipeline component.
+
+    - Uses `is_available` when the component provides capability semantics (e.g. ModelHeatmapGenerator, BaseSegmenter).
+      1. ModelHeatmapGenerator correctly reflects whether the heatmap subsystem is available/initialized.
+      2. NullSegmenter correctly displays as unavailable (❌) rather than falsely claiming segmentation capability.
+    - Uses `ready` when the component exposes it (e.g. loader, validator, preprocessor, quality, detector, localizer, visualizer).
+    - Falls back to `is_loaded` for models or default True for fully-initialized components.
+    """
+    comp_name = getattr(comp, "name", type(comp).__name__)
+
+    if hasattr(comp, "is_available"):
+        is_ok = bool(comp.is_available)
+    elif hasattr(comp, "ready"):
+        is_ok = bool(comp.ready)
+    elif hasattr(comp, "is_loaded"):
+        is_ok = bool(comp.is_loaded)
+    else:
+        is_ok = True
+
+    return is_ok, comp_name
+
+
 # ---- Sidebar: status ------------------------------------------------------
 with st.sidebar:
     st.subheader("Pipeline")
     for comp in (pipeline.loader, pipeline.validator, pipeline.preprocessor,
                  pipeline.quality, pipeline.detector, pipeline.localizer,
                  pipeline.heatmap, pipeline.segmenter, pipeline.visualizer):
-        is_ready = getattr(comp, "ready", getattr(comp, "is_available", True))
-        comp_name = getattr(comp, "name", type(comp).__name__)
+        is_ready, comp_name = get_component_status(comp)
         st.write(f"{'✅' if is_ready else '❌'} {comp_name}")
     st.write(f"{'✅' if pipeline.detector.is_loaded else '⚪'} Medical model")
     st.divider()

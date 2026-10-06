@@ -24,10 +24,6 @@ class BaseHeatmapGenerator(ABC):
     name: str = "BaseHeatmapGenerator"
 
     @property
-    def ready(self) -> bool:
-        return True
-
-    @property
     def is_available(self) -> bool:
         return False
 
@@ -138,10 +134,6 @@ class NullHeatmapGenerator(BaseHeatmapGenerator):
     name: str = "Null Heatmap Generator"
 
     @property
-    def ready(self) -> bool:
-        return False
-
-    @property
     def is_available(self) -> bool:
         return False
 
@@ -166,10 +158,6 @@ class ModelHeatmapGenerator(BaseHeatmapGenerator):
 
     def __init__(self, is_available: bool = True) -> None:
         self._available = is_available
-
-    @property
-    def ready(self) -> bool:
-        return self._available
 
     @property
     def is_available(self) -> bool:
