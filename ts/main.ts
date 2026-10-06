@@ -147,6 +147,11 @@ export function initModals(): void {
           window.location.href = 'doctor-dashboard.html';
         }, 300);
       }
+      if (form.closest('#modal-patient-login')) {
+        setTimeout(() => {
+          window.location.href = 'patient-dashboard.html';
+        }, 300);
+      }
     });
   });
 }
