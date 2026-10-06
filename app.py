@@ -1,0 +1,138 @@
+"""Minimal Streamlit UI for the Medical CV engine (dev harness).
+
+    streamlit run app.py
+
+Reads only `CVAnalysisResult`; tabs fill in automatically as phases land.
+No logic from cv/ is duplicated here.
+"""
+from __future__ import annotations
+
+import tempfile
+from pathlib import Path
+
+import streamlit as st
+
+import config
+from cv.pipeline import MedicalCVPipeline
+
+PHASES = [
+    (0, "Project foundation", True),
+    (1, "Image loading + validation", False),
+    (2, "OpenCV preprocessing", False),
+    (3, "Image quality assessment", False),
+    (4, "Model integration", False),
+    (5, "Bounding-box localization", False),
+    (6, "Heatmap / Grad-CAM", False),
+    (7, "Segmentation", False),
+    (8, "Confidence + evidence", False),
+    (9, "Structured JSON output", False),
+]
+
+st.set_page_config(page_title=config.PROJECT_NAME, page_icon="🩻", layout="wide")
+
+
+@st.cache_resource
+def get_pipeline() -> MedicalCVPipeline:
+    pipeline = MedicalCVPipeline()
+    pipeline.initialize()
+    return pipeline
+
+
+def pending(phase: int, text: str) -> None:
+    st.caption(f"{text} — available in Phase {phase}.")
+
+
+def show_image(path: str | None, phase: int, text: str) -> None:
+    if path and Path(path).exists():
+        st.image(path, use_container_width=True)
+    else:
+        pending(phase, text)
+
+
+pipeline = get_pipeline()
+
+# ---- Sidebar: status ------------------------------------------------------
+with st.sidebar:
+    st.subheader("Pipeline")
+    for comp in (pipeline.loader, pipeline.validator, pipeline.preprocessor,
+                 pipeline.quality, pipeline.detector, pipeline.visualizer):
+        st.write(f"{'✅' if comp.ready else '❌'} {comp.name}")
+    st.write(f"{'✅' if pipeline.detector.is_loaded else '⚪'} Medical model")
+    st.divider()
+    st.subheader("Phases")
+    for num, name, done in PHASES:
+        st.write(f"{'✅' if done else '⬜'} {num}. {name}")
+
+# ---- Main -----------------------------------------------------------------
+st.title(config.PROJECT_NAME)
+st.caption(f"{config.PROJECT_ID} · standalone prototype")
+
+upload = st.file_uploader("Upload an X-ray",
+                          type=[e.lstrip(".") for e in config.SUPPORTED_EXTENSIONS])
+
+result = None
+notice = None
+if upload is not None and st.button("Analyze", type="primary"):
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / upload.name
+        path.write_bytes(upload.getvalue())
+        try:
+            result = pipeline.run(path)
+        except NotImplementedError as exc:
+            notice = str(exc)
+        except Exception as exc:  # surface errors in the UI, not a stack trace
+            st.error(str(exc))
+
+if notice:
+    st.info(f"Not implemented yet: {notice}")
+
+tabs = st.tabs(["Original", "Processed", "Quality", "Detections",
+                "Heatmap", "Segmentation", "JSON"])
+
+with tabs[0]:
+    if upload is not None:
+        st.image(upload, use_container_width=True)
+    else:
+        st.caption("Upload an image to begin.")
+
+with tabs[1]:
+    show_image(result.visualization.processed_path if result and result.visualization else None,
+               2, "Preprocessed image")
+
+with tabs[2]:
+    if result and result.quality:
+        q = result.quality
+        st.metric("Quality", q.level.value, f"score {q.score:.2f}")
+        cols = st.columns(4)
+        for col, (label, val) in zip(cols, [("Blur", q.blur), ("Brightness", q.brightness),
+                                            ("Contrast", q.contrast), ("Noise", q.noise)]):
+            col.metric(label, "—" if val is None else f"{val:.1f}")
+        for issue in q.issues:
+            st.warning(issue)
+    else:
+        pending(3, "Quality report")
+
+with tabs[3]:
+    if not pipeline.detector.is_loaded:
+        st.caption("No medical model loaded — detections available in Phase 4/5.")
+    elif result and result.detections:
+        st.dataframe([{"label": d.label, "confidence": round(d.confidence, 3)}
+                      for d in result.detections])
+        show_image(result.visualization.overlay_path if result.visualization else None,
+                   5, "Overlay")
+    else:
+        st.caption("No findings reported.")
+
+with tabs[4]:
+    show_image(result.visualization.heatmap_path if result and result.visualization else None,
+               6, "Heatmap")
+
+with tabs[5]:
+    show_image(result.visualization.mask_path if result and result.visualization else None,
+               7, "Segmentation mask")
+
+with tabs[6]:
+    if result:
+        st.json(result.to_dict())
+    else:
+        pending(9, "Structured JSON result")
