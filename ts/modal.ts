@@ -98,6 +98,11 @@ export function setupModals(): void {
       if (feedback) {
         feedback.style.display = 'block';
       }
+      if (form.closest('#modal-doctor-login')) {
+        setTimeout(() => {
+          window.location.href = 'doctor-dashboard.html';
+        }, 300);
+      }
     });
   });
 }
