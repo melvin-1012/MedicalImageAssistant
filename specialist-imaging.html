@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specialist Medical Imaging Intake &amp; AI Analysis — MediSight AI</title>
+  <meta name="description" content="MediSight AI Specialist Imaging Portal — Clinical image upload, modality selection, and assistive AI multimodal diagnostic analysis.">
+
+  <!-- Inter & JetBrains Mono Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Core & Dashboard Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/doctor-dashboard.css">
+</head>
+<body style="background-color: var(--color-bg-subtle);">
+
+  <!-- ======================================================================
+       SPECIALIST PORTAL NAVBAR
+       ====================================================================== -->
+  <header class="site-header" role="banner">
+    <div class="nav-container">
+
+      <!-- MediSight AI Logo / Brand -->
+      <a href="doctor-dashboard.html" class="brand-group" aria-label="Return to Doctor Dashboard">
+        <div class="brand-logo" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M2 12h20"></path>
+            <circle cx="12" cy="12" r="5" stroke-width="1.8" stroke-dasharray="2 2"></circle>
+          </svg>
+        </div>
+        <div class="brand-text-wrapper">
+          <div class="brand-name">MediSight <span>AI</span></div>
+          <span class="brand-subtext">Specialist Imaging Portal</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav aria-label="Specialist Portal Navigation">
+        <ul class="nav-links">
+          <li><a href="doctor-dashboard.html#patients" class="dash-nav-tab">Patients</a></li>
+          <li><a href="doctor-dashboard.html#patient-status" class="dash-nav-tab">Patient Status</a></li>
+          <li><a href="doctor-dashboard.html#reports" class="dash-nav-tab">Reports</a></li>
+          <li><a href="doctor-dashboard.html#profile" class="dash-nav-tab">Doctor Team</a></li>
+        </ul>
+      </nav>
+
+      <!-- Return to Doctor Dashboard Action -->
+      <div class="nav-actions">
+        <a href="doctor-dashboard.html" class="btn btn-outline btn-sm" title="Return to Doctor Clinical Workspace">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Doctor Dashboard
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ======================================================================
+       HEADER STRIP / CLINICAL CONTEXT
+       ====================================================================== -->
+  <section class="doctor-header-strip" aria-label="Specialist Workflow Header">
+    <div class="container doctor-header-container">
+      <div class="doctor-context-group">
+        <h1 class="doctor-context-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          Specialist / Medical Imaging Intake
+        </h1>
+        <p class="doctor-context-subtitle">
+          Multimodal Image Analysis &bull; AI Assisted Radiomics &bull; MediSight Diagnostic Cloud
+        </p>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+        <span class="badge badge-primary">
+          <span class="badge-dot" aria-hidden="true"></span>
+          AI Model v4.2 Ready
+        </span>
+        <span class="badge badge-teal">
+          DICOM Protocol 3.0
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       MAIN CONTENT: IMAGING WORKFLOW
+       ====================================================================== -->
+  <main class="dash-main-content">
+    <div class="container">
+
+      <div class="imaging-portal-container">
+
+        <!-- Top Breadcrumb & Switcher Strip -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: -0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--color-text-muted);">
+            <a href="doctor-dashboard.html#patients" style="color: var(--color-primary); font-weight: 500;">Patients</a>
+            <span>/</span>
+            <span>Refer to Specialist</span>
+            <span>/</span>
+            <span class="font-semibold text-main" id="breadcrumb-mrno">MR001 Imaging Intake</span>
+          </div>
+
+          <!-- Quick Patient Switcher -->
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="text-xs text-muted font-semibold uppercase">Switch Patient:</span>
+            <button type="button" class="btn btn-outline btn-xs btn-patient-switch" data-mrno="MR001">MR001</button>
+            <button type="button" class="btn btn-outline btn-xs btn-patient-switch" data-mrno="MR002">MR002</button>
+            <button type="button" class="btn btn-outline btn-xs btn-patient-switch" data-mrno="MR003">MR003</button>
+          </div>
+        </div>
+
+        <!-- 2-Column Clinical Grid: Left Patient Info Card | Right Imaging Intake -->
+        <div class="imaging-grid-layout">
+
+          <!-- Left Column: Patient Case Information Card -->
+          <div>
+            <div class="card-table-wrapper" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;">
+              <div style="display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;">
+                <div>
+                  <span class="badge badge-primary font-mono text-sm" id="patient-info-mrno">MR001</span>
+                  <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--color-text-main); margin: 0.5rem 0 0.15rem 0;" id="patient-info-name">
+                    Arun Kumar
+                  </h2>
+                  <p class="text-sm text-muted mb-0" id="patient-info-demographics">
+                    45 Y &bull; Male
+                  </p>
+                </div>
+                <span class="badge badge-warning" id="patient-info-status-badge">
+                  <span class="badge-dot"></span>
+                  <span id="patient-info-status-text">Pending</span>
+                </span>
+              </div>
+
+              <!-- Episode Details -->
+              <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                <div>
+                  <span class="text-xs font-bold text-muted uppercase">Reported Symptoms</span>
+                  <div style="margin-top: 0.2rem;">
+                    <span class="badge badge-subtle font-semibold" style="font-size: 0.9rem;" id="patient-info-symptoms">
+                      Chest pain
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <span class="text-xs font-bold text-muted uppercase">Investigation Status</span>
+                  <p class="text-sm text-main font-medium mb-0" style="margin-top: 0.2rem;" id="patient-info-investigation">
+                    Digital Chest Radiography (PA View) Indexed
+                  </p>
+                </div>
+
+                <div>
+                  <span class="text-xs font-bold text-muted uppercase">Assigned Specialist</span>
+                  <p class="text-sm text-primary font-semibold mb-0" style="margin-top: 0.2rem;" id="patient-info-specialist">
+                    Dr. Joseph (Cardiology)
+                  </p>
+                </div>
+
+                <div>
+                  <span class="text-xs font-bold text-muted uppercase">Clinical Notes</span>
+                  <div class="report-text-box text-sm" style="margin-top: 0.35rem; padding: 0.75rem 1rem; background: #f8fafc;" id="patient-info-notes">
+                    Patient presents with acute retrosternal chest pain radiating to left shoulder on moderate exertion. BP: 138/86 mmHg, Pulse: 82 bpm. Resting ECG shows sinus rhythm without acute ST changes.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Doctor Safety Reminder Card -->
+              <div style="background-color: #f0fdfa; border: 1px solid #99f6e4; border-radius: var(--radius-md); padding: 0.85rem 1rem; font-size: 0.8125rem; color: #115e59; line-height: 1.45;">
+                <strong style="display: block; margin-bottom: 0.2rem; color: #0f766e;">Clinical Decision Support Notice</strong>
+                AI analysis outputs provide preliminary radiomic patterns for attending physician review. Attending doctor holds final clinical sign-off authority.
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Upload Medical Image, Modality Selection, AI Submit & Results -->
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+            <!-- Intake Card -->
+            <div class="imaging-upload-card" id="imaging-intake-card">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;">
+                <div>
+                  <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--color-text-main); margin: 0;">
+                    Diagnostic Image Intake
+                  </h3>
+                  <p class="text-xs text-muted mb-0">Select imaging modality and upload clinical scan files</p>
+                </div>
+                <span class="badge badge-teal">Step 1 of 2</span>
+              </div>
+
+              <!-- 1. Select Imaging Modality -->
+              <div>
+                <label for="modality-select" style="display: block; font-size: 0.875rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 0.5rem;">
+                  Select Imaging Modality <span class="required-star">*</span>
+                </label>
+                <select id="modality-select" class="modality-select-styled" aria-label="Select Imaging Modality">
+                  <option value="XRay" selected>XRay</option>
+                  <option value="CT Scan">CT Scan</option>
+                  <option value="MRI">MRI</option>
+                </select>
+                <span class="text-xs text-muted" style="display: block; margin-top: 0.35rem;">
+                  Select the imaging technique: Digital Radiography (XRay), Computed Tomography (CT Scan), or Magnetic Resonance Imaging (MRI).
+                </span>
+              </div>
+
+              <!-- 2. Upload Medical Image Dropzone -->
+              <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 0.5rem;">
+                  Upload Medical Image <span class="required-star">*</span>
+                </label>
+
+                <!-- Hidden file input -->
+                <input type="file" id="image-file-input" accept="image/*,.dcm" style="display: none;" aria-label="File Upload Input">
+
+                <!-- Dropzone Area -->
+                <div class="imaging-dropzone" id="imaging-dropzone" tabindex="0" role="button" aria-label="Medical Image Upload Dropzone">
+                  <div class="imaging-dropzone-icon">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                  </div>
+                  <div>
+                    <strong style="color: var(--color-text-main); font-size: 0.95rem; display: block;">
+                      Drag &amp; drop medical scan here, or <span style="color: var(--color-primary); text-decoration: underline;">Browse Files</span>
+                    </strong>
+                    <span class="text-xs text-muted" style="display: block; margin-top: 0.25rem;">
+                      Supports DICOM (.dcm), JPG, PNG, TIFF &bull; Up to 50MB
+                    </span>
+                  </div>
+                </div>
+
+                <!-- One-Click Sample Button for Quick Demonstration -->
+                <div style="margin-top: 0.75rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                  <button type="button" class="btn btn-outline btn-xs" id="btn-load-sample-scan" style="font-size: 0.78rem;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    Load Sample Chest Radiography (Demo Scan)
+                  </button>
+                  <span class="text-xs text-muted font-mono" id="upload-status-label">No scan attached yet</span>
+                </div>
+
+                <!-- Image Preview Box -->
+                <div class="imaging-preview-box" id="imaging-preview-container" style="display: none; margin-top: 1rem;">
+                  <img id="imaging-preview-img" class="imaging-preview-img" src="" alt="Clinical Scan Preview">
+                  <div class="imaging-radar-line" id="preview-radar-line" style="display: none;"></div>
+                  <div style="position: absolute; bottom: 8px; left: 12px; background: rgba(0,0,0,0.7); color: #ffffff; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-family: monospace;" id="preview-tag-badge">
+                    DICOM VIEW READY
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Submit for AI Analysis Button -->
+              <div style="margin-top: 0.5rem; border-top: 1px solid var(--color-border); padding-top: 1.25rem;">
+                <button type="button" class="btn btn-primary btn-lg" id="btn-submit-ai" style="width: 100%; justify-content: center;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v20M2 12h20"></path>
+                    <circle cx="12" cy="12" r="5" stroke-width="1.8" stroke-dasharray="2 2"></circle>
+                  </svg>
+                  Submit for AI Analysis
+                </button>
+              </div>
+            </div>
+
+            <!-- 4. Processing State Card (Hidden initially) -->
+            <div class="ai-processing-card" id="ai-processing-state" style="display: none;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div class="spinner spinner-primary" style="width: 26px; height: 26px; border-width: 3px; border-color: rgba(56,189,248,0.2); border-top-color: #38bdf8;"></div>
+                  <h3 style="font-size: 1.2rem; font-weight: 700; color: #ffffff; margin: 0;">
+                    Image submitted for AI analysis
+                  </h3>
+                </div>
+                <span class="badge badge-teal font-mono text-xs">MediSight Bio-Vision</span>
+              </div>
+
+              <p style="color: #94a3b8; font-size: 0.9rem; margin: 0;">
+                Executing multimodal deep radiomic inference across thoracic feature maps...
+              </p>
+
+              <!-- Progress Bar -->
+              <div class="ai-progress-bar-wrap">
+                <div class="ai-progress-bar-fill" id="ai-progress-bar" style="width: 15%;"></div>
+              </div>
+
+              <!-- Micro Steps -->
+              <div style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.8125rem; color: #cbd5e1; font-family: monospace;">
+                <div id="step-1" style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="color: #38bdf8;">&bull;</span> Radiomic voxel calibration &amp; ROI spatial normalization
+                </div>
+                <div id="step-2" style="display: flex; align-items: center; gap: 0.5rem; color: #94a3b8;">
+                  <span>&bull;</span> Dense neural segmentation &amp; cardiothoracic ratio calculation
+                </div>
+                <div id="step-3" style="display: flex; align-items: center; gap: 0.5rem; color: #94a3b8;">
+                  <span>&bull;</span> Multimodal Bayesian confidence scoring &amp; report compilation
+                </div>
+              </div>
+            </div>
+
+            <!-- 5. Completed Result Card (Hidden initially) -->
+            <div class="ai-result-card" id="ai-result-state" style="display: none;">
+              <div style="display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+                <div>
+                  <span class="badge badge-success" style="font-size: 0.875rem; padding: 0.35rem 0.85rem; margin-bottom: 0.5rem;">
+                    <span class="badge-dot"></span>
+                    Analysis completed – Report generated
+                  </span>
+                  <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--color-text-main); margin: 0.25rem 0 0 0;" id="result-headline">
+                    AI Diagnostic Analysis Completed
+                  </h3>
+                </div>
+                <div style="text-align: right;">
+                  <span class="badge badge-primary font-mono" id="result-confidence-pill">Confidence: 88%</span>
+                  <div class="text-xs text-muted" style="margin-top: 0.25rem;">Physician Verification Required</div>
+                </div>
+              </div>
+
+              <!-- Result Overview Grid -->
+              <div class="report-findings-card">
+                <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--color-text-light); margin-bottom: 0.35rem;">
+                  Generated AI Findings Summary
+                </div>
+                <p class="font-semibold text-main mb-0" id="result-findings-text" style="line-height: 1.55;">
+                  &ldquo;Possible mild cardiomegaly with subtle perihilar vascular prominence. No acute pneumothorax or focal consolidations detected.&rdquo;
+                </p>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; font-size: 0.875rem;">
+                <div class="report-text-box" style="padding: 0.75rem 1rem;">
+                  <span class="text-xs font-bold text-muted uppercase display-block">Analyzed Modality</span>
+                  <strong class="text-primary font-mono" id="result-modality-text">XRay (Chest PA)</strong>
+                </div>
+                <div class="report-text-box" style="padding: 0.75rem 1rem;">
+                  <span class="text-xs font-bold text-muted uppercase display-block">Hospital Record Status</span>
+                  <strong class="text-success font-semibold">Completed</strong> (Synced to PACS)
+                </div>
+              </div>
+
+              <!-- Status Notification -->
+              <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 0.85rem 1.1rem; color: #166534; font-size: 0.875rem; display: flex; align-items: center; gap: 0.65rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink: 0;">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>
+                  Patient investigation status is now marked as <strong>Completed</strong>. Attending physicians can now review and approve the report in Doctor Workspace.
+                </span>
+              </div>
+
+              <!-- Actions -->
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; border-top: 1px solid var(--color-border); padding-top: 1.25rem;">
+                <button type="button" class="btn btn-outline-primary btn-md" id="btn-view-report-modal">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                  </svg>
+                  Download / View Analysis Report
+                </button>
+
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                  <a href="doctor-dashboard.html#patient-status" class="btn btn-teal btn-md" id="btn-goto-patient-status">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Check Patient Status
+                  </a>
+                  <a href="doctor-dashboard.html#reports" class="btn btn-primary btn-md" id="btn-goto-doctor-reports">
+                    Doctor Reports &amp; Sign-off &rarr;
+                  </a>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ======================================================================
+       PDF-STYLE ANALYSIS REPORT MODAL
+       ====================================================================== -->
+  <div class="modal-backdrop" id="report-preview-modal" aria-hidden="true" role="dialog" aria-modal="true" style="display: none;">
+    <div class="modal-dialog" style="max-width: 780px;">
+      <div class="clinical-report-sheet" style="padding: 2rem; border-radius: var(--radius-xl);">
+        
+        <!-- Header -->
+        <div class="report-letterhead" style="margin-bottom: 1.25rem;">
+          <div class="report-letterhead-left">
+            <div class="brand-group">
+              <div class="brand-logo" style="width: 32px; height: 32px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M12 2v20M2 12h20"></path>
+                  <circle cx="12" cy="12" r="5" stroke-width="1.8" stroke-dasharray="2 2"></circle>
+                </svg>
+              </div>
+              <div>
+                <div class="brand-name" style="font-size: 1.05rem;">MediSight <span>AI</span></div>
+                <div class="text-xs text-muted uppercase">Hospital Specialist Imaging Analysis</div>
+              </div>
+            </div>
+          </div>
+          <div class="report-letterhead-right">
+            <div class="font-mono text-sm font-bold text-primary" id="modal-report-ref">REPORT REF: REP-MR001-2026</div>
+            <div class="text-xs text-success font-semibold">ANALYSIS COMPLETED &bull; GENERATED</div>
+          </div>
+        </div>
+
+        <!-- Safety Notice -->
+        <div class="clinical-safety-alert-banner" role="alert" style="margin-bottom: 1.25rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <div>
+            <strong>AI Preliminary Analysis – Requires Physician Review</strong>
+            <p class="mb-0 text-sm">
+              This imaging report was compiled using MediSight Multimodal AI v4.2. Observations are assistive and must be clinically correlated and approved by attending medical personnel.
+            </p>
+          </div>
+        </div>
+
+        <!-- Demographics Grid -->
+        <div class="report-patient-meta-grid" style="margin-bottom: 1.25rem;">
+          <div class="meta-item">
+            <span class="meta-label">Patient Name</span>
+            <span class="meta-value font-bold" id="modal-patient-name">Arun Kumar</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">MR No</span>
+            <span class="meta-value font-mono font-bold text-primary" id="modal-patient-mrno">MR001</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Age / Gender</span>
+            <span class="meta-value" id="modal-patient-demographics">45 Y / Male</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Imaging Modality</span>
+            <span class="meta-value font-semibold text-primary" id="modal-patient-modality">XRay</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">AI Status</span>
+            <span class="meta-value"><span class="badge badge-teal">Report Generated</span></span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Clinical Status</span>
+            <span class="meta-value"><span class="badge badge-success">Completed</span></span>
+          </div>
+        </div>
+
+        <!-- Findings -->
+        <div class="report-section-block" style="margin-bottom: 1.25rem;">
+          <h4 class="report-section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            AI Observations &amp; Confidence Calibration
+          </h4>
+          <div class="report-findings-card">
+            <p class="font-semibold text-main mb-0" id="modal-patient-findings">
+              &ldquo;Possible mild cardiomegaly with subtle perihilar vascular prominence. No acute pneumothorax or focal consolidations detected.&rdquo;
+            </p>
+          </div>
+        </div>
+
+        <!-- Evidence -->
+        <div class="report-section-block" style="margin-bottom: 1.5rem;">
+          <h4 class="report-section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            Evidence &amp; Clinical Context
+          </h4>
+          <div class="report-text-box" id="modal-patient-evidence">
+            Cardiothoracic ratio calculated at ~0.52. Correlated with clinical presentation of exertional chest discomfort and borderline hypertension. Suggestive of early hypertensive cardiac strain.
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="report-footer-actions">
+          <button type="button" class="btn btn-outline" id="btn-modal-print-report" onclick="window.print()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            Print / Save PDF
+          </button>
+          <div style="display: flex; gap: 0.75rem;">
+            <button type="button" class="btn btn-outline" id="btn-close-modal-report">Close</button>
+            <a href="doctor-dashboard.html#reports" class="btn btn-primary" id="btn-modal-open-doctor-review">
+              Open in Doctor Final Review
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Footer -->
+  <footer class="site-footer" style="padding-top: 2rem; padding-bottom: 2rem;">
+    <div class="container">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div class="brand-group">
+          <div class="brand-logo" style="width: 26px; height: 26px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M12 2v20M2 12h20"></path>
+              <circle cx="12" cy="12" r="5" stroke-width="1.8" stroke-dasharray="2 2"></circle>
+            </svg>
+          </div>
+          <span style="color: #ffffff; font-weight: 700; font-size: 0.92rem;">MediSight AI</span>
+          <span style="color: #94a3b8; font-size: 0.8rem;">&bull; Specialist Imaging Portal</span>
+        </div>
+        <div style="font-size: 0.8125rem; color: #94a3b8;">
+          Clinical Decision Support System &bull; Version 1.0 &bull; Licensed Hospital Personnel Only
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/specialist-imaging.js"></script>
+</body>
+</html>

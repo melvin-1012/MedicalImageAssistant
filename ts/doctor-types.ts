@@ -1,11 +1,12 @@
 /**
- * MediSight AI - Doctor Dashboard Type Definitions
- * TypeScript interfaces and types for the clinical decision-support doctor dashboard.
+ * MediSight AI - Doctor Dashboard & Specialist Imaging Type Definitions
+ * TypeScript interfaces and types for the clinical decision-support doctor dashboard and specialist workflow.
  */
 
 export type PatientGender = 'Male' | 'Female' | 'Other';
 export type PatientInvestigationStatus = 'Pending' | 'Completed';
 export type DashboardTab = 'patients' | 'patient-status' | 'reports' | 'profile';
+export type ImagingModality = 'XRay' | 'CT Scan' | 'MRI';
 
 /** Basic patient summary record for the patient directory table */
 export interface PatientRecord {
@@ -27,7 +28,8 @@ export interface ClinicalReport {
   readonly patientName: string;
   readonly age: number;
   readonly gender: PatientGender;
-  readonly investigationType: string;
+  investigationType: string;
+  modality?: ImagingModality;
   aiPreliminaryReportStatus: string;
   doctorReviewStatus: string;
   finalReportStatus: string;
@@ -36,23 +38,26 @@ export interface ClinicalReport {
   readonly evidenceExplanation: string;
   doctorConclusion: string;
   medications: string;
+  recommendations?: string;
+  additionalNotes?: string;
+  reviewedBy?: string;
   isApproved: boolean;
+  isFinalSent?: boolean;
   approvalTimestamp?: string;
 }
 
-/** Doctor profile information model */
-export interface DoctorProfile {
+/** Team Doctor profile information model */
+export interface TeamDoctorProfile {
+  readonly id: string;
   readonly name: string;
-  readonly title: string;
-  readonly licenseNo: string;
+  readonly credentials: string;
+  readonly role: string;
   readonly department: string;
-  readonly hospital: string;
-  readonly email: string;
-  readonly phone: string;
-  readonly experienceYears: number;
   readonly specialization: string;
-  readonly consultationHours: string;
-  readonly verifiedStatus: boolean;
+  readonly licenseNo: string;
+  readonly experienceYears: number;
+  readonly avatarText: string;
+  readonly email: string;
 }
 
 /** Toast feedback alert model */
