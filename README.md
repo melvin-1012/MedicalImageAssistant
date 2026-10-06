@@ -17,15 +17,23 @@ The-Unscripted/
 │   ├── variables.css       # Clinical color palette, typography & design tokens
 │   ├── styles.css          # Layout grids, hero styling, responsive breakpoints
 │   └── components.css      # Navbar, medical HUD, feature cards, modals, footer
-├── js/
+├── js/                     # Preserved JavaScript runtime files
 │   ├── main.js             # Standalone application script & accessible modal handlers
 │   ├── data.js             # Clinical demo data model
 │   ├── modal.js            # Reusable modal manager
-│   └── app.js              # Modular ES6 entry point
+│   └── app.js              # Modular entry point
+├── ts/                     # Converted TypeScript source files
+│   ├── types.ts            # Type definitions & clinical data interfaces
+│   ├── data.ts             # Strongly-typed clinical demo dataset
+│   ├── modal.ts            # Strongly-typed accessible modal manager
+│   ├── app.ts              # Strongly-typed application logic & HUD interactions
+│   └── main.ts             # Strongly-typed standalone bundle
 ├── assets/
 │   └── images/
 │       ├── chest_xray.jpg  # Clinical chest radiograph (PA view)
 │       └── doctor_consultation.jpg # Clinical team consultation visual
+├── tsconfig.json           # TypeScript compiler configuration (strict mode)
+├── package.json            # NPM scripts & TypeScript development configuration
 ├── serve.py                # Lightweight development server (Python)
 └── README.md               # Documentation and future roadmap
 ```

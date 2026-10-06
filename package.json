@@ -1,0 +1,24 @@
+{
+  "name": "medisight-ai-hospital-system",
+  "version": "1.0.0",
+  "description": "MediSight AI — Multimodal Medical Image Intelligence Hospital System",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "type-check": "tsc --noEmit",
+    "serve": "python serve.py"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "keywords": [
+    "medical-imaging",
+    "hospital-system",
+    "multimodal-ai",
+    "clinical-decision-support",
+    "typescript"
+  ],
+  "author": "MediSight AI Team",
+  "license": "UNLICENSED"
+}
