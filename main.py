@@ -23,6 +23,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=config.PROJECT_NAME)
     parser.add_argument("image", nargs="?", type=Path, help="path to a medical image")
     parser.add_argument("--json", action="store_true", help="output full CVAnalysisResult JSON")
+    parser.add_argument("--genai", action="store_true", help="output CV -> GenAI handshake JSON schema")
     args = parser.parse_args(argv)
 
     print(f"{BAR}\n{config.PROJECT_NAME}\n{config.PROJECT_ID}\n{BAR}\n")
@@ -36,10 +37,14 @@ def main(argv: list[str] | None = None) -> int:
         print("No medical model loaded.")
 
     if args.image is None:
-        print("Batch 2 active: Phases 1 through 6 initialized (Loading, Preprocessing, Quality, Model, Localization, Heatmap).")
+        print("Batch 3 active: Phases 1 through 9 initialized (Loading, Preprocessing, Quality, Model, Localization, Heatmap, Segmentation, Confidence/Evidence, Structured JSON).")
         return 0
 
     result = pipeline.run(args.image)
+
+    if args.genai:
+        print(result.to_genai_json())
+        return 0 if result.status == AnalysisStatus.OK else 1
 
     if args.json:
         print(result.to_json())

@@ -23,9 +23,9 @@ PHASES = [
     (4, "Model integration", True),
     (5, "Bounding-box localization", True),
     (6, "Heatmap / Explainability", True),
-    (7, "Segmentation", False),
-    (8, "Confidence + evidence", False),
-    (9, "Structured JSON output", False),
+    (7, "Segmentation (Unavailable - BBoxes only)", True),
+    (8, "Confidence + evidence", True),
+    (9, "Structured JSON output", True),
 ]
 
 
@@ -56,8 +56,11 @@ pipeline = get_pipeline()
 with st.sidebar:
     st.subheader("Pipeline")
     for comp in (pipeline.loader, pipeline.validator, pipeline.preprocessor,
-                 pipeline.quality, pipeline.detector, pipeline.visualizer):
-        st.write(f"{'✅' if comp.ready else '❌'} {comp.name}")
+                 pipeline.quality, pipeline.detector, pipeline.localizer,
+                 pipeline.heatmap, pipeline.segmenter, pipeline.visualizer):
+        is_ready = getattr(comp, "ready", getattr(comp, "is_available", True))
+        comp_name = getattr(comp, "name", type(comp).__name__)
+        st.write(f"{'✅' if is_ready else '❌'} {comp_name}")
     st.write(f"{'✅' if pipeline.detector.is_loaded else '⚪'} Medical model")
     st.divider()
     st.subheader("Phases")
@@ -143,11 +146,19 @@ with tabs[4]:
                6, "Heatmap")
 
 with tabs[5]:
+    st.info(
+        "Pixel-level segmentation is unavailable because the RSNA Pneumonia Detection "
+        "Challenge dataset provides bounding-box annotations, not pixel-level masks. "
+        "The system explicitly declares segmentation unavailable rather than fabricating artificial masks."
+    )
     show_image(result.visualization.mask_path if result and result.visualization else None,
                7, "Segmentation mask")
 
 with tabs[6]:
     if result:
-        st.json(result.to_dict())
+        st.subheader("CV ➔ GenAI Handshake Schema (Phase 9)")
+        st.json(result.to_genai_dict())
+        with st.expander("Complete Internal Pipeline Result"):
+            st.json(result.to_dict())
     else:
         pending(9, "Structured JSON result")

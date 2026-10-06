@@ -186,4 +186,10 @@ class Visualizer:
             cv2.imwrite(str(heat_path), heatmap_img)
             res.heatmap_path = str(heat_path)
 
+        # 4. Phase 7: Segmentation mask (if available)
+        if mask is not None:
+            mask_path = out_dir / f"{stem}_mask.png"
+            cv2.imwrite(str(mask_path), mask)
+            res.mask_path = str(mask_path)
+
         return res

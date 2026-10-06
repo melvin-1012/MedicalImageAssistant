@@ -1,11 +1,11 @@
 # medical_cv — Medical Computer Vision Engine (HNX26PSI05)
 
 Standalone computer vision engine for **Multimodal Medical Image Intelligence** (Hackathon Project HNX26PSI05).
-Responsible strictly for medical image intake, decodability validation, quality assessment, OpenCV preprocessing, deep-learning abnormality detection, coordinate localization, and explainability heatmaps. Authentication, database, LLM orchestration, and frontend clinical UI are maintained separately.
+Responsible strictly for medical image intake, decodability validation, quality assessment, OpenCV preprocessing, deep-learning abnormality detection, coordinate localization, explainability heatmaps, segmentation handling, confidence/evidence preservation, and structured JSON contracts. Authentication, database, LLM orchestration, and frontend clinical UI are maintained separately.
 
 ---
 
-## Architecture & End-to-End Pipeline (Batch 1 + Batch 2)
+## Architecture & End-to-End Pipeline (Batch 1 + Batch 2 + Batch 3)
 
 ```
 Input Image (DICOM / PNG / JPG)
@@ -32,10 +32,13 @@ Input Image (DICOM / PNG / JPG)
 [Phase 6: HeatmapGenerator] ─► Model-grounded localization heatmap aligned to original scan
   │                            Returns None on zero detections (no fabricated overlays)
   ▼
-[Visualizer & Output] ───────► Saves original, processed, comparison, bbox overlay, heatmap
-  │
+[Phase 7: Segmenter] ────────► BaseSegmenter interface + NullSegmenter graceful fallback
+  │                            Distinguishes unavailable vs completed; no fake masks
   ▼
-[CVAnalysisResult] ──────────► Standardized JSON-serializable clinical data contract
+[Phase 8: Evidence Layer] ───► Preserves genuine CV confidence, orig coords, conservative labels
+  │                            Mandates physician review flag on all findings
+  ▼
+[Phase 9: Structured JSON] ──► Stable, deterministic CV → GenAI handshake JSON contract
 ```
 
 ---
@@ -50,20 +53,22 @@ Input Image (DICOM / PNG / JPG)
 | **Batch 2** | **Phase 4** | `dataset`, `detector` | **Complete** | RSNA dataset conversion, YOLO11n detector training on real RSNA data, `MedicalDetector` abstraction. |
 | | **Phase 5** | `localization`, `visualization`| **Complete** | Letterbox offset removal, coordinate restoration to original 1024x1024 space, amber bounding-box overlays. |
 | | **Phase 6** | `heatmap` | **Complete** | Model-grounded localization heatmap strictly tied to predictions, letterbox unpadding, no fake overlays. |
-| **Batch 3** | **Phase 7** | `segmentation` | Pending | Lung field and lesion anatomical segmentation. |
-| | **Phase 8** | `confidence` | Pending | Multi-evidence aggregation and uncertainty calibration. |
-| | **Phase 9** | `schemas` | Pending | Final structured clinical JSON schema delivery. |
+| **Batch 3** | **Phase 7** | `segmentation` | **Complete** | `BaseSegmenter` interface, `NullSegmenter` honest fallback (RSNA has no pixel masks), `MaskProcessor`. |
+| | **Phase 8** | `schemas` (Evidence) | **Complete** | Evidence preservation: genuine CV confidence, original DICOM $\{x_1, y_1, x_2, y_2\}$, physician review flag. |
+| | **Phase 9** | `schemas` (Contract) | **Complete** | Deterministic CV → GenAI handshake JSON contract (`to_genai_dict`, `to_genai_json`). |
 | **Batch 4** | **Phase 10**| `integration` | Pending | End-to-end web platform and external API integration. |
 
 ---
 
 ## Conventions & Medical Safety Standards
 
-- **Conservative Medical Terminology:** Findings are strictly designated `"Possible abnormal opacity"` rather than asserting diagnostic certainty ("Pneumonia confirmed").
+- **Conservative Medical Terminology:** Findings are strictly designated `"Possible abnormal opacity"` (`"possible_abnormal_opacity"`) rather than asserting diagnostic certainty ("Pneumonia confirmed").
+- **No Ground-Truth Fabrication:** The RSNA Pneumonia Detection Challenge provides bounding boxes, not pixel masks. We strictly report segmentation as unavailable (`segmentation_available: false`, `segmentation: null`) instead of rasterizing bounding boxes into fake masks.
 - **HIPAA / PHI De-identification:** The DICOM loader strictly strips all Protected Health Information (`PatientName`, `PatientID`, `PatientBirthDate`, `PatientAge`, `PatientSex`). `patientId` is used solely as a filename stem and is never logged.
 - **Image Immutability:** Input image arrays are **never modified in-place**. Every processing step creates an explicit, isolated copy.
-- **Path Handling:** All disk I/O uses `np.fromfile` + `cv2.imdecode` to guarantee Windows path compatibility (spaces and non-ASCII paths).
-- **Explainability Integrity:** Heatmaps are generated only when the model predicts actual candidate regions (`len(detections) > 0`). When zero detections exist, the heatmap generator returns `None`. We do not label bounding-box heatmaps as "Grad-CAM" because YOLO's anchor-free multi-scale detection head is mathematically incompatible with classification bottleneck Grad-CAM.
+- **Coordinate Space Authority:** Bounding boxes always refer to the **original** full-resolution DICOM coordinates ($1024 \times 1024$), never to resized or letterboxed model space.
+- **Confidence Authority:** Model confidences originate strictly from CV head predictions. Downstream LLMs/GenAI modules cannot alter coordinates or confidence values.
+- **Mandatory Physician Review:** Every finding sets `requires_physician_review: true` and `no_confirmed_diagnosis: true`.
 - **Non-Clinical Disclaimer:** This software is developed strictly for research and hackathon exploration (`HNX26PSI05`). It is **not** validated for clinical diagnostic use.
 
 ---
@@ -98,9 +103,6 @@ Input Image (DICOM / PNG / JPG)
   - Model-agnostic `MedicalDetector` interface (`load_model`, `predict`, `train`, `get_model_info`).
   - `YOLOMedicalDetector` implementing Ultralytics YOLO11n.
   - Auto-discovers weights from `models/model.pt` or falls back safely to `NullDetector`.
-- **Training Pipeline (`scripts/train_yolo.py`):**
-  - Fine-tunes YOLO on converted RSNA radiographs.
-  - Saves weights to `models/pneumonia_yolo/train_run/weights/best.pt` and deploys to `models/model.pt`.
 
 ### Phase 5: Bounding-Box Localization & Coordinate Restoration
 - **Localization Engine (`cv/localization.py`):**
@@ -118,6 +120,70 @@ Input Image (DICOM / PNG / JPG)
   - Blends `COLORMAP_JET` false-color overlay with original radiograph while maintaining anatomical visibility.
   - Returns `None` on scans with 0 detections.
 
+### Phase 7: Segmentation Interface & Graceful Fallback
+- **Interface & Alignment (`cv/segmentation.py`):**
+  - `BaseSegmenter`: Defines standard methods `segment()`, `is_available`, `ready`, and `align_to_original()`.
+  - `NullSegmenter`: Correctly and transparently declares `is_available = False` with clinical justification:
+    *"Pixel-level segmentation is unavailable because the RSNA dataset provides bounding-box annotations, not pixel-level masks."*
+  - `MaskProcessor`: Morphological opening/closing (`cv2.morphologyEx`), contour extraction (`cv2.findContours`), and pixel area calculation for future mask sources.
+
+### Phase 8: Confidence & Evidence Aggregation
+- **Evidence Layer (`cv/schemas.py`):**
+  - `FindingLocation`: Explicit $\{x_1, y_1, x_2, y_2\}$ pixel bounds in original radiograph space.
+  - `FindingEvidence`: Structured evidence container preserving:
+    - Genuine CV confidence directly from detector head
+    - Heatmap and segmentation availability flags
+    - Conservative label `"Possible abnormal opacity"`
+    - Mandatory `requires_physician_review = True`
+
+### Phase 9: Structured JSON Output (CV → GenAI Contract)
+- **Deterministic Serialization (`cv/schemas.py`):**
+  - `to_genai_dict()` and `to_genai_json()` implement the exact handshake contract consumed by the downstream GenAI module.
+  - Guaranteed fields: `image`, `quality`, `findings`, `artifacts`, `safety`.
+
+```json
+{
+  "image": {
+    "source": "datasets/rsna/stage_2_train_images/05212f46-32b5-4350-812b-2bab7509d93f.dcm",
+    "width": 1024,
+    "height": 1024,
+    "modality": "X-Ray"
+  },
+  "quality": {
+    "status": "GOOD",
+    "score": 1.0,
+    "issues": []
+  },
+  "findings": [
+    {
+      "finding": "possible_abnormal_opacity",
+      "finding_label": "Possible abnormal opacity",
+      "confidence": 0.018,
+      "location": {
+        "x1": 109.6,
+        "y1": 419.8,
+        "x2": 333.6,
+        "y2": 821.4
+      },
+      "heatmap_available": true,
+      "segmentation_available": false,
+      "requires_physician_review": true
+    }
+  ],
+  "artifacts": {
+    "original": "datasets/rsna/stage_2_train_images/05212f46-32b5-4350-812b-2bab7509d93f.dcm",
+    "processed": "output/processed/05212f46-32b5-4350-812b-2bab7509d93f_processed.png",
+    "detections": "output/processed/05212f46-32b5-4350-812b-2bab7509d93f_overlay.png",
+    "heatmap": "output/processed/05212f46-32b5-4350-812b-2bab7509d93f_heatmap.png",
+    "segmentation": null
+  },
+  "safety": {
+    "physician_review_required": true,
+    "no_confirmed_diagnosis": true
+  }
+}
+```
+
 ---
 
 ## Project Structure
@@ -125,13 +191,14 @@ Input Image (DICOM / PNG / JPG)
 ```
 medical_cv/
 ├── config.py                 # Central configuration constants and paths
-├── main.py                   # Command-line interface
-├── app.py                    # Streamlit web interface
+├── main.py                   # Command-line interface with --json and --genai
+├── app.py                    # Streamlit web interface (Phases 1-9 status & outputs)
 ├── requirements.txt          # Python dependencies
-├── .gitignore                # Git ignore rules
+├── .gitignore                # Git ignore rules (weights, data, caches excluded)
+├── README.md                 # Project architecture & documentation
 ├── cv/                       # Core CV engine
 │   ├── __init__.py
-│   ├── schemas.py            # Dataclasses & data contracts
+│   ├── schemas.py            # Dataclasses, FindingEvidence, CVAnalysisResult, GenAI contract
 │   ├── image_loader.py       # Phase 1: Image & DICOM loader + PHI scrubbing
 │   ├── validator.py          # Phase 1: Decodability & integrity validation
 │   ├── preprocessing.py      # Phase 2: Letterboxing, CLAHE, 8-bit scaling
@@ -141,13 +208,13 @@ medical_cv/
 │   ├── detector.py           # Phase 4: MedicalDetector & YOLOMedicalDetector
 │   ├── localization.py       # Phase 5: Bounding-box coordinate restoration
 │   ├── heatmap.py            # Phase 6: Model-grounded localization heatmaps
-│   ├── visualization.py      # Comparison, bounding box overlay & heatmap blending
-│   ├── segmentation.py       # Phase 7: Stubbed for Batch 3
+│   ├── visualization.py      # Phase 5/6: Overlays, heatmaps, mask blending
+│   ├── segmentation.py       # Phase 7: BaseSegmenter, NullSegmenter, MaskProcessor
 │   └── pipeline.py           # End-to-end orchestration pipeline
 ├── scripts/                  # Workflow scripts
 │   ├── prepare_yolo_dataset.py  # Convert RSNA DICOM to YOLO dataset
 │   ├── train_yolo.py            # Train YOLO detector on RSNA dataset
-│   └── verify_real_batch2.py    # Verify inference, localization & heatmaps on DICOMs
+│   └── verify_real_batch2.py    # Verify Batch 2 pipeline on DICOMs
 ├── models/                   # Model weight storage
 │   ├── README.md
 │   └── model.pt              # Trained real detector weights (excluded from git)
@@ -158,7 +225,7 @@ medical_cv/
 │   ├── overlays/
 │   ├── heatmaps/
 │   └── masks/
-└── tests/                    # Complete pytest suite (86 tests)
+└── tests/                    # Complete pytest suite (96 tests)
     ├── conftest.py
     ├── check_cuda.py
     ├── inspect_dataset.py
@@ -174,7 +241,8 @@ medical_cv/
     ├── test_heatmap.py
     ├── test_visualization.py
     ├── test_pipeline.py
-    └── test_pipeline_batch2.py
+    ├── test_pipeline_batch2.py
+    └── test_batch3.py        # Phase 7, 8, 9 unit & contract tests
 ```
 
 ---
@@ -185,7 +253,7 @@ medical_cv/
 ```bash
 python -m pytest tests/
 ```
-**86 unit tests passing (100% green)** covering:
+**96 unit tests passing (100% green)** covering:
 - DICOM loader edge cases, MONOCHROME inversion, bit-depth scaling, PHI scrubbing
 - Validator boundary conditions, blank/saturated rejection
 - Letterbox resizing, CLAHE preprocessing, and coordinate math
@@ -194,27 +262,23 @@ python -m pytest tests/
 - MedicalDetector lifecycle, NullDetector fallback, and YOLOMedicalDetector loading
 - Phase 5 localization, box clipping, and coordinate restoration
 - Phase 6 heatmap generation, letterbox unpadding, and overlay rendering
-- End-to-end pipeline execution with 0-detection, single-detection, and multi-detection findings
+- Phase 7 NullSegmenter, MaskProcessor, morphological operations, unpadding alignment
+- Phase 8 FindingEvidence, confidence preservation, original coordinate mapping
+- Phase 9 CV → GenAI handshake JSON contract, deterministic serialization, safety flags
 
-### 2. Run Batch 2 Verification Script
+### 2. Run Command-Line Interface (CLI)
 ```bash
-python scripts/verify_real_batch2.py
-```
-Executes real DICOM inference on positive and negative RSNA radiographs, verifies Phase 5 localization to original `1024x1024` space, generates Phase 6 model-grounded heatmaps, and writes visual artifacts and `verification_report.json` to `output/batch2_verification/`.
-
-### 3. Run Command-Line Interface (CLI)
-```bash
-# Display initialization status and active detector
-python main.py
-
 # Analyze a medical radiograph with terminal summary
-python main.py input/sample_images/sample_01.dcm
+python main.py datasets/rsna/stage_2_train_images/00436515-870c-4b36-a041-de91049b9ab4.dcm
 
-# Output structured JSON result
-python main.py input/sample_images/sample_01.dcm --json
+# Output standard JSON result
+python main.py datasets/rsna/stage_2_train_images/00436515-870c-4b36-a041-de91049b9ab4.dcm --json
+
+# Output structured CV -> GenAI handshake contract JSON
+python main.py datasets/rsna/stage_2_train_images/00436515-870c-4b36-a041-de91049b9ab4.dcm --genai
 ```
 
-### 4. Launch Development UI
+### 3. Launch Development UI
 ```bash
 streamlit run app.py
 ```
@@ -223,19 +287,5 @@ Interactive multi-tab interface:
 - **Quality Assessment:** Blur, brightness, contrast, and noise metrics with traffic-light status
 - **Detections:** Bounding box overlays on the original scan with confidence percentages
 - **Heatmap:** Model-grounded localization heatmap overlay
-- **Structured JSON:** Full clinical JSON data contract output
-
----
-
-## Real Model Training (Reproducibility)
-
-To reproduce the RSNA dataset conversion and YOLO model training:
-
-```bash
-# 1. Convert RSNA dataset to YOLO format (balanced cohort of 2,000 scans)
-python scripts/prepare_yolo_dataset.py --dataset-dir datasets/rsna --limit 2000
-
-# 2. Train YOLO detector
-python scripts/train_yolo.py --epochs 25 --batch 8 --imgsz 640
-```
-Trained weights are automatically saved to `models/pneumonia_yolo/train_run/weights/best.pt` and deployed to `models/model.pt`.
+- **Segmentation:** Phase 7 status & clinical rationale (reports honest unavailability)
+- **GenAI Handshake:** Full deterministic CV → GenAI JSON contract display
