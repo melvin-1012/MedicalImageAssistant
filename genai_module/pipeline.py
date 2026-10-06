@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 from typing import Dict, Any, Optional
 from .ai_response_schema import VisionModelOutput, GenAIInput
 from .notes_processor import NotesProcessor

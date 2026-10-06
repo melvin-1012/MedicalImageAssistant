@@ -5,8 +5,8 @@ from google.genai import types
 from tenacity import retry, stop_after_attempt, wait_exponential
 from .ai_response_schema import GenAIInput, AIAnalysisReport
 
-# Load environment variables
-load_dotenv()
+# Load environment variables explicitly from the genai_module folder
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 class ExplanationGenerator:
     def __init__(self):
