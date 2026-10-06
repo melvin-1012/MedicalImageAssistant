@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel, EmailStr
 from app.database import get_supabase, get_supabase_admin
+from app.dependencies import get_current_user, get_current_user_id
 
 router = APIRouter()
 
@@ -15,6 +16,44 @@ class SignUpRequest(BaseModel):
     password: str
     full_name: str
     role: str  # patient | doctor | specialist
+
+
+@router.get("/me")
+async def get_current_user_profile(
+    user_id: str = Depends(get_current_user_id),
+    user: dict = Depends(get_current_user),
+):
+    """Retrieve profile of the currently authenticated user."""
+    meta = user.get("user_metadata") or {}
+    role = meta.get("role", "patient")
+    email = user.get("email") or meta.get("email")
+    full_name = meta.get("full_name")
+
+    db = get_supabase_admin()
+    profile_table_id = None
+    try:
+        if role == "patient":
+            p = db.table("patients").select("id").eq("profile_id", user_id).single().execute()
+            if p.data:
+                profile_table_id = p.data["id"]
+        elif role == "doctor":
+            d = db.table("doctors").select("id").eq("profile_id", user_id).single().execute()
+            if d.data:
+                profile_table_id = d.data["id"]
+        elif role == "specialist":
+            s = db.table("specialists").select("id").eq("profile_id", user_id).single().execute()
+            if s.data:
+                profile_table_id = s.data["id"]
+    except Exception:
+        pass
+
+    return {
+        "id": user_id,
+        "role": role,
+        "full_name": full_name,
+        "email": email,
+        "profile_table_id": profile_table_id,
+    }
 
 
 @router.post("/login")

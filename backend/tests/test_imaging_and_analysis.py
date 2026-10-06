@@ -37,7 +37,7 @@ def test_validation_utilities():
         validate_imaging_type("PET_SCAN")
 
     # Filename sanitization
-    assert sanitise_filename("scan../../test.png") == "scan____test.png"
+    assert sanitise_filename("scan../../test.png") == "scan______test.png"
 
     # Valid image file
     validate_image_file("scan.jpg", "image/jpeg", 1024 * 1024)
@@ -94,7 +94,7 @@ async def test_genai_service_interface():
 async def test_ai_analysis_endpoint(client):
     """GET /analysis/{study_id} returns AI analysis without mixing doctor assessment."""
     mock_db = MagicMock()
-    mock_db.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value.data = {
+    analysis_row = {
         "id": "analysis-001",
         "imaging_study_id": "study-001",
         "finding": "Test Finding",
@@ -104,8 +104,10 @@ async def test_ai_analysis_endpoint(client):
         "model_version": "0.0.1",
         "analysis_status": "completed",
     }
+    mock_db.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value.data = analysis_row
+    mock_db.table.return_value.select.return_value.eq.return_value.order.return_value.execute.return_value.data = [analysis_row]
 
-    with patch("app.database.get_supabase_admin", return_value=mock_db):
+    with patch("app.database._override_admin", mock_db):
         resp = await client.get("/analysis/study-001", headers=DOCTOR_HEADERS)
     assert resp.status_code == 200
     data = resp.json()

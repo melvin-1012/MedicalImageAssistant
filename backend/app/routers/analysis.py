@@ -22,11 +22,19 @@ async def trigger_analysis(
     return {"message": "Analysis pipeline triggered", "study_id": study_id}
 
 
+@router.get("/{study_id}")
 @router.get("/{study_id}/results")
 async def get_analysis_results(study_id: str, user: dict = Depends(get_current_user)):
     """Get AI analysis results for a study."""
     db = get_supabase_admin()
-    resp = db.table("ai_analysis_results").select("*").eq("imaging_study_id", study_id).order("created_at", desc=True).limit(1).execute()
-    if not resp.data:
-        raise HTTPException(status_code=404, detail="Analysis results not found yet")
-    return resp.data[0]
+    resp = db.table("ai_analysis_results").select("*").eq("imaging_study_id", study_id).order("created_at", desc=True).execute()
+    if resp.data and isinstance(resp.data, list) and len(resp.data) > 0:
+        return resp.data[0]
+    elif resp.data and isinstance(resp.data, dict):
+        return resp.data
+
+    # Fallback to single lookup
+    single_resp = db.table("ai_analysis_results").select("*").eq("imaging_study_id", study_id).single().execute()
+    if single_resp.data:
+        return single_resp.data
+    raise HTTPException(status_code=404, detail="Analysis results not found yet")

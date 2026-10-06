@@ -9,6 +9,8 @@ import pytest
 import pytest_asyncio
 from unittest.mock import MagicMock, patch, AsyncMock
 from httpx import AsyncClient, ASGITransport
+import app.config
+import app.database
 
 # ── JWT helpers ─────────────────────────────────────────────────────────────
 
@@ -89,13 +91,24 @@ def mock_supabase():
     return client
 
 
+@pytest.fixture(autouse=True)
+def setup_mock_db(mock_supabase):
+    import app.database
+    app.database._override_admin = mock_supabase
+    app.database._override_client = mock_supabase
+    yield mock_supabase
+    app.database._override_admin = mock_supabase
+    app.database._override_client = mock_supabase
+
+
 @pytest_asyncio.fixture(scope="session")
 async def client(mock_settings, mock_supabase):
     """AsyncClient wired to the FastAPI app."""
-    with patch("app.database.get_supabase_admin", return_value=mock_supabase), \
-         patch("app.database.get_supabase", return_value=mock_supabase):
-        from app.main import app
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as ac:
-            yield ac
+    import app.database
+    app.database._override_admin = mock_supabase
+    app.database._override_client = mock_supabase
+    from app.main import app
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
+        yield ac
