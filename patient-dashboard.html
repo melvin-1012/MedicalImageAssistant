@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Patient Portal — MediSight AI Hospital Information System</title>
-  <meta name="description" content="MediSight AI Patient Health Portal — View clinical records, doctor-approved diagnostic reports, upcoming appointments, and care history.">
+  <meta name="description" content="MediSight AI Patient Portal — Book an Appointment, Records, Reports, and About Us.">
 
   <!-- Inter & JetBrains Mono Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,12 +21,13 @@
 <body class="patient-portal-body">
 
   <!-- ======================================================================
-       HEADER / NAVIGATION
+       HEADER / NAVBAR (STRICT: EXACTLY 4 TABS ONLY)
+       Book an Appointment | Records | Reports | About Us
        ====================================================================== -->
   <header class="site-header" role="banner">
     <div class="nav-container">
 
-      <!-- MediSight AI Logo / Brand -->
+      <!-- Existing Project Brand Logo -->
       <a href="index.html" class="brand-group" aria-label="Return to MediSight AI Landing Page">
         <div class="brand-logo" aria-hidden="true">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -36,37 +37,29 @@
         </div>
         <div class="brand-text-wrapper">
           <div class="brand-name">MediSight <span>AI</span></div>
-          <span class="brand-subtext">Patient Health Portal</span>
+          <span class="brand-subtext">Patient Portal</span>
         </div>
       </a>
 
-      <!-- Desktop Navigation Links -->
+      <!-- Desktop Navigation Links: EXACTLY THESE 4 TABS AND NOTHING ELSE -->
       <nav aria-label="Patient Portal Navigation">
         <ul class="nav-links">
-          <li><a href="#dashboard" class="patient-nav-link active" data-tab="dashboard">Dashboard</a></li>
-          <li><a href="#profile" class="patient-nav-link" data-tab="profile">My Profile</a></li>
-          <li><a href="#appointments" class="patient-nav-link" data-tab="appointments">Appointments</a></li>
-          <li><a href="#medical-records" class="patient-nav-link" data-tab="medical-records">Medical Records</a></li>
-          <li><a href="#investigations" class="patient-nav-link" data-tab="investigations">Investigations</a></li>
+          <li><a href="#book-appointment" class="patient-nav-link active" data-tab="book-appointment">Book an Appointment</a></li>
+          <li><a href="#records" class="patient-nav-link" data-tab="records">Records</a></li>
           <li><a href="#reports" class="patient-nav-link" data-tab="reports">Reports</a></li>
-          <li>
-            <a href="#notifications" class="patient-nav-link" data-tab="notifications">
-              Notifications
-              <span class="patient-tab-badge" id="nav-unread-badge">2</span>
-            </a>
-          </li>
+          <li><a href="#about-us" class="patient-nav-link" data-tab="about-us">About Us</a></li>
         </ul>
       </nav>
 
-      <!-- Right Side: Patient Profile & Logout -->
+      <!-- Right Side: Patient Identification Pill & Logout -->
       <div class="nav-actions">
-        <button type="button" class="doctor-profile-badge patient-nav-link" data-tab="profile" style="cursor: pointer; background: none;" title="View My Profile">
+        <div class="doctor-profile-badge" style="background: none;" title="Current Patient">
           <div class="doctor-avatar" style="background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);" aria-hidden="true">AK</div>
           <div class="doctor-profile-info" style="text-align: left;">
-            <span class="doctor-name" id="nav-patient-name">Arun Kumar</span>
+            <span class="doctor-name" id="header-patient-name">Arun Kumar</span>
             <span class="doctor-role-tag font-mono">MR001 &bull; Active Patient</span>
           </div>
-        </button>
+        </div>
 
         <button type="button" class="btn btn-outline btn-sm btn-patient-logout" title="Sign out of Patient Portal">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -78,8 +71,8 @@
         </button>
       </div>
 
-      <!-- Mobile Hamburger Menu Button -->
-      <button type="button" class="mobile-menu-btn" id="patient-mobile-toggle" aria-label="Toggle navigation drawer" aria-expanded="false">
+      <!-- Mobile Hamburger Menu Button (Existing Project Icon) -->
+      <button type="button" class="mobile-menu-btn" id="patient-mobile-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -89,16 +82,13 @@
 
     </div>
 
-    <!-- Mobile Drawer Panel -->
+    <!-- Mobile Navigation Drawer: EXACTLY THESE 4 TABS AND NOTHING ELSE -->
     <div class="mobile-nav-panel" id="patient-mobile-panel">
       <ul class="mobile-nav-links">
-        <li><a href="#dashboard" class="mobile-nav-link active" data-tab="dashboard">Dashboard</a></li>
-        <li><a href="#profile" class="mobile-nav-link" data-tab="profile">My Profile</a></li>
-        <li><a href="#appointments" class="mobile-nav-link" data-tab="appointments">Appointments</a></li>
-        <li><a href="#medical-records" class="mobile-nav-link" data-tab="medical-records">Medical Records</a></li>
-        <li><a href="#investigations" class="mobile-nav-link" data-tab="investigations">Investigations</a></li>
+        <li><a href="#book-appointment" class="mobile-nav-link active" data-tab="book-appointment">Book an Appointment</a></li>
+        <li><a href="#records" class="mobile-nav-link" data-tab="records">Records</a></li>
         <li><a href="#reports" class="mobile-nav-link" data-tab="reports">Reports</a></li>
-        <li><a href="#notifications" class="mobile-nav-link" data-tab="notifications">Notifications</a></li>
+        <li><a href="#about-us" class="mobile-nav-link" data-tab="about-us">About Us</a></li>
       </ul>
       <div class="mobile-nav-actions">
         <button type="button" class="btn btn-outline btn-patient-logout" style="width: 100%;">Logout</button>
@@ -109,589 +99,407 @@
   <!-- ======================================================================
        HEADER STRIP / PATIENT CONTEXT
        ====================================================================== -->
-  <section class="patient-header-strip" aria-label="Patient Welcome Header">
+  <section class="patient-header-strip" aria-label="Hospital Patient Header">
     <div class="container patient-header-container">
       <div>
         <h1 class="patient-welcome-title">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          Welcome back, <span id="welcome-patient-name">Arun Kumar</span>
+          MediSight Hospital Patient Portal
         </h1>
         <p class="patient-welcome-sub">
-          Here is an overview of your healthcare information.
+          Patient: <strong>Arun Kumar</strong> &bull; MR No: <span class="font-mono">MR001</span>
         </p>
       </div>
 
       <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-        <span class="badge badge-primary font-mono">MR No: MR001</span>
+        <span class="badge badge-primary font-mono">MR001</span>
         <span class="badge badge-teal">MediSight Memorial Hospital</span>
       </div>
     </div>
   </section>
 
   <!-- ======================================================================
-       STICKY SECONDARY NAVIGATION TABS
-       ====================================================================== -->
-  <nav class="patient-nav-bar" aria-label="Section Tabs">
-    <div class="container">
-      <div class="patient-tabs-list" role="tablist">
-        <button type="button" class="patient-tab-btn active" data-tab="dashboard" role="tab" aria-selected="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-          </svg>
-          Dashboard
-        </button>
-
-        <button type="button" class="patient-tab-btn" data-tab="profile" role="tab" aria-selected="false">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          My Profile
-        </button>
-
-        <button type="button" class="patient-tab-btn" data-tab="appointments" role="tab" aria-selected="false">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          Appointments
-        </button>
-
-        <button type="button" class="patient-tab-btn" data-tab="medical-records" role="tab" aria-selected="false">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-          </svg>
-          Medical Records
-        </button>
-
-        <button type="button" class="patient-tab-btn" data-tab="investigations" role="tab" aria-selected="false">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-            <line x1="8" y1="21" x2="16" y2="21"></line>
-            <line x1="12" y1="17" x2="12" y2="21"></line>
-          </svg>
-          Investigations
-        </button>
-
-        <button type="button" class="patient-tab-btn" data-tab="reports" role="tab" aria-selected="false">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-          </svg>
-          Reports
-        </button>
-
-        <button type="button" class="patient-tab-btn" data-tab="notifications" role="tab" aria-selected="false">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-          </svg>
-          Notifications
-          <span class="patient-tab-badge" id="tab-unread-badge">2</span>
-        </button>
-      </div>
-    </div>
-  </nav>
-
-  <!-- ======================================================================
-       MAIN CONTENT CONTAINER
+       MAIN CONTENT: STRICTLY THE 4 SECTIONS
+       1. Book an Appointment
+       2. Records
+       3. Reports
+       4. About Us
        ====================================================================== -->
   <main class="dash-main-content">
     <div class="container">
 
       <!-- ==================================================================
-           1. DASHBOARD / HOME VIEW
+           SECTION 1: BOOK AN APPOINTMENT
            ================================================================== -->
-      <section class="patient-view-panel active" id="view-dashboard" aria-labelledby="heading-dashboard">
-        
-        <!-- Summary Cards Grid -->
-        <div class="patient-summary-grid">
-          
-          <!-- Card 1: Upcoming Appointment -->
-          <div class="summary-card">
-            <div>
-              <div class="summary-card-header">
-                <div class="summary-card-icon primary">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg>
+      <section class="patient-view-panel active" id="view-book-appointment" aria-labelledby="heading-book-appointment">
+        <div class="booking-card-wrapper">
+          <div class="booking-card-header">
+            <h2 class="booking-card-title" id="heading-book-appointment">Book an Appointment</h2>
+            <p class="booking-card-sub">Please provide the necessary information below to book your consultation.</p>
+          </div>
+
+          <!-- Appointment Booking Form -->
+          <form id="appointment-booking-form">
+            <div class="booking-form-grid">
+              
+              <!-- 1. Patient Name -->
+              <div class="booking-form-group">
+                <label class="booking-label" for="booking-patient-name">Patient Name <span class="required-star">*</span></label>
+                <input type="text" class="booking-input" id="booking-patient-name" value="Arun Kumar" required placeholder="Enter full name">
+              </div>
+
+              <!-- 2. MR No. -->
+              <div class="booking-form-group">
+                <label class="booking-label" for="booking-mrno">MR No. <span class="required-star">*</span></label>
+                <input type="text" class="booking-input font-mono" id="booking-mrno" value="MR001" required placeholder="e.g. MR001">
+              </div>
+
+              <!-- 3. Age -->
+              <div class="booking-form-group">
+                <label class="booking-label" for="booking-age">Age <span class="required-star">*</span></label>
+                <input type="number" class="booking-input" id="booking-age" value="45" min="1" max="120" required placeholder="Age in years">
+              </div>
+
+              <!-- 4. Gender -->
+              <div class="booking-form-group">
+                <label class="booking-label" for="booking-gender">Gender <span class="required-star">*</span></label>
+                <select class="booking-select" id="booking-gender" required>
+                  <option value="Male" selected>Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <!-- 5. Contact Number -->
+              <div class="booking-form-group">
+                <label class="booking-label" for="booking-contact">Contact Number <span class="required-star">*</span></label>
+                <input type="tel" class="booking-input" id="booking-contact" value="+91 98451 23098" required placeholder="+91 XXXXX XXXXX">
+              </div>
+
+              <!-- 6. Preferred Date -->
+              <div class="booking-form-group">
+                <label class="booking-label" for="booking-date">Preferred Date <span class="required-star">*</span></label>
+                <input type="date" class="booking-input" id="booking-date" value="2026-10-14" required>
+              </div>
+
+              <!-- 7. Preferred Time -->
+              <div class="booking-form-group">
+                <label class="booking-label" for="booking-time">Preferred Time <span class="required-star">*</span></label>
+                <select class="booking-select" id="booking-time" required>
+                  <option value="09:30 AM">09:30 AM</option>
+                  <option value="10:30 AM" selected>10:30 AM</option>
+                  <option value="11:30 AM">11:30 AM</option>
+                  <option value="02:00 PM">02:00 PM</option>
+                  <option value="03:30 PM">03:30 PM</option>
+                  <option value="04:30 PM">04:30 PM</option>
+                </select>
+              </div>
+
+              <!-- 8. Department / Specialist -->
+              <div class="booking-form-group">
+                <label class="booking-label" for="booking-department">Department / Specialist <span class="required-star">*</span></label>
+                <select class="booking-select" id="booking-department" required>
+                  <option value="Dr. Joison, MD (Diagnostic Imaging &amp; Thoracic Medicine)" selected>Dr. Joison, MD — Diagnostic Imaging &amp; Thoracic</option>
+                  <option value="Dr. Melvin, MD (Pulmonary &amp; Respiratory Medicine)">Dr. Melvin, MD — Pulmonary &amp; Respiratory</option>
+                  <option value="Dr. Joseph, MD (Cardiovascular Medicine)">Dr. Joseph, MD — Cardiovascular Medicine</option>
+                  <option value="Dr. Ilakkiya, MD (Medical Intelligence &amp; Triage)">Dr. Ilakkiya, MD — Medical Intelligence &amp; Triage</option>
+                </select>
+              </div>
+
+              <!-- 9. Reason for Visit -->
+              <div class="booking-form-group booking-col-span-2">
+                <label class="booking-label" for="booking-reason">Reason for Visit <span class="required-star">*</span></label>
+                <input type="text" class="booking-input" id="booking-reason" value="Follow-up consultation regarding chest radiograph findings and medication review" required placeholder="State main purpose of visit">
+              </div>
+
+              <!-- 10. Symptoms / Additional Notes -->
+              <div class="booking-form-group booking-col-span-2">
+                <label class="booking-label" for="booking-notes">Symptoms / Additional Notes</label>
+                <textarea class="booking-textarea" id="booking-notes" rows="3" placeholder="Describe symptoms or clinical notes...">Occasional retrosternal discomfort on exertion. Currently adhering to prescribed medication regimen.</textarea>
+              </div>
+
+            </div>
+
+            <div class="booking-actions">
+              <button type="submit" class="btn btn-primary btn-lg" id="btn-submit-appointment">
+                Book Appointment
+              </button>
+            </div>
+          </form>
+
+          <!-- Booking Confirmation Message -->
+          <div class="booking-success-card" id="booking-success-message" style="display: none;">
+            <div class="booking-success-header">
+              <div>
+                <h3 style="color: #15803d; margin: 0 0 0.25rem 0; font-size: 1.15rem; font-weight: 700;">Appointment Booked Successfully!</h3>
+                <p class="text-sm mb-0" style="color: #15803d;">Your appointment has been registered in the hospital system.</p>
+              </div>
+            </div>
+
+            <div class="booking-summary-grid">
+              <div>
+                <span class="record-cell-label">Patient &bull; MR No</span>
+                <div class="record-cell-value font-semibold" id="success-patient-info">Arun Kumar (MR001)</div>
+              </div>
+              <div>
+                <span class="record-cell-label">Specialist</span>
+                <div class="record-cell-value font-semibold text-primary" id="success-specialist-info">Dr. Joison, MD</div>
+              </div>
+              <div>
+                <span class="record-cell-label">Date &amp; Time</span>
+                <div class="record-cell-value font-semibold" id="success-datetime-info">Oct 14, 2026 at 10:30 AM</div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+              <button type="button" class="btn btn-outline btn-sm" id="btn-book-another">Book Another Appointment</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           SECTION 2: RECORDS
+           Shows ONLY: Last Date of Visit | Patient Name | Previous Diagnosis
+           ================================================================== -->
+      <section class="patient-view-panel" id="view-records" aria-labelledby="heading-records">
+        <div class="records-card-wrapper">
+          <div class="booking-card-header">
+            <h2 class="booking-card-title" id="heading-records">Records</h2>
+            <p class="booking-card-sub">Summary of your previous hospital clinical diagnosis.</p>
+          </div>
+
+          <!-- Displays ONLY the 3 requested fields -->
+          <div class="records-table-grid">
+            <div class="record-row-card">
+              
+              <!-- 1. Last Date of Visit -->
+              <div>
+                <div class="record-cell-label">Last Date of Visit</div>
+                <div class="record-cell-value font-mono font-bold" id="records-last-visit-date">
+                  October 06, 2026
                 </div>
-                <span class="badge badge-primary">Next Visit</span>
               </div>
-              <h3 class="summary-card-title">Upcoming Appointment</h3>
-              <p class="summary-card-val" style="font-size: 1.15rem;">Dr. Joison, MD</p>
-              <div class="summary-card-sub">
-                Oct 12, 2026 &bull; 10:30 AM (OPD Rm 204)
-              </div>
-            </div>
-            <button type="button" class="summary-card-link patient-nav-link" data-tab="appointments">
-              View Appointments &rarr;
-            </button>
-          </div>
 
-          <!-- Card 2: Medical Records -->
-          <div class="summary-card">
-            <div>
-              <div class="summary-card-header">
-                <div class="summary-card-icon teal">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                  </svg>
+              <!-- 2. Patient Name -->
+              <div>
+                <div class="record-cell-label">Patient Name</div>
+                <div class="record-cell-value font-bold" id="records-patient-name">
+                  Arun Kumar
                 </div>
-                <span class="badge badge-teal">3 On File</span>
               </div>
-              <h3 class="summary-card-title">Medical Records</h3>
-              <p class="summary-card-val">3 Consultations</p>
-              <div class="summary-card-sub">
-                Latest: Thoracic Episode (Oct 06, 2026)
-              </div>
-            </div>
-            <button type="button" class="summary-card-link patient-nav-link" data-tab="medical-records">
-              Browse Medical Records &rarr;
-            </button>
-          </div>
 
-          <!-- Card 3: Investigations -->
-          <div class="summary-card">
-            <div>
-              <div class="summary-card-header">
-                <div class="summary-card-icon amber">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                    <line x1="8" y1="21" x2="16" y2="21"></line>
-                    <line x1="12" y1="17" x2="12" y2="21"></line>
-                  </svg>
-                </div>
-                <span class="badge badge-warning">2 Active</span>
-              </div>
-              <h3 class="summary-card-title">Investigations</h3>
-              <p class="summary-card-val">Digital Chest X-Ray</p>
-              <div class="summary-card-sub">
-                Completed &bull; High-res scan synced
-              </div>
-            </div>
-            <button type="button" class="summary-card-link patient-nav-link" data-tab="investigations">
-              Track Investigations &rarr;
-            </button>
-          </div>
-
-          <!-- Card 4: Reports -->
-          <div class="summary-card">
-            <div>
-              <div class="summary-card-header">
-                <div class="summary-card-icon purple">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                  </svg>
-                </div>
-                <span class="badge badge-success">Approved</span>
-              </div>
-              <h3 class="summary-card-title">Doctor-Approved Reports</h3>
-              <p class="summary-card-val" style="color: #16a34a;">1 Final Report</p>
-              <div class="summary-card-sub">
-                Signed off by Dr. Joison, MD
-              </div>
-            </div>
-            <button type="button" class="summary-card-link patient-nav-link" data-tab="reports">
-              View Doctor's Final Report &rarr;
-            </button>
-          </div>
-
-        </div>
-
-        <!-- Section 8: Care Journey Pathway (Visual Complete Patient Workflow Tracker) -->
-        <div class="care-journey-card">
-          <div class="care-journey-header">
-            <div>
-              <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--color-text-main); margin: 0 0 0.25rem 0;">
-                Your Clinical Care Pathway
-              </h3>
-              <p class="text-xs text-muted mb-0">
-                Visual tracker of your episode: from clinical triage and specialist imaging to doctor final approval.
-              </p>
-            </div>
-            <span class="badge badge-teal">
-              <span class="badge-dot"></span>
-              Doctor Sign-Off Completed
-            </span>
-          </div>
-
-          <!-- 7-Step Interactive Flow -->
-          <div class="care-journey-steps">
-            <div class="journey-step-box completed">
-              <div class="journey-step-num">✓</div>
-              <span class="journey-step-label">1. Health Concern</span>
-              <span class="journey-step-desc">Chest pain reported at triage</span>
-            </div>
-            <div class="journey-step-box completed">
-              <div class="journey-step-num">✓</div>
-              <span class="journey-step-label">2. Doctor Review</span>
-              <span class="journey-step-desc">Reviewed by Dr. Joison, MD</span>
-            </div>
-            <div class="journey-step-box completed">
-              <div class="journey-step-num">✓</div>
-              <span class="journey-step-label">3. Investigation</span>
-              <span class="journey-step-desc">Referred to Specialist</span>
-            </div>
-            <div class="journey-step-box completed">
-              <div class="journey-step-num">✓</div>
-              <span class="journey-step-label">4. Image Intake</span>
-              <span class="journey-step-desc">Chest Radiograph uploaded</span>
-            </div>
-            <div class="journey-step-box completed">
-              <div class="journey-step-num">✓</div>
-              <span class="journey-step-label">5. AI Analysis</span>
-              <span class="journey-step-desc">Assistive pattern generated</span>
-            </div>
-            <div class="journey-step-box completed">
-              <div class="journey-step-num">✓</div>
-              <span class="journey-step-label">6. Doctor Review</span>
-              <span class="journey-step-desc">Synthesized with prescriptions</span>
-            </div>
-            <div class="journey-step-box current">
-              <div class="journey-step-num">7</div>
-              <span class="journey-step-label">7. Final Report</span>
-              <span class="journey-step-desc">Approved &amp; available in portal</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Recent Activity Section -->
-        <div class="recent-activity-card">
-          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;">
-            <div>
-              <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--color-text-main); margin: 0 0 0.15rem 0;">
-                Recent Healthcare Activity
-              </h3>
-              <p class="text-xs text-muted mb-0">Timeline of updates, clinical reviews, and hospital orders</p>
-            </div>
-            <span class="text-xs text-muted font-mono">Real-time PACS Sync</span>
-          </div>
-
-          <div class="activity-timeline">
-            <div class="activity-item">
-              <div class="activity-icon" style="background-color: #dcfce7; color: #16a34a;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              </div>
-              <div class="activity-content">
-                <h4 class="activity-title">Doctor Approved Final Report Transmitted</h4>
-                <p class="activity-desc">Dr. Joison completed clinical review of your Digital Chest Radiography, added treatment conclusion and prescribed medications.</p>
-                <span class="activity-time">Today &bull; 14:45 IST</span>
-              </div>
-            </div>
-
-            <div class="activity-item">
-              <div class="activity-icon" style="background-color: #e0f2fe; color: #0284c7;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-              </div>
-              <div class="activity-content">
-                <h4 class="activity-title">Specialist Imaging Analysis Completed</h4>
-                <p class="activity-desc">Digital Chest Radiography (PA View) analyzed with MediSight AI assistance. Transmitted to attending doctor for verification.</p>
-                <span class="activity-time">Today &bull; 11:20 IST</span>
-              </div>
-            </div>
-
-            <div class="activity-item">
-              <div class="activity-icon" style="background-color: #fef3c7; color: #d97706;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-              </div>
-              <div class="activity-content">
-                <h4 class="activity-title">Follow-up Clinical Appointment Confirmed</h4>
-                <p class="activity-desc">Consultation booked with Dr. Joison, MD (Radiology &amp; Thoracic Medicine) for Oct 12, 2026 at 10:30 AM.</p>
-                <span class="activity-time">Yesterday &bull; 16:30 IST</span>
-              </div>
-            </div>
-
-            <div class="activity-item">
-              <div class="activity-icon" style="background-color: #f1f5f9; color: #475569;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-              </div>
-              <div class="activity-content">
-                <h4 class="activity-title">Episode Consultation Recorded</h4>
-                <p class="activity-desc">Clinical triage notes recorded for exertional chest discomfort episode. Vitals and resting ECG documented.</p>
-                <span class="activity-time">Oct 06, 2026 &bull; 09:15 IST</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- ==================================================================
-           2. MY PROFILE VIEW
-           ================================================================== -->
-      <section class="patient-view-panel" id="view-profile" aria-labelledby="heading-profile">
-        <div class="profile-grid-layout">
-          
-          <!-- Identity Summary Card -->
-          <div class="patient-identity-card">
-            <div class="patient-big-avatar" id="profile-avatar-letters">AK</div>
-            <div>
-              <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--color-text-main); margin: 0 0 0.25rem 0;" id="profile-display-name">
-                Arun Kumar
-              </h2>
-              <span class="badge badge-primary font-mono" id="profile-display-mrno">MR001</span>
-              <p class="text-sm text-muted" style="margin-top: 0.5rem;" id="profile-display-age-gender">
-                45 Years &bull; Male
-              </p>
-            </div>
-
-            <div style="width: 100%; border-top: 1px solid var(--color-border); padding-top: 1rem; text-align: left; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.85rem;">
+              <!-- 3. Previous Diagnosis (CLICKABLE -> Redirects to Reports Tab) -->
               <div>
-                <span class="text-xs font-bold text-muted uppercase">Primary Doctor</span>
-                <div class="font-semibold text-primary">Dr. Joison, MD</div>
+                <div class="record-cell-label">Previous Diagnosis</div>
+                <button type="button" class="clickable-diagnosis-btn" id="btn-diagnosis-link" title="Click to open medical report">
+                  <div class="clickable-diagnosis-title">
+                    <span id="records-diagnosis-text">Early Hypertensive Cardiac Strain</span>
+                    <span style="font-weight: 700; color: #0284c7; margin-left: 0.5rem;">&rarr;</span>
+                  </div>
+                  <div class="clickable-diagnosis-hint">
+                    Click to open Reports &rarr;
+                  </div>
+                </button>
               </div>
-              <div>
-                <span class="text-xs font-bold text-muted uppercase">Hospital</span>
-                <div>MediSight Memorial Hospital</div>
-              </div>
-              <div>
-                <span class="text-xs font-bold text-muted uppercase">Known Allergies</span>
-                <div class="text-danger font-medium">Penicillin, Dust mites</div>
-              </div>
+
             </div>
-
-            <button type="button" class="btn btn-outline-primary btn-sm" id="btn-edit-profile-open" style="width: 100%;">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              Edit Profile
-            </button>
-          </div>
-
-          <!-- Comprehensive Details Grid -->
-          <div class="patient-details-card">
-            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;">
-              <div>
-                <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--color-text-main); margin: 0 0 0.15rem 0;">
-                  Personal &amp; Emergency Information
-                </h3>
-                <p class="text-xs text-muted mb-0">Verified hospital electronic health record information</p>
-              </div>
-              <span class="badge badge-teal">Verified Patient</span>
-            </div>
-
-            <div class="profile-info-grid">
-              <div class="profile-info-item">
-                <span class="profile-info-label">Medical Record Number (MRN)</span>
-                <span class="profile-info-val font-mono text-primary" id="prof-val-mrno">MR001</span>
-              </div>
-
-              <div class="profile-info-item">
-                <span class="profile-info-label">Full Name</span>
-                <span class="profile-info-val" id="prof-val-name">Arun Kumar</span>
-              </div>
-
-              <div class="profile-info-item">
-                <span class="profile-info-label">Age &amp; Gender</span>
-                <span class="profile-info-val" id="prof-val-age-gender">45 / Male</span>
-              </div>
-
-              <div class="profile-info-item">
-                <span class="profile-info-label">Blood Group</span>
-                <span class="profile-info-val font-mono" id="prof-val-blood">O+ Positive</span>
-              </div>
-
-              <div class="profile-info-item">
-                <span class="profile-info-label">Phone Number</span>
-                <span class="profile-info-val" id="prof-val-phone">+91 98451 23098</span>
-              </div>
-
-              <div class="profile-info-item">
-                <span class="profile-info-label">Email Address</span>
-                <span class="profile-info-val text-xs" id="prof-val-email">arun.kumar@gmail.com</span>
-              </div>
-
-              <div class="profile-info-item col-span-2">
-                <span class="profile-info-label">Emergency Contact</span>
-                <span class="profile-info-val" id="prof-val-emergency">Sunita Kumar (Spouse) &bull; +91 98451 23099</span>
-              </div>
-
-              <div class="profile-info-item col-span-2">
-                <span class="profile-info-label">Residential Address</span>
-                <span class="profile-info-val" id="prof-val-address">#42, 4th Cross, Indiranagar, Bengaluru, Karnataka 560038</span>
-              </div>
-            </div>
-
-            <!-- Privacy & Health Records Security Note -->
-            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 1rem; margin-top: 1.5rem; display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.8125rem; color: var(--color-text-muted);">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              <div>
-                <strong>Healthcare Privacy Protected:</strong> Your medical records and imaging investigations are encrypted end-to-end and stored according to hospital data protection guidelines.
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ==================================================================
-           3. APPOINTMENTS VIEW
-           ================================================================== -->
-      <section class="patient-view-panel" id="view-appointments" aria-labelledby="heading-appointments">
-        <div class="appointments-card-wrapper">
-          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--color-border); padding-bottom: 1.25rem;">
-            <div>
-              <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--color-text-main); margin: 0 0 0.15rem 0;">
-                Clinical Consultations &amp; Appointments
-              </h2>
-              <p class="text-xs text-muted mb-0">View scheduled doctor visits, follow-up evaluations, and booking history</p>
-            </div>
-            <button type="button" class="btn btn-primary" id="btn-book-appointment-open">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              Book an Appointment
-            </button>
-          </div>
-
-          <!-- Appointments Grid Container -->
-          <div class="appointment-items-grid" id="appointments-list-container">
-            <!-- Dynamically populated by patient-dashboard.js -->
           </div>
         </div>
       </section>
 
       <!-- ==================================================================
-           4. MEDICAL RECORDS VIEW
-           ================================================================== -->
-      <section class="patient-view-panel" id="view-medical-records" aria-labelledby="heading-medical-records">
-        <div class="card-table-wrapper" style="padding: 1.75rem;">
-          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--color-border); padding-bottom: 1.25rem; margin-bottom: 1.5rem;">
-            <div>
-              <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--color-text-main); margin: 0 0 0.15rem 0;">
-                Patient Medical Records &amp; Clinical Episodes
-              </h2>
-              <p class="text-xs text-muted mb-0">Physician consultation summaries, diagnostic notes, and verified prescriptions</p>
-            </div>
-            <span class="badge badge-teal">3 Episodes Documented</span>
-          </div>
-
-          <!-- Clinical Safety Notice -->
-          <div class="clinical-safety-alert-banner" style="margin-bottom: 1.5rem;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-              <line x1="12" y1="9" x2="12" y2="13"></line>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-            <div>
-              <strong>Medical Records Policy</strong>
-              <p class="mb-0 text-sm">
-                Diagnostic formulations reflect clinical physician evaluations. AI imaging outputs are assistive preliminary references and are never presented as confirmed medical diagnoses.
-              </p>
-            </div>
-          </div>
-
-          <!-- Medical Records List -->
-          <div class="medical-records-container" id="medical-records-list-container">
-            <!-- Dynamically populated by patient-dashboard.js -->
-          </div>
-        </div>
-      </section>
-
-      <!-- ==================================================================
-           5. INVESTIGATIONS VIEW
-           ================================================================== -->
-      <section class="patient-view-panel" id="view-investigations" aria-labelledby="heading-investigations">
-        <div class="investigations-table-card">
-          <div class="card-table-header">
-            <div>
-              <h2 class="table-header-title">Diagnostic Investigations</h2>
-              <p class="table-header-sub">Radiological scans and laboratory tests ordered by attending physicians</p>
-            </div>
-            <span class="badge badge-primary">Hospital Radiology &bull; PACS Synced</span>
-          </div>
-
-          <div class="table-responsive">
-            <table class="clinical-table">
-              <thead>
-                <tr>
-                  <th>Investigation Name</th>
-                  <th>MR No</th>
-                  <th>Requested By</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                  <th class="text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody id="investigations-tbody">
-                <!-- Dynamically populated by patient-dashboard.js -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ==================================================================
-           6. REPORTS VIEW (DOCTOR-APPROVED FINAL REPORTS)
+           SECTION 3: REPORTS
+           Initially without diagnosis; later displays Doctor's Comments,
+           Diagnosis, Medications, Recommendations.
            ================================================================== -->
       <section class="patient-view-panel" id="view-reports" aria-labelledby="heading-reports">
-        <div class="patient-reports-container">
+        <div class="reports-card-wrapper">
           
-          <!-- Search & Filter Bar -->
-          <div class="report-search-bar">
-            <div class="report-search-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input type="text" id="patient-report-search" placeholder="Search by MR No, report name (e.g. Chest X-Ray), or date..." value="MR001">
+          <!-- Mode Switcher: Demonstrates Initial Report (Without Diagnosis) vs Doctor-Provided Report -->
+          <div class="report-state-toggle-bar">
+            <div>
+              <span class="text-xs font-bold text-muted uppercase display-block">Report State:</span>
+              <span class="text-xs text-muted" id="report-mode-caption">Initial report without diagnosis (awaiting physician review).</span>
+            </div>
+            <div class="report-state-btn-group">
+              <button type="button" class="report-state-btn active" id="btn-toggle-initial-report">
+                Initial Report (Without Diagnosis)
+              </button>
+              <button type="button" class="report-state-btn" id="btn-toggle-doctor-report">
+                Doctor-Provided Report (With Diagnosis)
+              </button>
+            </div>
+          </div>
+
+          <!-- Medical Report Sheet -->
+          <div class="clinical-report-sheet" id="patient-report-sheet-container">
+            
+            <!-- Letterhead -->
+            <div class="report-letterhead">
+              <div class="report-letterhead-left">
+                <div class="brand-group">
+                  <div class="brand-logo" style="width: 34px; height: 34px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <path d="M12 2v20M2 12h20"></path>
+                      <circle cx="12" cy="12" r="5" stroke-width="1.8" stroke-dasharray="2 2"></circle>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="brand-name" style="font-size: 1.1rem;">MediSight <span>AI</span></div>
+                    <div class="text-xs text-muted uppercase">Medical Investigation Report</div>
+                  </div>
+                </div>
+              </div>
+              <div class="report-letterhead-right">
+                <div class="font-mono text-sm font-bold text-primary">REPORT REF: REP-MR001-2026</div>
+                <div id="report-header-status-badge">
+                  <!-- Injected by patient-dashboard.js -->
+                </div>
+              </div>
             </div>
 
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-              <button type="button" class="btn btn-outline btn-sm btn-report-filter active" data-filter="all">All Reports</button>
-              <button type="button" class="btn btn-outline btn-sm btn-report-filter" data-filter="approved">Doctor Approved</button>
+            <!-- Basic Report Information -->
+            <div class="report-patient-meta-grid" style="margin-bottom: 1.5rem;">
+              <div class="meta-item">
+                <span class="meta-label">Patient Name</span>
+                <span class="meta-value font-bold" id="rep-meta-name">Arun Kumar</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">MR No.</span>
+                <span class="meta-value font-mono font-bold text-primary" id="rep-meta-mrno">MR001</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Age / Gender</span>
+                <span class="meta-value" id="rep-meta-age-gender">45 Y / Male</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Investigation Type</span>
+                <span class="meta-value font-semibold text-primary" id="rep-meta-investigation">Digital Chest Radiography (PA View)</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Investigation Date</span>
+                <span class="meta-value font-mono" id="rep-meta-date">October 06, 2026</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Attending Doctor</span>
+                <span class="meta-value font-medium" id="rep-meta-doctor">Dr. Joison, MD</span>
+              </div>
             </div>
-          </div>
 
-          <!-- Report Cards List -->
-          <div id="patient-reports-list">
-            <!-- Dynamically populated by patient-dashboard.js -->
-          </div>
+            <!-- Dynamic Doctor Content Area: Initial (Without Diagnosis) OR Doctor-Provided -->
+            <div id="report-dynamic-content-area">
+              <!-- Dynamically populated: Doctor's Comments, Diagnosis, Medications, Recommendations -->
+            </div>
 
-          <!-- PDF Style Viewer Container (Patient View) -->
-          <div id="patient-report-viewer-wrapper" style="margin-top: 1rem;">
-            <!-- Rendered by patient-dashboard.js -->
           </div>
-
         </div>
       </section>
 
       <!-- ==================================================================
-           7. NOTIFICATIONS VIEW
+           SECTION 4: ABOUT US
+           Shows ONLY: Contact Information | Hospital History | Terms & Conditions | Basic Hospital Info
            ================================================================== -->
-      <section class="patient-view-panel" id="view-notifications" aria-labelledby="heading-notifications">
-        <div class="notifications-card">
-          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 1.25rem;">
-            <div>
-              <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--color-text-main); margin: 0 0 0.15rem 0;">
-                Notifications &amp; Clinical Alerts
-              </h2>
-              <p class="text-xs text-muted mb-0">Stay updated on report approvals, investigation results, and appointments</p>
+      <section class="patient-view-panel" id="view-about-us" aria-labelledby="heading-about-us">
+        <div class="about-us-container">
+
+          <!-- 1. Hospital History -->
+          <div class="about-card">
+            <div class="about-card-header">
+              <div>
+                <h2 class="about-card-title" id="heading-about-us">Hospital History</h2>
+                <span class="text-xs text-muted">MediSight Memorial Hospital &bull; Established 2012</span>
+              </div>
             </div>
-            <button type="button" class="btn btn-outline btn-sm" id="btn-mark-all-read">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              Mark All as Read
-            </button>
+            <div style="font-size: 0.9375rem; line-height: 1.65; color: var(--color-text-muted);">
+              <p style="margin: 0;">
+                Founded in 2012, <strong>MediSight Memorial Hospital</strong> is a leading multi-specialty healthcare institution dedicated to excellence in diagnostic imaging, thoracic medicine, and cardiovascular therapeutics. Our mission is to provide evidence-backed, compassionate healthcare supported by advanced clinical decision-support systems.
+              </p>
+            </div>
           </div>
 
-          <div class="notification-list" id="notifications-list-container">
-            <!-- Dynamically populated by patient-dashboard.js -->
+          <!-- 2. Contact Information -->
+          <div class="about-card">
+            <div class="about-card-header">
+              <div>
+                <h3 class="about-card-title">Contact Information</h3>
+                <span class="text-xs text-muted">Emergency helpline, outpatient desk, and hospital location</span>
+              </div>
+            </div>
+
+            <div class="about-contact-grid">
+              <div class="about-contact-item">
+                <span class="about-contact-label">Emergency 24/7 Helpline</span>
+                <span class="about-contact-value text-danger font-mono font-bold">+91 80 4920 0000 / 1066</span>
+              </div>
+
+              <div class="about-contact-item">
+                <span class="about-contact-label">Outpatient Consultation Desk</span>
+                <span class="about-contact-value font-mono">+91 80 4920 1100</span>
+              </div>
+
+              <div class="about-contact-item">
+                <span class="about-contact-label">Hospital Address</span>
+                <span class="about-contact-value" style="font-size: 0.88rem;">
+                  #100, MediSight Healthcare Boulevard, Indiranagar, Bengaluru, Karnataka 560038
+                </span>
+              </div>
+
+              <div class="about-contact-item">
+                <span class="about-contact-label">Email Address</span>
+                <span class="about-contact-value text-primary font-mono text-xs">
+                  patientcare@medisight.health
+                </span>
+              </div>
+            </div>
           </div>
+
+          <!-- 3. Terms & Conditions -->
+          <div class="about-card">
+            <div class="about-card-header">
+              <div>
+                <h3 class="about-card-title">Terms &amp; Conditions</h3>
+                <span class="text-xs text-muted">Patient rights and hospital policies</span>
+              </div>
+            </div>
+
+            <div style="font-size: 0.9rem; line-height: 1.6; color: var(--color-text-muted); display: flex; flex-direction: column; gap: 0.65rem;">
+              <div>
+                <strong style="color: var(--color-text-main);">Patient Care Rights:</strong>
+                <p style="margin: 0.15rem 0 0 0;">Patients are entitled to complete clinical information, informed consent, and confidential handling of all medical records.</p>
+              </div>
+              <div>
+                <strong style="color: var(--color-text-main);">Medical Records Confidentiality:</strong>
+                <p style="margin: 0.15rem 0 0 0;">Hospital records and diagnostic imaging files are stored securely in compliance with healthcare data protection standards.</p>
+              </div>
+              <div>
+                <strong style="color: var(--color-text-main);">Appointment Policies:</strong>
+                <p style="margin: 0.15rem 0 0 0;">Consultation slots are reserved for 30 minutes from the scheduled time. Cancellations should be notified at least 2 hours in advance.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Basic Hospital Information -->
+          <div class="about-card">
+            <div class="about-card-header">
+              <div>
+                <h3 class="about-card-title">Basic Hospital Information</h3>
+                <span class="text-xs text-muted">Accreditations and facility details</span>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; font-size: 0.88rem;">
+              <div style="background: #f8fafc; padding: 0.85rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                <strong class="text-main" style="display: block; margin-bottom: 0.2rem;">Accreditations</strong>
+                <span class="text-muted text-xs">Accredited by NABH (National Accreditation Board for Hospitals) &amp; NABL Certified Laboratories.</span>
+              </div>
+              <div style="background: #f8fafc; padding: 0.85rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                <strong class="text-main" style="display: block; margin-bottom: 0.2rem;">Hospital Facilities</strong>
+                <span class="text-muted text-xs">24/7 Level-1 Emergency, Multislice CT, 3T MRI, and Digital Radiography suites integrated with PACS.</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -699,116 +507,7 @@
   </main>
 
   <!-- ======================================================================
-       MODAL: EDIT PROFILE
-       ====================================================================== -->
-  <div class="modal-backdrop" id="modal-edit-profile" aria-hidden="true" role="dialog" aria-modal="true" style="display: none;">
-    <div class="modal-dialog" style="max-width: 540px;">
-      <div class="card-table-wrapper" style="padding: 1.75rem;">
-        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem; margin-bottom: 1.25rem;">
-          <h3 style="font-size: 1.2rem; font-weight: 700; margin: 0;">Edit Patient Profile</h3>
-          <button type="button" class="modal-close-btn" id="btn-close-edit-profile" aria-label="Close dialog">&times;</button>
-        </div>
-
-        <form id="form-edit-profile">
-          <div class="form-group">
-            <label class="form-label" for="edit-name">Patient Name</label>
-            <input type="text" class="form-input" id="edit-name" value="Arun Kumar" required>
-          </div>
-          <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-            <div>
-              <label class="form-label" for="edit-phone">Phone Number</label>
-              <input type="text" class="form-input" id="edit-phone" value="+91 98451 23098" required>
-            </div>
-            <div>
-              <label class="form-label" for="edit-email">Email Address</label>
-              <input type="email" class="form-input" id="edit-email" value="arun.kumar@gmail.com" required>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="edit-emergency">Emergency Contact</label>
-            <input type="text" class="form-input" id="edit-emergency" value="Sunita Kumar (Spouse) - +91 98451 23099" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="edit-address">Residential Address</label>
-            <textarea class="form-input" id="edit-address" rows="2" required>#42, 4th Cross, Indiranagar, Bengaluru, Karnataka 560038</textarea>
-          </div>
-          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem;">
-            <button type="button" class="btn btn-outline" id="btn-cancel-edit-profile">Cancel</button>
-            <button type="submit" class="btn btn-primary">Save Profile Changes</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- ======================================================================
-       MODAL: BOOK AN APPOINTMENT
-       ====================================================================== -->
-  <div class="modal-backdrop" id="modal-book-appointment" aria-hidden="true" role="dialog" aria-modal="true" style="display: none;">
-    <div class="modal-dialog" style="max-width: 560px;">
-      <div class="card-table-wrapper" style="padding: 1.75rem;">
-        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem; margin-bottom: 1.25rem;">
-          <div>
-            <h3 style="font-size: 1.2rem; font-weight: 700; margin: 0;">Book a Clinical Appointment</h3>
-            <p class="text-xs text-muted mb-0">Schedule an outpatient consultation with a MediSight doctor</p>
-          </div>
-          <button type="button" class="modal-close-btn" id="btn-close-book-appointment" aria-label="Close dialog">&times;</button>
-        </div>
-
-        <form id="form-book-appointment">
-          <div class="form-group">
-            <label class="form-label" for="book-doctor">Select Physician <span class="required-star">*</span></label>
-            <select class="form-select" id="book-doctor" required>
-              <option value="Dr. Joison, MD (Chief Medical Officer &amp; Radiologist)">Dr. Joison, MD — Diagnostic Imaging &amp; Thoracic</option>
-              <option value="Dr. Melvin, MD (Consultant Pulmonologist)">Dr. Melvin, MD — Pulmonary &amp; Critical Care</option>
-              <option value="Dr. Joseph, MD (Consultant Cardiologist)">Dr. Joseph, MD — Cardiovascular Medicine</option>
-              <option value="Dr. Ilakkiya, MD (Clinical AI Specialist)">Dr. Ilakkiya, MD — Medical Intelligence &amp; Triage</option>
-            </select>
-          </div>
-
-          <div class="form-group" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.75rem;">
-            <div>
-              <label class="form-label" for="book-date">Preferred Date <span class="required-star">*</span></label>
-              <input type="date" class="form-input" id="book-date" value="2026-10-15" required>
-            </div>
-            <div>
-              <label class="form-label" for="book-time">Time Slot <span class="required-star">*</span></label>
-              <select class="form-select" id="book-time" required>
-                <option value="09:30 AM">09:30 AM</option>
-                <option value="10:30 AM" selected>10:30 AM</option>
-                <option value="02:00 PM">02:00 PM</option>
-                <option value="04:30 PM">04:30 PM</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="book-reason">Reason for Visit <span class="required-star">*</span></label>
-            <textarea class="form-input" id="book-reason" rows="2" placeholder="Describe symptoms or reason for follow-up consultation..." required>Follow-up clinical consultation regarding chest radiograph findings and medication review.</textarea>
-          </div>
-
-          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem;">
-            <button type="button" class="btn btn-outline" id="btn-cancel-book-appointment">Cancel</button>
-            <button type="submit" class="btn btn-primary">Confirm Appointment</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- ======================================================================
-       MODAL: FULL REPORT VIEWER DIALOG
-       ====================================================================== -->
-  <div class="modal-backdrop" id="modal-report-dialog" aria-hidden="true" role="dialog" aria-modal="true" style="display: none;">
-    <div class="modal-dialog" style="max-width: 820px;">
-      <div id="modal-report-dialog-content">
-        <!-- Rendered by patient-dashboard.js -->
-      </div>
-    </div>
-  </div>
-
-  <!-- ======================================================================
-       TOAST NOTIFICATIONS
+       TOAST NOTIFICATIONS CONTAINER
        ====================================================================== -->
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
@@ -826,10 +525,10 @@
             </svg>
           </div>
           <span style="color: #ffffff; font-weight: 700; font-size: 0.92rem;">MediSight AI</span>
-          <span style="color: #94a3b8; font-size: 0.8rem;">&bull; Patient Health Portal</span>
+          <span style="color: #94a3b8; font-size: 0.8rem;">&bull; Patient Portal</span>
         </div>
         <div style="font-size: 0.8125rem; color: #94a3b8;">
-          Clinical Decision Support System &bull; Version 1.0 &bull; Patient Care Network
+          Clinical Decision Support System &bull; Version 1.0 &bull; Licensed Hospital Personnel Only
         </div>
       </div>
     </div>
