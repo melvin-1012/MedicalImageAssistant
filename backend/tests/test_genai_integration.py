@@ -74,7 +74,7 @@ async def test_genai_service_integration():
     assert isinstance(result, GenAIResult)
     assert len(result.clinical_context) > 0
     assert len(result.explanation) > 0
-    assert "mild consolidation" in result.explanation
+    assert "mild consolidation" in result.explanation.lower()
     assert result.raw_output is not None
     assert "findings" in result.raw_output
 

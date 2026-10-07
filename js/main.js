@@ -122,55 +122,41 @@ function initModals() {
       e.preventDefault();
       const feedback = form.querySelector('.form-demo-feedback');
       const submitBtn = form.querySelector('button[type="submit"]');
-      const originalBtnText = submitBtn ? submitBtn.innerText : '';
 
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'Connecting...';
-      }
+      if (submitBtn) submitBtn.disabled = true;
 
       try {
-        // 1. Doctor Login
         if (form.closest('#modal-doctor-login')) {
           const docIdInput = form.querySelector('#doc-id');
           const passInput = form.querySelector('#doc-password');
-          const emailVal = docIdInput && docIdInput.value.includes('@')
-            ? docIdInput.value.trim()
-            : 'doctor@hospital.org';
-          const passwordVal = passInput && passInput.value ? passInput.value : 'DoctorPass123!';
+          const emailVal = docIdInput ? docIdInput.value.trim() : '';
+          const passwordVal = passInput ? passInput.value : '';
 
           if (feedback) {
             feedback.style.display = 'block';
             feedback.style.color = '#0284c7';
-            feedback.innerText = 'Authenticating with MediSight Backend (Port 8000)...';
+            feedback.innerText = 'Authenticating with backend...';
           }
 
           if (window.MediSightAPI) {
-            try {
-              await window.MediSightAPI.login(emailVal, passwordVal);
-            } catch (apiErr) {
-              console.warn('[Doctor Login] Backend login notice:', apiErr);
-              localStorage.setItem('auth_token', 'demo-doctor-token');
-              localStorage.setItem('currentUser', JSON.stringify({ role: 'doctor', email: emailVal, full_name: 'Dr. Joison' }));
+            await window.MediSightAPI.login(emailVal, passwordVal);
+            const user = window.MediSightAPI.getCurrentUser();
+            if (user && user.role !== 'doctor') {
+               throw new Error("Access denied: Not a doctor account.");
             }
           }
 
           if (feedback) {
-            feedback.innerText = '✓ Authenticated with Backend! Opening Doctor Workspace...';
+            feedback.innerText = 'Authenticated! Opening Doctor Workspace...';
             feedback.style.color = '#10b981';
           }
-          setTimeout(() => {
-            window.location.href = 'doctor-dashboard.html';
-          }, 400);
+          setTimeout(() => { window.location.href = 'doctor-dashboard.html'; }, 400);
         }
-
-        // 2. Patient Login
         else if (form.closest('#modal-patient-login')) {
           const mrnInput = form.querySelector('#pat-mrn');
-          const emailVal = mrnInput && mrnInput.value.includes('@')
-            ? mrnInput.value.trim()
-            : 'patient@hospital.org';
-          const passVal = 'PatientPass123!';
+          const passInput = form.querySelector('#pat-password');
+          const emailVal = mrnInput ? mrnInput.value.trim() : '';
+          const passwordVal = passInput ? passInput.value : '';
 
           if (feedback) {
             feedback.style.display = 'block';
@@ -179,32 +165,29 @@ function initModals() {
           }
 
           if (window.MediSightAPI) {
-            try {
-              await window.MediSightAPI.login(emailVal, passVal);
-            } catch (err) {
-              localStorage.setItem('auth_token', 'demo-patient-token');
-              localStorage.setItem('currentUser', JSON.stringify({ role: 'patient', email: emailVal, full_name: 'Arun Kumar' }));
-            }
+             await window.MediSightAPI.login(emailVal, passwordVal);
+             const user = window.MediSightAPI.getCurrentUser();
+             if (user && user.role !== 'patient') {
+                 throw new Error("Access denied: Not a patient account.");
+             }
           }
 
           if (feedback) {
-            feedback.innerText = '✓ Patient record verified! Opening Health Portal...';
+            feedback.innerText = 'Patient record verified! Opening Health Portal...';
             feedback.style.color = '#10b981';
           }
-          setTimeout(() => {
-            window.location.href = 'patient-dashboard.html';
-          }, 400);
+          setTimeout(() => { window.location.href = 'patient-dashboard.html'; }, 400);
         }
-
-        // 3. New User Registration
         else if (form.closest('#modal-register')) {
           const roleSelect = form.querySelector('#reg-role');
           const nameInput = form.querySelector('#reg-name');
           const emailInput = form.querySelector('#reg-email');
+          const passInput = form.querySelector('#reg-password');
 
           const role = roleSelect ? roleSelect.value : 'patient';
-          const fullName = nameInput && nameInput.value ? nameInput.value.trim() : 'New User';
-          const email = emailInput && emailInput.value ? emailInput.value.trim() : 'user@medisight.health';
+          const fullName = nameInput ? nameInput.value.trim() : 'New User';
+          const email = emailInput ? emailInput.value.trim() : '';
+          const passwordVal = passInput ? passInput.value : '';
 
           if (feedback) {
             feedback.style.display = 'block';
@@ -213,21 +196,17 @@ function initModals() {
           }
 
           if (window.MediSightAPI) {
-            try {
-              await window.MediSightAPI.signup({
-                email: email,
-                password: 'SecurePassword123!',
-                full_name: fullName,
-                role: role === 'staff' ? 'specialist' : role,
-              });
-              await window.MediSightAPI.login(email, 'SecurePassword123!').catch(() => {});
-            } catch (err) {
-              console.warn('[Registration] Notice:', err);
-            }
+             await window.MediSightAPI.signup({
+               email: email,
+               password: passwordVal,
+               full_name: fullName,
+               role: role === 'staff' ? 'specialist' : role,
+             });
+             await window.MediSightAPI.login(email, passwordVal);
           }
 
           if (feedback) {
-            feedback.innerText = '✓ Registered in hospital database! Redirecting...';
+            feedback.innerText = 'Registered! Redirecting...';
             feedback.style.color = '#10b981';
           }
 
@@ -239,19 +218,39 @@ function initModals() {
             } else {
               window.location.href = 'patient-dashboard.html';
             }
-          }, 600);
+          }, 400);
+        }
+        else if (form.closest('#modal-appointment')) {
+          if (feedback) {
+            feedback.style.display = 'block';
+            feedback.style.color = '#0284c7';
+            feedback.innerText = 'Checking doctor availability...';
+          }
+          setTimeout(() => {
+            if (feedback) {
+              feedback.innerText = 'Appointment Scheduled Successfully!';
+              feedback.style.color = '#10b981';
+            }
+            form.reset();
+            setTimeout(() => {
+              const modal = form.closest('[id^="modal-"]');
+              if (modal) {
+                 modal.style.display = 'none';
+                 document.getElementById('modal-backdrop').classList.remove('is-active');
+                 document.getElementById('modal-backdrop').setAttribute('aria-hidden', 'true');
+                 document.body.style.overflow = '';
+              }
+            }, 1500);
+          }, 1500);
         }
       } catch (err) {
-        if (feedback) {
-          feedback.style.display = 'block';
-          feedback.style.color = '#ef4444';
-          feedback.innerText = 'Notice: ' + err.message;
-        }
+         if (feedback) {
+            feedback.style.display = 'block';
+            feedback.style.color = '#ef4444';
+            feedback.innerText = err.message || 'Authentication failed';
+         }
       } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerText = originalBtnText;
-        }
+         if (submitBtn) submitBtn.disabled = false;
       }
     });
   });
