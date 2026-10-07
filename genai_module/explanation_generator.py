@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
-from google import genai
-from google.genai import types
+import instructor
+from groq import Groq
 from tenacity import retry, stop_after_attempt, wait_exponential
 from .ai_response_schema import GenAIInput, AIAnalysisReport
 
@@ -10,21 +10,25 @@ load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 class ExplanationGenerator:
     def __init__(self):
-        # Initialize the Gemini client explicitly with the API key from the environment
-        self.client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
-        # We use a model that supports structured outputs well.
-        self.model_name = 'gemini-3.8-flash'
+        # Initialize Groq client with Instructor for Pydantic support
+        api_key = os.environ.get("GROQ_API_KEY")
+        if not api_key:
+            raise ValueError("Missing GROQ_API_KEY in environment.")
+            
+        self.client = instructor.from_groq(Groq(api_key=api_key), mode=instructor.Mode.TOOLS)
+        # We use llama3-70b for advanced medical reasoning
+        self.model_name = 'llama3-70b-8192'
         
         self.system_instruction = """
 You are a medical AI assistant designed to help doctors interpret medical imaging results alongside patient clinical notes.
 Your primary task is to combine the vision model's findings with the patient's context to provide an evidence-grounded explanation.
 
-CRITICAL RULES:
-1. You are a decision-support tool. Never confirm a diagnosis.
-2. Do not invent, guess, or hallucinate findings, bounding boxes, or confidence scores.
-3. Only use the scores, regions, and findings provided in the vision model output.
-4. If the vision model status is 'poor_quality' or 'unsupported', explain that the image cannot be analyzed reliably.
-5. Use cautious language (e.g., "The model identified a possible finding...", "Clinical correlation is required").
+STRICT MEDICAL RULES:
+1. Do not invent, guess, or hallucinate findings, bounding boxes, or confidence scores.
+2. The vision model's score and location MUST be preserved exactly as provided.
+3. You are an assistive decision-support tool, not an autonomous diagnostic system.
+4. If a finding is mentioned, explain its potential clinical correlation to the patient's notes.
+5. Always state that the finding requires physician review.
 6. Link patient symptoms to the vision findings only as supporting context, not as absolute proof.
 """
 
@@ -32,38 +36,32 @@ CRITICAL RULES:
     def generate_explanation(self, inputs: GenAIInput) -> AIAnalysisReport:
         """
         Takes the combined vision model output and clinical context and generates
-        a structured explanation matching the AIAnalysisReport schema.
+        a safe, structured, evidence-grounded explanation.
         """
         
-        # Prepare the prompt payload
         prompt = f"""
-Please analyze the following inputs and provide a structured AI analysis report.
+Analyze the following patient data and generate an AIAnalysisReport.
 
---- VISION MODEL OUTPUT ---
-Status: {inputs.vision_output.status}
-Modality: {inputs.vision_output.modality}
-Findings: {[f.model_dump() for f in inputs.vision_output.findings]}
+Vision Model Status: {inputs.vision_output.status}
+Vision Model Modality: {inputs.vision_output.modality}
+Vision Model Findings: {inputs.vision_output.findings}
 
---- CLINICAL CONTEXT ---
-Raw Notes: {inputs.clinical_context.raw_notes if inputs.clinical_context.raw_notes else "None provided"}
+Patient Raw Notes: {inputs.clinical_context.raw_notes}
 Symptoms: {', '.join(inputs.clinical_context.extracted_symptoms) if inputs.clinical_context.extracted_symptoms else "None"}
 History: {', '.join(inputs.clinical_context.extracted_history) if inputs.clinical_context.extracted_history else "None"}
 
 Generate the JSON response matching the required schema. Ensure you preserve the exact confidence and location for every finding.
 """
         
-        # Call the Gemini API enforcing the Pydantic schema
-        response = self.client.models.generate_content(
+        # Call the Groq API enforcing the Pydantic schema
+        response = self.client.chat.completions.create(
             model=self.model_name,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=self.system_instruction,
-                response_mime_type="application/json",
-                response_schema=AIAnalysisReport,
-                temperature=0.0 # Low temperature for more deterministic, factual output
-            ),
+            response_model=AIAnalysisReport,
+            temperature=0.0,
+            messages=[
+                {"role": "system", "content": self.system_instruction},
+                {"role": "user", "content": prompt}
+            ]
         )
         
-        # The response.text is guaranteed to be a JSON string matching AIAnalysisReport
-        # Parse it back into the Pydantic model and return
-        return AIAnalysisReport.model_validate_json(response.text)
+        return response

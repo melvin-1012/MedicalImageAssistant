@@ -1,9 +1,9 @@
 import os
-from google import genai
-from google.genai import types
 from pydantic import BaseModel
 from tenacity import retry, stop_after_attempt, wait_exponential
 from typing import List
+import instructor
+from groq import Groq
 from .ai_response_schema import ClinicalContext
 
 class NotesExtraction(BaseModel):
@@ -13,11 +13,17 @@ class NotesExtraction(BaseModel):
 class NotesProcessor:
     """
     Parses unstructured patient notes and extracts structured clinical information
-    such as symptoms and medical history using GenAI.
+    such as symptoms and medical history using GenAI (Groq).
     """
     def __init__(self):
-        self.client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
-        self.model_name = 'gemini-3.8-flash'
+        # Initialize Groq client with Instructor for Pydantic support
+        api_key = os.environ.get("GROQ_API_KEY")
+        if not api_key:
+            raise ValueError("Missing GROQ_API_KEY in environment.")
+            
+        self.client = instructor.from_groq(Groq(api_key=api_key), mode=instructor.Mode.TOOLS)
+        # Llama 3 70B is extremely fast and smart for extraction
+        self.model_name = 'llama3-70b-8192'
         
         self.system_instruction = """
 You are a medical data extraction assistant. Your task is to extract explicitly mentioned 
@@ -27,17 +33,16 @@ Do not invent information. If none are found, return empty lists.
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
     def _extract_with_retry(self, raw_notes: str) -> NotesExtraction:
-        response = self.client.models.generate_content(
+        response = self.client.chat.completions.create(
             model=self.model_name,
-            contents=f"Extract information from these notes:\n\n{raw_notes}",
-            config=types.GenerateContentConfig(
-                system_instruction=self.system_instruction,
-                response_mime_type="application/json",
-                response_schema=NotesExtraction,
-                temperature=0.0
-            ),
+            response_model=NotesExtraction,
+            temperature=0.0,
+            messages=[
+                {"role": "system", "content": self.system_instruction},
+                {"role": "user", "content": f"Extract information from these notes:\n\n{raw_notes}"}
+            ]
         )
-        return NotesExtraction.model_validate_json(response.text)
+        return response
 
     def process_notes(self, raw_notes: str) -> ClinicalContext:
         """
