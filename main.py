@@ -30,8 +30,18 @@ def main(argv: list[str] | None = None) -> int:
     print(f"{BAR}\n{config.PROJECT_NAME}\n{config.PROJECT_ID}\n{BAR}\n")
     logger = get_logger("main")
 
-    pipeline = MedicalCVPipeline()
+    try:
+        from cv.classifier import DenseNet121Classifier
+        classifier = DenseNet121Classifier()
+    except Exception:
+        classifier = None
+
+    pipeline = MedicalCVPipeline(classifier=classifier)
     pipeline.initialize()
+    
+    # Load the DenseNet model into memory (will take a sec on first run)
+    if pipeline.classifier:
+        pipeline.classifier.load_model()
     if args.conf is not None and hasattr(pipeline.detector, "confidence_threshold"):
         pipeline.detector.confidence_threshold = args.conf
     print("\nMedical CV pipeline initialized successfully.\n")
@@ -88,6 +98,14 @@ def main(argv: list[str] | None = None) -> int:
             print("  Detections   : No model-detected abnormality above configured threshold.")
     else:
         print("  Model        : No medical model loaded (NullDetector).")
+
+    if result.classification:
+        print(f"  Classification: (DenseNet-121 Probabilities)")
+        # Sort and take top 5
+        sorted_cls = sorted(result.classification.items(), key=lambda x: x[1], reverse=True)[:5]
+        for label, prob in sorted_cls:
+            if prob > 0.1:  # only show mildly confident ones
+                print(f"    - {label}: {prob*100:.1f}%")
 
     if result.visualization:
         v = result.visualization
