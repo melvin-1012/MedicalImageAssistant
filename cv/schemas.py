@@ -141,6 +141,7 @@ class CVAnalysisResult:
     metadata: Optional[ImageMetadata] = None
     quality: Optional[ImageQualityResult] = None
     detections: List[Detection] = field(default_factory=list)
+    classification: Dict[str, float] = field(default_factory=dict)
     findings: List[FindingEvidence] = field(default_factory=list)
     visualization: Optional[VisualizationResult] = None
     model_loaded: bool = False

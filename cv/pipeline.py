@@ -18,6 +18,7 @@ from typing import Optional
 
 import config
 from cv.detector import BaseDetector, NullDetector, create_detector
+from cv.classifier import BaseClassifier, NullClassifier
 from cv.heatmap import BaseHeatmapGenerator, ModelHeatmapGenerator, NullHeatmapGenerator
 from cv.image_loader import ImageLoader
 from cv.localization import Localizer
@@ -45,6 +46,7 @@ class MedicalCVPipeline:
         self,
         app_config: config.AppConfig = config.CONFIG,
         detector: Optional[BaseDetector] = None,
+        classifier: Optional[BaseClassifier] = None,
         heatmap: Optional[BaseHeatmapGenerator] = None,
         segmenter: Optional[BaseSegmenter] = None,
     ) -> None:
@@ -60,6 +62,7 @@ class MedicalCVPipeline:
             confidence_threshold=app_config.detector.confidence_threshold,
             iou_threshold=app_config.detector.iou_threshold,
         )
+        self.classifier: BaseClassifier = classifier or NullClassifier()
         # 3. Visual explainability (Phases 5-6)
         self.localizer = Localizer()
         self.heatmap: BaseHeatmapGenerator = heatmap or (
@@ -135,7 +138,7 @@ class MedicalCVPipeline:
             # 5. Phase 2: OpenCV Preprocessing (produces display uint8 + normalized float32 model input)
             preprocessed = self.preprocessor.preprocess(loaded.image)
 
-            # 6. Phase 4: Model Inference
+            # 6. Phase 4: Model Inference (YOLO Detection)
             orig_size = (loaded.metadata.width, loaded.metadata.height)
             raw_model_detections = []
             if self.detector.is_loaded:
@@ -143,6 +146,10 @@ class MedicalCVPipeline:
                 result.model_loaded = True
             else:
                 result.model_loaded = False
+
+            # Phase 4b: Image Classification (DenseNet-121)
+            if self.classifier.is_loaded:
+                result.classification = self.classifier.predict(loaded.image)
 
             # 7. Phase 5: Localization (map model-space boxes to original image coordinates)
             if raw_model_detections:
