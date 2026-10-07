@@ -35,7 +35,14 @@ st.set_page_config(page_title=config.PROJECT_NAME, page_icon="🩻", layout="wid
 @st.cache_resource
 def get_pipeline() -> MedicalCVPipeline:
     # Hackathon demo default threshold: 0.016 (not clinically validated)
-    pipeline = MedicalCVPipeline()
+    try:
+        from cv.classifier import DenseNet121Classifier
+        classifier = DenseNet121Classifier()
+        classifier.load_model()
+    except Exception as e:
+        classifier = None
+
+    pipeline = MedicalCVPipeline(classifier=classifier)
     pipeline.initialize()
     return pipeline
 
