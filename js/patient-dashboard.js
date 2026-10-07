@@ -1,3 +1,13 @@
+(function() {
+  if (!window.MediSightAPI) return;
+  const token = window.MediSightAPI.getToken();
+  const user = window.MediSightAPI.getCurrentUser();
+  if (!token || !user || !(user.role === "patient")) {
+    alert("Access Denied: You must be logged in as a patient.");
+    window.location.replace('index.html');
+  }
+})();
+
 /**
  * MediSight AI - Patient Dashboard Logic (Runtime JavaScript)
  * Strictly 4 Tabs: Book an Appointment | Records | Reports | About Us.

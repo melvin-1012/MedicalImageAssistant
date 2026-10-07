@@ -1,3 +1,13 @@
+(function() {
+  if (!window.MediSightAPI) return;
+  const token = window.MediSightAPI.getToken();
+  const user = window.MediSightAPI.getCurrentUser();
+  if (!token || !user || !(user.role === "specialist" || user.role === "admin" || user.role === "doctor")) {
+    alert("Access Denied: You must be logged in as a specialist.");
+    window.location.replace('index.html');
+  }
+})();
+
 /**
  * MediSight AI - Specialist Medical Imaging & AI Analysis
  * Runtime JavaScript for specialist-imaging.html

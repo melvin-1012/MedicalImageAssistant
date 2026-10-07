@@ -1,3 +1,13 @@
+(function() {
+  if (!window.MediSightAPI) return;
+  const token = window.MediSightAPI.getToken();
+  const user = window.MediSightAPI.getCurrentUser();
+  if (!token || !user || !(user.role === "doctor")) {
+    alert("Access Denied: You must be logged in as a doctor.");
+    window.location.replace('index.html');
+  }
+})();
+
 /**
  * MediSight AI - Doctor Dashboard Logic (Runtime JavaScript)
  * Clinical Decision-Support System - Doctor Workspace
