@@ -52,6 +52,8 @@ def show_image(path: str | None, phase: int, text: str) -> None:
 
 
 pipeline = get_pipeline()
+if hasattr(pipeline.detector, "confidence_threshold"):
+    pipeline.detector.confidence_threshold = config.CONFIG.detector.confidence_threshold
 
 def get_component_status(comp: Any) -> tuple[bool, str]:
     """Safely determines the active status and display name for any pipeline component.
@@ -91,18 +93,21 @@ with st.sidebar:
         st.write(f"{'✅' if done else '⬜'} {num}. {name}")
     st.divider()
     st.subheader("Inference Settings")
-    current_conf = float(getattr(pipeline.detector, "confidence_threshold", config.CONFIG.detector.confidence_threshold))
-    conf_thresh = st.slider(
+    default_conf_str = f"{config.CONFIG.detector.confidence_threshold:.3f}"
+    conf_str = st.text_input(
         "Confidence Threshold",
-        min_value=0.001,
-        max_value=0.950,
-        value=current_conf,
-        step=0.001,
-        format="%.3f",
-        help="Confidence threshold for candidate opacity detections. The current 1-epoch checkpoint outputs raw confidences around ~0.015-0.018.",
+        value=default_conf_str,
+        key="conf_threshold_text",
+        help="Detector confidence threshold (fixed at 0.016 for hackathon demo).",
     )
+    try:
+        conf_thresh = float(conf_str.strip())
+    except (ValueError, TypeError):
+        conf_thresh = config.CONFIG.detector.confidence_threshold
+
     if hasattr(pipeline.detector, "confidence_threshold"):
         pipeline.detector.confidence_threshold = conf_thresh
+    st.caption(f"Active threshold: `{conf_thresh:.3f}` (Fixed Demo)")
 
 # ---- Main -----------------------------------------------------------------
 st.title(config.PROJECT_NAME)
