@@ -79,7 +79,7 @@ class QualityConfig:
 @dataclass(frozen=True)
 class DetectorConfig:
     model_path: Path = MODELS_DIR / "model.pt"  # placeholder, no model ships
-    confidence_threshold: float = 0.017  # Hackathon demo threshold, not clinically validated
+    confidence_threshold: float = 0.016  # Hackathon demo threshold, not clinically validated
     iou_threshold: float = 0.45
 
 

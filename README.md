@@ -69,7 +69,7 @@ Input Image (DICOM / PNG / JPG)
 - **Coordinate Space Authority:** Bounding boxes always refer to the **original** full-resolution DICOM coordinates ($1024 \times 1024$), never to resized or letterboxed model space.
 - **Confidence Authority:** Model confidences originate strictly from CV head predictions. Downstream LLMs/GenAI modules cannot alter coordinates or confidence values.
 - **Mandatory Physician Review:** Every finding sets `requires_physician_review: true` and `no_confirmed_diagnosis: true`.
-- **Confidence Threshold Calibration (Hackathon Demo Operating Point):** The detector's default confidence threshold is set to `0.017` in `DetectorConfig` (`config.py`). This operating threshold is tuned specifically for hackathon demo workflows with preliminary model checkpoints (raw confidence outputs cluster around `~0.015 - 0.018`). It is **not** a clinically validated diagnostic cut-off. The threshold is dynamically adjustable via the Streamlit slider (`step=0.001`), the CLI (`--conf`), and detector parameters.
+- **Confidence Threshold Calibration (Hackathon Demo Operating Point):** The detector's default confidence threshold is set to `0.016` in `DetectorConfig` (`config.py`). This operating threshold is tuned specifically for hackathon demo workflows with preliminary model checkpoints (raw confidence outputs cluster around `~0.015 - 0.018`). It is **not** a clinically validated diagnostic cut-off. The threshold is dynamically adjustable via the Streamlit slider (`step=0.001`), the CLI (`--conf`), and detector parameters.
 - **Non-Clinical Disclaimer:** This software is developed strictly for research and hackathon exploration (`HNX26PSI05`). It is **not** validated for clinical diagnostic use.
 
 ---
@@ -104,7 +104,7 @@ Input Image (DICOM / PNG / JPG)
   - Model-agnostic `MedicalDetector` interface (`load_model`, `predict`, `train`, `get_model_info`).
   - `YOLOMedicalDetector` implementing Ultralytics YOLO11n.
   - Auto-discovers weights from `models/model.pt` or falls back safely to `NullDetector`.
-  - Configurable confidence threshold (default: `0.017` demo threshold, configurable via config/CLI/UI) and IoU threshold (`0.45`).
+  - Configurable confidence threshold (default: `0.016` demo threshold, configurable via config/CLI/UI) and IoU threshold (`0.45`).
 - **Training & Calibration Pipeline (`scripts/`):**
   - `train_yolo.py`: Trains YOLO11n on converted RSNA cohorts with AdamW optimizer, mixed precision (AMP), and configurable epochs/batch size.
   - `evaluate_and_calibrate.py`: Evaluates validation metrics (Precision, Recall, mAP@0.5, mAP@0.5:0.95), computes BoxF1 optimal confidence threshold, and verifies known positive and negative test radiographs.
@@ -275,11 +275,11 @@ python -m pytest tests/
 
 ### 2. Run Command-Line Interface (CLI)
 ```bash
-# Analyze a medical radiograph with terminal summary (uses default 0.017 demo threshold)
+# Analyze a medical radiograph with terminal summary (uses default 0.016 demo threshold)
 python main.py datasets/rsna/stage_2_train_images/00436515-870c-4b36-a041-de91049b9ab4.dcm
 
 # Override detector confidence threshold
-python main.py datasets/rsna/stage_2_train_images/00436515-870c-4b36-a041-de91049b9ab4.dcm --conf 0.017
+python main.py datasets/rsna/stage_2_train_images/00436515-870c-4b36-a041-de91049b9ab4.dcm --conf 0.016
 
 # Output standard JSON result
 python main.py datasets/rsna/stage_2_train_images/00436515-870c-4b36-a041-de91049b9ab4.dcm --json
@@ -293,7 +293,7 @@ python main.py datasets/rsna/stage_2_train_images/00436515-870c-4b36-a041-de9104
 streamlit run app.py
 ```
 Interactive multi-tab interface:
-- **Inference Settings Sidebar:** Dynamic confidence threshold slider (default `0.017`, step `0.001`, range `0.001 - 0.950`) allowing live sensitivity tuning without restarting the server.
+- **Inference Settings Sidebar:** Dynamic confidence threshold slider (default `0.016`, step `0.001`, range `0.001 - 0.950`) allowing live sensitivity tuning without restarting the server.
 - **Original & Processed:** Side-by-side radiograph inspection with CLAHE toggle.
 - **Quality Assessment:** Blur, brightness, contrast, and noise metrics with traffic-light status.
 - **Detections:** Bounding box overlays on the original scan with confidence percentages.
