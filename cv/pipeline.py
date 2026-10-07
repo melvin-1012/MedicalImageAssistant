@@ -187,7 +187,7 @@ class MedicalCVPipeline:
                 fe = FindingEvidence(
                     finding="possible_abnormal_opacity",
                     finding_label="Possible abnormal opacity",
-                    confidence=round(float(det.confidence), 4),
+                    confidence=float(det.confidence),
                     location=loc,
                     heatmap_available=(aligned_heatmap is not None),
                     segmentation_available=bool(self.segmenter.is_available and aligned_mask is not None),

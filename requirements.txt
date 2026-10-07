@@ -15,3 +15,8 @@ pytest>=7.4
 torch>=2.1
 torchvision>=0.16
 torchxrayvision>=0.1.1
+
+# Multimodal GenAI
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+tenacity>=8.0.0

@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional, Union, Dict
+from pydantic import BaseModel, Field, model_validator
+from typing import List, Optional, Union, Dict, Any
 
 # ---------------------------------------------------------
 # INPUT SCHEMAS (What you expect from Person 2 & 3)
@@ -19,9 +19,32 @@ class VisionFinding(BaseModel):
     requires_physician_review: Optional[bool] = Field(True)
 
 class VisionModelOutput(BaseModel):
-    status: str = Field(..., description="Status of the image analysis ('success', 'poor_quality', 'unsupported', 'inconclusive')")
+    status: str = Field(default="success", description="Status of the image analysis ('success', 'poor_quality', 'unsupported', 'inconclusive')")
     findings: List[VisionFinding] = Field(default_factory=list, description="List of findings detected by the model")
-    modality: str = Field(..., description="The imaging modality used (e.g., 'X-Ray', 'CT Scan')")
+    modality: str = Field(default="X-Ray", description="The imaging modality used (e.g., 'X-Ray', 'CT Scan')")
+
+    @model_validator(mode="before")
+    @classmethod
+    def extract_nested_fields(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            # Extract modality from nested image dict if not at root
+            if "modality" not in data and "image" in data and isinstance(data["image"], dict):
+                data["modality"] = data["image"].get("modality", "X-Ray")
+            # Extract status from nested quality dict or analysis status if not at root
+            if "status" not in data:
+                if "quality" in data and isinstance(data["quality"], dict):
+                    q_status = data["quality"].get("status")
+                    if q_status == "POOR":
+                        data["status"] = "poor_quality"
+                    else:
+                        data["status"] = "success"
+                else:
+                    data["status"] = "success"
+            elif data.get("status") in ["ok", "OK"]:
+                data["status"] = "success"
+            elif data.get("status") in ["rejected", "REJECTED"]:
+                data["status"] = "poor_quality"
+        return data
 
 class ClinicalContext(BaseModel):
     raw_notes: Optional[str] = Field(None, description="Original raw clinical notes provided by the patient or doctor")

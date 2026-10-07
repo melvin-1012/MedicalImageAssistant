@@ -117,7 +117,7 @@ class FindingEvidence:
         return {
             "finding": self.finding,
             "finding_label": self.finding_label,
-            "confidence": round(float(self.confidence), 4),
+            "confidence": float(self.confidence),
             "location": self.location.to_dict() if isinstance(self.location, FindingLocation) else self.location,
             "heatmap_available": bool(self.heatmap_available),
             "segmentation_available": bool(self.segmentation_available),
@@ -169,6 +169,13 @@ class CVAnalysisResult:
         quality_score = round(self.quality.score, 2) if self.quality else 0.0
         quality_issues = list(self.quality.issues) if self.quality else []
 
+        if self.status == AnalysisStatus.REJECTED or quality_status == "POOR":
+            status_str = "poor_quality"
+        elif self.status == AnalysisStatus.ERROR:
+            status_str = "error"
+        else:
+            status_str = "success"
+
         findings_list = [f.to_dict() for f in self.findings]
 
         art_original = str(source_name) if source_name != "unknown" else None
@@ -183,6 +190,8 @@ class CVAnalysisResult:
             art_seg = self.visualization.mask_path
 
         return {
+            "status": status_str,
+            "modality": modality,
             "image": {
                 "source": str(source_name),
                 "width": int(width),

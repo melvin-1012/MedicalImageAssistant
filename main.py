@@ -24,6 +24,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("image", nargs="?", type=Path, help="path to a medical image")
     parser.add_argument("--json", action="store_true", help="output full CVAnalysisResult JSON")
     parser.add_argument("--genai", action="store_true", help="output CV -> GenAI handshake JSON schema")
+    parser.add_argument("--integrated", action="store_true", help="execute end-to-end integrated CV + GenAI pipeline")
+    parser.add_argument("--notes", type=str, default=None, help="clinical notes to pass to GenAI")
     parser.add_argument("--conf", type=float, default=None, help="override detector confidence threshold")
     args = parser.parse_args(argv)
 
@@ -42,6 +44,17 @@ def main(argv: list[str] | None = None) -> int:
     if args.image is None:
         print("Batch 3 active: Phases 1 through 9 initialized (Loading, Preprocessing, Quality, Model, Localization, Heatmap, Segmentation, Confidence/Evidence, Structured JSON).")
         return 0
+
+    if args.integrated:
+        import json
+        from cv.integration import IntegratedMedicalAIPipeline
+        integrated_pipe = IntegratedMedicalAIPipeline(cv_pipeline=pipeline)
+        integrated_pipe.initialize()
+        result_dict = integrated_pipe.run(args.image, clinical_notes=args.notes)
+        # Drop non-serializable _cv_result for JSON output
+        serializable = {k: v for k, v in result_dict.items() if not k.startswith("_")}
+        print(json.dumps(serializable, indent=2))
+        return 0 if result_dict.get("status") in ("success", "ok") else 1
 
     result = pipeline.run(args.image)
 
