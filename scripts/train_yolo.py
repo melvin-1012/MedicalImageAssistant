@@ -32,7 +32,7 @@ import config
 
 def train_detector(
     dataset_yaml: Path | str = "datasets/rsna_yolo/dataset.yaml",
-    epochs: int = 30,
+    epochs: int = 35,
     batch_size: int = 8,
     img_size: int = 640,
     patience: int = 10,
@@ -79,7 +79,8 @@ def train_detector(
         device=device,
         workers=workers,
         seed=seed,
-        amp=False,
+        amp=True,
+        optimizer="AdamW",
         cache=cache,
         project=str(output_project),
         name="train_run",
@@ -128,7 +129,7 @@ def train_detector(
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train YOLO detector on RSNA dataset.")
     parser.add_argument("--yaml", default="datasets/rsna_yolo/dataset.yaml", help="Path to dataset.yaml")
-    parser.add_argument("--epochs", type=int, default=30, help="Number of epochs (default: 30)")
+    parser.add_argument("--epochs", type=int, default=35, help="Number of epochs (default: 35)")
     parser.add_argument("--patience", type=int, default=10, help="Early stopping patience (default: 10)")
     parser.add_argument("--batch", type=int, default=8, help="Batch size (default: 8)")
     parser.add_argument("--imgsz", type=int, default=640, help="Image size (default: 640)")

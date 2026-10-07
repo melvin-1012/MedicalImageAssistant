@@ -34,6 +34,7 @@ st.set_page_config(page_title=config.PROJECT_NAME, page_icon="🩻", layout="wid
 
 @st.cache_resource
 def get_pipeline() -> MedicalCVPipeline:
+    # Hackathon demo default threshold: 0.17 (not clinically validated)
     pipeline = MedicalCVPipeline()
     pipeline.initialize()
     return pipeline

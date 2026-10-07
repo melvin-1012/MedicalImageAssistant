@@ -30,3 +30,18 @@ output/*
 output/**/*
 !output/**/.gitkeep
 output/batch2_verification/
+
+# Demo and local test images
+demo_images/
+
+# Local model weights & logs
+weights/
+*.log
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+.vscode/
+.idea/
+
