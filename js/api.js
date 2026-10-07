@@ -69,7 +69,7 @@
     login: async function (email, password) {
       const data = await api.request('/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ identifier: email, password }),
       });
       if (data.access_token) {
         api.setToken(data.access_token);
