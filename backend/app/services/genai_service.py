@@ -114,25 +114,3 @@ async def generate_clinical_report(
         model_version="0.0.1",
         is_mock=True,
     )
-
-
-async def generate_clinical_context(
-    vision_result,
-    patient_context: Optional[dict] = None,
-    imaging_type: str = "xray",
-) -> GenAIResult:
-    """
-    Standard interface adapter for Person 4 (Multimodal AI / GenAI).
-    Accepts vision_result and patient_context dict.
-    """
-    patient_context = patient_context or {}
-    return await generate_clinical_report(
-        vision_finding=getattr(vision_result, "finding", str(vision_result)),
-        vision_location=getattr(vision_result, "location", "Anatomical region"),
-        confidence_score=getattr(vision_result, "confidence_score", 0.8),
-        imaging_type=imaging_type,
-        patient_symptoms=patient_context.get("symptoms"),
-        patient_history=patient_context.get("reason"),
-        patient_age=patient_context.get("age"),
-        patient_gender=patient_context.get("gender"),
-    )

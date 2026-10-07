@@ -37,7 +37,7 @@ async def test_doctor_creates_imaging_request(client):
         "status": "requested",
     }]
 
-    with patch("app.database._override_admin", mock_db):
+    with patch("app.database.get_supabase_admin", return_value=mock_db):
         resp = await client.post(
             "/imaging/requests",
             headers=DOCTOR_HEADERS,
@@ -84,7 +84,7 @@ async def test_doctor_submits_assessment(client):
     }]
     mock_db.table.return_value.update.return_value.eq.return_value.execute.return_value.data = [{}]
 
-    with patch("app.database._override_admin", mock_db):
+    with patch("app.database.get_supabase_admin", return_value=mock_db):
         resp = await client.post(
             "/reports/report-001/assessment",
             headers=DOCTOR_HEADERS,
@@ -127,7 +127,7 @@ async def test_doctor_finalizes_report(client):
     mock_db.table.return_value.update.return_value.eq.return_value.execute.return_value.data = [{}]
     mock_db.table.return_value.insert.return_value.execute.return_value.data = [{}]
 
-    with patch("app.database._override_admin", mock_db):
+    with patch("app.database.get_supabase_admin", return_value=mock_db):
         resp = await client.patch(
             "/reports/report-001/finalize",
             headers=DOCTOR_HEADERS,

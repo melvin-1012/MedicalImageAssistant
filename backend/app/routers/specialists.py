@@ -20,7 +20,6 @@ from app.dependencies import (
 router = APIRouter()
 
 
-@router.get("", summary="List all specialists")
 @router.get("/", summary="List all specialists")
 async def list_specialists(
     user: dict = Depends(require_doctor_or_admin),

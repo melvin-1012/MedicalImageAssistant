@@ -9,7 +9,6 @@ from datetime import datetime
 router = APIRouter()
 
 
-@router.get("")
 @router.get("/")
 async def list_reports(user_id: str = Depends(get_current_user_id), user: dict = Depends(get_current_user)):
     """List reports. Role-filtered."""
@@ -188,9 +187,9 @@ async def finalize_report(report_id: str, user_id: str = Depends(get_current_use
 
     # Update imaging request
     report = db.table("medical_reports").select("imaging_study_id").eq("id", report_id).single().execute()
-    if report.data and isinstance(report.data, dict) and report.data.get("imaging_study_id"):
+    if report.data:
         study = db.table("imaging_studies").select("imaging_request_id").eq("id", report.data["imaging_study_id"]).single().execute()
-        if study.data and isinstance(study.data, dict) and study.data.get("imaging_request_id"):
+        if study.data:
             db.table("imaging_requests").update({"status": "completed", "completed_at": now}).eq("id", study.data["imaging_request_id"]).execute()
 
     # Create/update medical record

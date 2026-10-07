@@ -64,7 +64,7 @@ async def test_doctor_can_access_patients_list(client):
     """Doctors should be able to list patients."""
     mock_db = MagicMock()
     mock_db.table.return_value.select.return_value.order.return_value.execute.return_value.data = []
-    with patch("app.database._override_admin", mock_db):
+    with patch("app.database.get_supabase_admin", return_value=mock_db):
         resp = await client.get("/patients", headers=DOCTOR_HEADERS)
     assert resp.status_code == 200
 

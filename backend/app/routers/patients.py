@@ -7,7 +7,6 @@ from typing import List, Optional
 router = APIRouter()
 
 
-@router.get("", response_model=List[dict])
 @router.get("/", response_model=List[dict])
 async def list_patients(user: dict = Depends(require_doctor_or_admin)):
     """Doctors can list all patients."""

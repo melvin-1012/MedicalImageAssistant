@@ -31,7 +31,7 @@ async def test_patient_can_create_appointment(client):
         "status": "pending",
     }]
 
-    with patch("app.database._override_admin", mock_db):
+    with patch("app.database.get_supabase_admin", return_value=mock_db):
         resp = await client.post(
             "/appointments",
             headers=PATIENT_HEADERS,
@@ -75,7 +75,7 @@ async def test_doctor_can_update_appointment_status(client):
         "status": "confirmed",
     }]
 
-    with patch("app.database._override_admin", mock_db):
+    with patch("app.database.get_supabase_admin", return_value=mock_db):
         resp = await client.patch(
             "/appointments/appt-001",
             headers=DOCTOR_HEADERS,

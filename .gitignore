@@ -1,16 +1,19 @@
-__pycache__/
-*.py[cod]
-*$py.class
-*.env
+# Environment variables and secrets
 .env
 .env.*
-.env.local
-*.pem
-*.key
-.venv/
-env/
-venv/
-*.sqlite3
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
 .pytest_cache/
-.coverage
-htmlcov/
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

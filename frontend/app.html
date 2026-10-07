@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MediVision AI — Healthcare Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ── Reset & Base ────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f0f4f8;color:#1e293b;min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+input,select,textarea{font-family:inherit}
+/* ── Variables ───────────────────────────────────────────── */
+:root{
+  --primary:#1565C0;--primary-light:#1976D2;--primary-dark:#0D47A1;
+  --accent:#00897B;--accent-light:#4DB6AC;
+  --danger:#C62828;--danger-light:#EF5350;
+  --warn:#E65100;--success:#2E7D32;--success-light:#4CAF50;
+  --bg:#f0f4f8;--card:#fff;--border:#CBD5E1;
+  --text:#1e293b;--muted:#64748B;--light-bg:#EFF6FF;
+  --header-h:64px;
+}
+/* ── Layout ──────────────────────────────────────────────── */
+.page{display:none;min-height:100vh}
+.page.active{display:block}
+/* ── Header / Nav ────────────────────────────────────────── */
+.header{
+  background:var(--primary);color:#fff;height:var(--header-h);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 8px rgba(0,0,0,.25)
+}
+.header-brand{display:flex;align-items:center;gap:12px;font-size:1.25rem;font-weight:700}
+.header-brand span{font-size:.75rem;font-weight:400;opacity:.7;margin-top:2px;display:block}
+.nav-links{display:flex;gap:4px}
+.nav-btn{
+  background:transparent;border:none;color:rgba(255,255,255,.85);
+  padding:8px 16px;border-radius:8px;font-size:.875rem;font-weight:500;
+  transition:.2s
+}
+.nav-btn:hover,.nav-btn.active{background:rgba(255,255,255,.15);color:#fff}
+.logout-btn{
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);
+  color:#fff;padding:7px 16px;border-radius:8px;font-size:.875rem;font-weight:500
+}
+.logout-btn:hover{background:rgba(255,255,255,.2)}
+/* ── Content ─────────────────────────────────────────────── */
+.content{max-width:1200px;margin:0 auto;padding:32px 24px}
+/* ── Cards ───────────────────────────────────────────────── */
+.card{background:var(--card);border-radius:12px;border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.card-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-header h2{font-size:1.1rem;font-weight:600;color:var(--text)}
+.card-body{padding:24px}
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-size:.875rem;font-weight:500;border:none;transition:.2s;cursor:pointer}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-light)}
+.btn-success{background:var(--success);color:#fff}.btn-success:hover{background:var(--success-light)}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{background:var(--danger-light)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-outline:hover{background:var(--light-bg)}
+.btn-sm{padding:6px 12px;font-size:.8rem}
+.btn-icon{width:36px;height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:8px}
+/* ── Form Elements ───────────────────────────────────────── */
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+.form-control{
+  width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;
+  font-size:.9rem;background:#fff;transition:.2s;outline:none;color:var(--text)
+}
+.form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(21,101,192,.12)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+/* ── Tables ──────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.875rem}
+th{background:#F8FAFC;padding:12px 16px;text-align:left;font-weight:600;color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+td{padding:13px 16px;border-bottom:1px solid #F1F5F9;color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFCFF}
+/* ── Badges ──────────────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:.75rem;font-weight:600}
+.badge-blue{background:#EFF6FF;color:#1d4ed8}.badge-green{background:#F0FDF4;color:#15803d}
+.badge-yellow{background:#FFFBEB;color:#b45309}.badge-red{background:#FEF2F2;color:#b91c1c}
+.badge-gray{background:#F1F5F9;color:#475569}.badge-teal{background:#F0FDFA;color:#0f766e}
+/* ── Alerts ──────────────────────────────────────────────── */
+.alert{padding:12px 16px;border-radius:8px;font-size:.875rem;margin-bottom:16px}
+.alert-error{background:#FEF2F2;border:1px solid #FECACA;color:#991b1b}
+.alert-success{background:#F0FDF4;border:1px solid #BBF7D0;color:#166534}
+.alert-info{background:#EFF6FF;border:1px solid #BFDBFE;color:#1e40af}
+.alert-warn{background:#FFFBEB;border:1px solid #FDE68A;color:#92400e}
+/* ── Misc helpers ────────────────────────────────────────── */
+.hidden{display:none!important}
+.mt-4{margin-top:16px}.mt-8{margin-top:32px}.mb-4{margin-bottom:16px}
+.flex{display:flex}.items-center{align-items:center}.gap-2{gap:8px}.gap-4{gap:16px}
+.justify-between{justify-content:space-between}.justify-end{justify-content:flex-end}
+.text-muted{color:var(--muted)}.text-sm{font-size:.8rem}.font-bold{font-weight:700}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat-card{background:var(--card);border-radius:12px;padding:20px 24px;border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.stat-value{font-size:2rem;font-weight:700;color:var(--primary)}
+.stat-label{font-size:.8rem;color:var(--muted);margin-top:4px;font-weight:500}
+.section-title{font-size:1.3rem;font-weight:700;margin-bottom:20px;color:var(--text)}
+.ai-disclaimer{background:#FFF8F0;border:1px solid #FED7AA;border-radius:8px;padding:12px 16px;font-size:.8rem;color:#92400e;margin-bottom:16px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-header h3{font-size:1.1rem;font-weight:600}
+.modal-body{padding:24px}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:12px}
+.close-btn{background:none;border:none;font-size:1.5rem;color:var(--muted);cursor:pointer;line-height:1}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,.8);z-index:300;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.loading-spinner{width:48px;height:48px;border:4px solid #E2E8F0;border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+.tab-content{display:none}.tab-content.active{display:block}
+/* ── Landing page ────────────────────────────────────────── */
+.landing-hero{
+  background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary) 50%,#1565C0 100%);
+  color:#fff;padding:80px 24px;text-align:center;position:relative;overflow:hidden
+}
+.landing-hero::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.landing-hero-content{position:relative;max-width:800px;margin:0 auto}
+.landing-hero h1{font-size:3rem;font-weight:800;margin-bottom:16px;line-height:1.15}
+.landing-hero p{font-size:1.2rem;opacity:.85;margin-bottom:40px;max-width:600px;margin-left:auto;margin-right:auto}
+.login-cards{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:40px}
+.login-card{
+  background:rgba(255,255,255,.08);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.2);
+  border-radius:16px;padding:32px 28px;width:220px;cursor:pointer;transition:.25s;text-align:center
+}
+.login-card:hover{background:rgba(255,255,255,.15);transform:translateY(-4px)}
+.login-card-icon{font-size:2.5rem;margin-bottom:12px}
+.login-card h3{font-size:1rem;font-weight:600;margin-bottom:4px}
+.login-card p{font-size:.8rem;opacity:.7}
+.landing-about{max-width:900px;margin:60px auto;padding:0 24px}
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-top:32px}
+.feature-card{background:var(--card);border-radius:12px;padding:24px;border:1px solid var(--border);text-align:center}
+.feature-icon{font-size:2rem;margin-bottom:12px}
+.feature-card h4{font-weight:600;margin-bottom:8px}
+.feature-card p{font-size:.85rem;color:var(--muted);line-height:1.6}
+/* ── Login form ──────────────────────────────────────────── */
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#EFF6FF 0%,#F0FDFA 100%)}
+.login-box{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 4px 24px rgba(0,0,0,.12);border:1px solid var(--border)}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo h2{font-size:1.5rem;font-weight:700;color:var(--primary)}
+.login-logo p{font-size:.85rem;color:var(--muted);margin-top:4px}
+/* ── Report view ─────────────────────────────────────────── */
+.report-section{background:#F8FAFC;border-radius:8px;padding:16px;margin-bottom:12px;border-left:3px solid var(--primary)}
+.report-section h4{font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.report-section p{font-size:.9rem;color:var(--text);line-height:1.6}
+.report-ai-banner{background:linear-gradient(135deg,#FFF8F0,#FFF3E0);border:1px solid #FDBA74;border-radius:10px;padding:16px;margin-bottom:16px}
+.report-ai-banner h4{color:#9a3412;font-weight:700;margin-bottom:4px}
+.report-doctor-banner{background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:1px solid #86EFAC;border-radius:10px;padding:16px;margin-bottom:16px}
+.report-doctor-banner h4{color:#15803d;font-weight:700;margin-bottom:4px}
+/* ── Imaging portal ──────────────────────────────────────── */
+.upload-zone{
+  border:2px dashed var(--border);border-radius:12px;padding:48px;text-align:center;
+  cursor:pointer;transition:.2s;background:#FAFCFF
+}
+.upload-zone:hover,.upload-zone.dragging{border-color:var(--primary);background:var(--light-bg)}
+.upload-zone-icon{font-size:3rem;margin-bottom:12px}
+.upload-zone input{display:none}
+.status-badge{display:inline-flex;align-items:center;gap:6px}
+.status-dot{width:8px;height:8px;border-radius:50%}
+
+@media(max-width:768px){
+  .form-row,.form-row-3,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .landing-hero h1{font-size:2rem}
+  .login-cards{gap:12px}
+  .login-card{width:160px;padding:20px}
+  .content{padding:20px 16px}
+  .header{padding:0 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     LOADING OVERLAY
+══════════════════════════════════════════════════════════════ -->
+<div id="loadingOverlay" class="loading-overlay hidden">
+  <div class="loading-spinner"></div>
+  <p style="color:var(--muted);font-size:.9rem">Loading...</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     LANDING PAGE
+══════════════════════════════════════════════════════════════ -->
+<div id="landingPage" class="page active">
+  <div class="landing-hero">
+    <div class="landing-hero-content">
+      <div style="font-size:3.5rem;margin-bottom:16px">🏥</div>
+      <h1>MediVision AI</h1>
+      <p>Advanced AI-Powered Medical Imaging & Healthcare Management System for City Medical Center</p>
+      <p style="font-size:.9rem;opacity:.6;margin-top:-24px">Integrated Doctor · Patient · Imaging Workflows</p>
+      <div class="login-cards">
+        <div class="login-card" onclick="showLogin('patient')">
+          <div class="login-card-icon">👤</div>
+          <h3>Patient Portal</h3>
+          <p>Book appointments, view records & reports</p>
+        </div>
+        <div class="login-card" onclick="showLogin('doctor')">
+          <div class="login-card-icon">⚕️</div>
+          <h3>Doctor Portal</h3>
+          <p>Manage patients, request imaging, review reports</p>
+        </div>
+        <div class="login-card" onclick="showLogin('specialist')">
+          <div class="login-card-icon">🔬</div>
+          <h3>Imaging Portal</h3>
+          <p>View requests & upload medical images</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- About section -->
+  <div class="landing-about">
+    <h2 class="section-title" style="text-align:center">About MediVision AI</h2>
+    <p style="text-align:center;color:var(--muted);max-width:700px;margin:0 auto 32px;line-height:1.7">
+      MediVision AI is a state-of-the-art healthcare management system combining cutting-edge AI with seamless clinical workflows. 
+      Our platform supports doctors, patients, and imaging specialists in delivering better patient outcomes.
+    </p>
+    <div class="feature-grid">
+      <div class="feature-card"><div class="feature-icon">🧠</div><h4>AI-Powered Analysis</h4><p>Vision AI and Multimodal GenAI models analyze X-Ray, CT, and MRI images to support clinical decisions.</p></div>
+      <div class="feature-card"><div class="feature-icon">🔒</div><h4>Secure & Private</h4><p>Row-Level Security ensures patients only access their own records. All data encrypted in transit and at rest.</p></div>
+      <div class="feature-card"><div class="feature-icon">📋</div><h4>End-to-End Workflow</h4><p>From appointment booking to report finalization — a complete clinical workflow in one platform.</p></div>
+      <div class="feature-card"><div class="feature-icon">📄</div><h4>PDF Reports</h4><p>Professional medical imaging reports auto-generated and reviewed by doctors before delivery to patients.</p></div>
+      <div class="feature-card"><div class="feature-icon">🏥</div><h4>Multi-Role Access</h4><p>Tailored dashboards for patients, doctors, and imaging specialists with appropriate access controls.</p></div>
+      <div class="feature-card"><div class="feature-icon">⚡</div><h4>Real-Time Updates</h4><p>Live status tracking from imaging request to report delivery — always know where your case stands.</p></div>
+    </div>
+
+    <!-- Contact / About Us -->
+    <div style="margin-top:60px;padding:32px;background:var(--card);border-radius:16px;border:1px solid var(--border)">
+      <h3 style="font-weight:700;margin-bottom:16px;color:var(--primary)">🏥 City Medical Center</h3>
+      <div class="grid-2">
+        <div>
+          <h4 style="font-weight:600;margin-bottom:8px">Our Mission</h4>
+          <p style="color:var(--muted);font-size:.9rem;line-height:1.7">To provide compassionate, patient-centered care using the most advanced medical technology available, ensuring every patient receives accurate diagnosis and timely treatment.</p>
+          <h4 style="font-weight:600;margin-top:16px;margin-bottom:8px">Our Vision</h4>
+          <p style="color:var(--muted);font-size:.9rem;line-height:1.7">To be the leading AI-integrated healthcare institution in South Asia, setting the standard for diagnostic accuracy and patient care excellence.</p>
+        </div>
+        <div>
+          <h4 style="font-weight:600;margin-bottom:12px">Contact Information</h4>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:.9rem;color:var(--muted)">
+            <div>📍 123 Medical Drive, Anna Nagar, Chennai 600040</div>
+            <div>📞 +91-44-1234-5678 (General) | +91-44-1234-9999 (Emergency)</div>
+            <div>📧 info@medivision-ai.com</div>
+            <div>🚨 24/7 Emergency Services Available</div>
+            <div>🕐 OPD Hours: 8:00 AM – 8:00 PM (Mon–Sat)</div>
+          </div>
+          <div class="alert alert-info mt-4" style="font-size:.8rem">
+            🔒 <strong>Privacy Notice:</strong> All patient data is stored securely and handled in accordance with applicable healthcare data protection regulations.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p style="text-align:center;color:var(--muted);font-size:.8rem;margin-top:40px">
+      © 2026 MediVision AI · City Medical Center · All Rights Reserved
+      · <a href="#" style="color:var(--primary)">Privacy Policy</a> · <a href="#" style="color:var(--primary)">Terms of Service</a>
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     LOGIN PAGE
+══════════════════════════════════════════════════════════════ -->
+<div id="loginPage" class="page">
+  <div class="login-page">
+    <div class="login-box">
+      <div class="login-logo">
+        <div style="font-size:2.5rem;margin-bottom:8px">🏥</div>
+        <h2>MediVision AI</h2>
+        <p id="loginRoleLabel">Sign in to your portal</p>
+      </div>
+      <div id="loginAlert"></div>
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="loginEmail" class="form-control" placeholder="you@hospital.com" required autocomplete="email"/>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password"/>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" id="loginBtn">
+          Sign In
+        </button>
+      </form>
+      <div style="text-align:center;margin-top:16px">
+        <button onclick="showPage('landing')" class="btn btn-outline btn-sm">← Back to Home</button>
+      </div>
+      <div class="alert alert-info mt-4" style="font-size:.8rem">
+        <strong>Demo Credentials:</strong><br>
+        Patient: priya@demo.com / demo1234<br>
+        Doctor: arun.mehta@demo.com / demo1234<br>
+        Specialist: rajesh@demo.com / demo1234
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     DOCTOR DASHBOARD
+══════════════════════════════════════════════════════════════ -->
+<div id="doctorPage" class="page">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-brand">
+      <span style="font-size:1.5rem">⚕️</span>
+      <div><div>MediVision AI</div><span>Doctor Portal</span></div>
+    </div>
+    <div class="nav-links">
+      <button class="nav-btn active" onclick="doctorTab('patients',this)">Patients</button>
+      <button class="nav-btn" onclick="doctorTab('status',this)">Patient Status</button>
+      <button class="nav-btn" onclick="doctorTab('reports',this)">Reports</button>
+    </div>
+    <div class="flex items-center gap-2">
+      <span style="font-size:.85rem;opacity:.8" id="doctorName">Dr. —</span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Welcome -->
+    <div id="doctorWelcome" class="flex items-center justify-between mb-4">
+      <div><h1 class="section-title" style="margin:0">Good day, <span id="doctorWelcomeName">Doctor</span> 👋</h1>
+      <p class="text-muted text-sm" id="doctorDate"></p></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid-4 mb-4">
+      <div class="stat-card"><div class="stat-value" id="statPatients">—</div><div class="stat-label">Total Patients</div></div>
+      <div class="stat-card"><div class="stat-value" id="statPending">—</div><div class="stat-label">Pending Imaging</div></div>
+      <div class="stat-card"><div class="stat-value" id="statCompleted">—</div><div class="stat-label">Completed Cases</div></div>
+      <div class="stat-card"><div class="stat-value" id="statReports">—</div><div class="stat-label">Reports Ready</div></div>
+    </div>
+
+    <!-- ── PATIENTS TAB ── -->
+    <div id="tab-patients" class="tab-content active">
+      <div class="card">
+        <div class="card-header">
+          <h2>All Patients</h2>
+          <input type="text" class="form-control" style="width:280px" placeholder="🔍 Search by name or MR#..." oninput="filterPatients(this.value)"/>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div id="patientsTableWrap" class="table-wrap">
+            <table id="patientsTable">
+              <thead><tr>
+                <th>MR Number</th><th>Patient Name</th><th>Age</th><th>Gender</th><th>Symptoms</th><th>Status</th><th>Action</th>
+              </tr></thead>
+              <tbody id="patientsTableBody">
+                <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">Loading patients...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PATIENT STATUS TAB ── -->
+    <div id="tab-status" class="tab-content">
+      <div class="card">
+        <div class="card-header"><h2>Patient Status — Imaging & Reports</h2></div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th>MR Number</th><th>Patient Name</th><th>Age</th><th>Gender</th><th>Imaging Type</th><th>Status</th><th>Date</th><th>Action</th>
+              </tr></thead>
+              <tbody id="statusTableBody">
+                <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REPORTS TAB ── -->
+    <div id="tab-reports" class="tab-content">
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="flex items-center gap-2">
+            <input type="text" id="reportSearchInput" class="form-control" placeholder="🔍 Search by MR Number (e.g. MR-2024-0001)..." style="max-width:360px"/>
+            <button class="btn btn-primary" onclick="searchReport()">Search</button>
+            <button class="btn btn-outline" onclick="loadAllReports()">Show All</button>
+          </div>
+        </div>
+      </div>
+      <div id="reportsContainer">
+        <div style="text-align:center;padding:60px;color:var(--muted)">
+          <div style="font-size:2rem;margin-bottom:12px">🔍</div>
+          <p>Search by MR Number to find a report, or click "Show All" to view all reports.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PATIENT DASHBOARD
+══════════════════════════════════════════════════════════════ -->
+<div id="patientPage" class="page">
+  <div class="header" style="background:linear-gradient(135deg,var(--accent),#00796B)">
+    <div class="header-brand">
+      <span style="font-size:1.5rem">👤</span>
+      <div><div>MediVision AI</div><span>Patient Portal</span></div>
+    </div>
+    <div class="nav-links">
+      <button class="nav-btn active" onclick="patientTab('appointment',this)">Book Appointment</button>
+      <button class="nav-btn" onclick="patientTab('records',this)">Records</button>
+      <button class="nav-btn" onclick="patientTab('patient-reports',this)">Reports</button>
+      <button class="nav-btn" onclick="patientTab('about',this)">About Us</button>
+    </div>
+    <div class="flex items-center gap-2">
+      <span style="font-size:.85rem;opacity:.8" id="patientName">Patient</span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="flex items-center justify-between mb-4">
+      <div><h1 class="section-title" style="margin:0">Welcome, <span id="patientWelcomeName">—</span> 👋</h1>
+      <p class="text-muted text-sm" id="patientDate"></p></div>
+    </div>
+
+    <!-- ── APPOINTMENT TAB ── -->
+    <div id="tab-appointment" class="tab-content active">
+      <div class="card">
+        <div class="card-header"><h2>📅 Book an Appointment</h2></div>
+        <div class="card-body">
+          <div id="appointmentAlert"></div>
+          <form id="appointmentForm" onsubmit="submitAppointment(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Full Name *</label>
+                <input type="text" id="apt_name" class="form-control" required placeholder="Your full name"/>
+              </div>
+              <div class="form-group">
+                <label>MR Number</label>
+                <input type="text" id="apt_mr" class="form-control" placeholder="MR-2024-XXXX"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Date of Birth</label>
+                <input type="date" id="apt_dob" class="form-control"/>
+              </div>
+              <div class="form-group">
+                <label>Gender *</label>
+                <select id="apt_gender" class="form-control">
+                  <option value="">Select...</option>
+                  <option>male</option><option>female</option><option>other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Phone Number *</label>
+                <input type="tel" id="apt_phone" class="form-control" required placeholder="+91-9876543210"/>
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="apt_email" class="form-control" placeholder="you@email.com"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Symptoms / Reason for Visit *</label>
+              <textarea id="apt_symptoms" class="form-control" rows="3" required placeholder="Describe your symptoms or reason for visiting..."></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Preferred Department</label>
+                <select id="apt_dept" class="form-control">
+                  <option value="">Select Department...</option>
+                  <option>General Medicine</option><option>Cardiology</option>
+                  <option>Neurology</option><option>Chest & Pulmonary</option>
+                  <option>Orthopedics</option><option>Oncology</option>
+                  <option>Radiology</option><option>Pediatrics</option>
+                  <option>Gynecology</option><option>ENT</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Preferred Doctor</label>
+                <input type="text" id="apt_doctor" class="form-control" placeholder="Dr. Name (optional)"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Preferred Appointment Date *</label>
+                <input type="date" id="apt_date" class="form-control" required/>
+              </div>
+              <div class="form-group">
+                <label>Preferred Time *</label>
+                <input type="time" id="apt_time" class="form-control" required/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Additional Notes</label>
+              <textarea id="apt_notes" class="form-control" rows="2" placeholder="Any additional information..."></textarea>
+            </div>
+            <div class="flex justify-end gap-2">
+              <button type="reset" class="btn btn-outline">Reset</button>
+              <button type="submit" class="btn btn-success" id="aptSubmitBtn">📅 Book Appointment</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Appointment History -->
+      <div class="card mt-4">
+        <div class="card-header"><h2>My Appointments</h2></div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Date</th><th>Time</th><th>Department</th><th>Symptoms</th><th>Status</th></tr></thead>
+          <tbody id="myAppointmentsBody">
+            <tr><td colspan="5" style="text-align:center;padding:30px;color:var(--muted)">Loading...</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RECORDS TAB ── -->
+    <div id="tab-records" class="tab-content">
+      <div class="card">
+        <div class="card-header"><h2>📁 My Medical Records</h2></div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table><thead><tr>
+              <th>Visit Date</th><th>Diagnosis</th><th>Summary</th><th>Report</th>
+            </tr></thead>
+            <tbody id="recordsTableBody">
+              <tr><td colspan="4" style="text-align:center;padding:40px;color:var(--muted)">Loading records...</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PATIENT REPORTS TAB ── -->
+    <div id="tab-patient-reports" class="tab-content">
+      <h2 class="section-title">My Reports</h2>
+      <div id="patientReportsContainer">
+        <div style="text-align:center;padding:60px;color:var(--muted)">
+          <div class="loading-spinner" style="margin:0 auto 12px"></div>
+          <p>Loading your reports...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ABOUT TAB ── -->
+    <div id="tab-about" class="tab-content">
+      <div class="card">
+        <div class="card-body">
+          <div style="text-align:center;margin-bottom:32px">
+            <div style="font-size:3rem;margin-bottom:12px">🏥</div>
+            <h2 style="font-size:1.8rem;font-weight:700;color:var(--primary)">City Medical Center</h2>
+            <p style="color:var(--muted)">Powered by MediVision AI</p>
+          </div>
+          <div class="grid-2">
+            <div>
+              <h3 style="font-weight:700;margin-bottom:12px;color:var(--primary)">Our History</h3>
+              <p style="color:var(--muted);line-height:1.8;font-size:.9rem">Established in 1985, City Medical Center has grown from a small clinic to a full-service tertiary care hospital with over 500 beds, 1,200 staff, and a legacy of saving lives across South India for over four decades.</p>
+              <h3 style="font-weight:700;margin:20px 0 12px;color:var(--primary)">Our Mission</h3>
+              <p style="color:var(--muted);line-height:1.8;font-size:.9rem">To provide compassionate, world-class healthcare to every patient regardless of background, integrating the latest medical technology to ensure accurate diagnosis and effective treatment.</p>
+              <h3 style="font-weight:700;margin:20px 0 12px;color:var(--primary)">Our Vision</h3>
+              <p style="color:var(--muted);line-height:1.8;font-size:.9rem">To be South Asia's leading AI-integrated healthcare institution, setting benchmarks for diagnostic precision, patient experience, and clinical excellence.</p>
+            </div>
+            <div>
+              <h3 style="font-weight:700;margin-bottom:12px;color:var(--primary)">Contact Us</h3>
+              <div style="display:flex;flex-direction:column;gap:12px;font-size:.9rem">
+                <div style="background:#F8FAFC;padding:12px;border-radius:8px"><strong>📍 Address</strong><br>123 Medical Drive, Anna Nagar<br>Chennai, Tamil Nadu 600040</div>
+                <div style="background:#F8FAFC;padding:12px;border-radius:8px"><strong>📞 Phone</strong><br>General: +91-44-1234-5678<br>Emergency: +91-44-1234-9999 (24/7)</div>
+                <div style="background:#F8FAFC;padding:12px;border-radius:8px"><strong>📧 Email</strong><br>info@medivision-ai.com<br>appointments@medivision-ai.com</div>
+                <div style="background:#FEF2F2;padding:12px;border-radius:8px"><strong>🚨 Emergency</strong><br>Available 24 hours, 7 days a week<br>Ambulance: +91-44-1234-0000</div>
+              </div>
+              <h3 style="font-weight:700;margin:20px 0 12px;color:var(--primary)">OPD Hours</h3>
+              <div style="font-size:.85rem;color:var(--muted)">
+                Monday – Friday: 8:00 AM – 8:00 PM<br>
+                Saturday: 8:00 AM – 6:00 PM<br>
+                Sunday: Emergency only
+              </div>
+            </div>
+          </div>
+          <div class="alert alert-info mt-4">
+            🔒 <strong>Privacy Policy:</strong> We are committed to protecting your personal and medical information in accordance with applicable healthcare data protection laws. Your data is encrypted, securely stored, and never shared without your explicit consent.
+          </div>
+          <p style="text-align:center;color:var(--muted);font-size:.8rem;margin-top:20px">
+            By using this portal, you agree to our <a href="#" style="color:var(--primary)">Terms of Service</a> and <a href="#" style="color:var(--primary)">Privacy Policy</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     IMAGING / SPECIALIST PORTAL
+══════════════════════════════════════════════════════════════ -->
+<div id="imagingPage" class="page">
+  <div class="header" style="background:linear-gradient(135deg,#4A148C,#6A1B9A)">
+    <div class="header-brand">
+      <span style="font-size:1.5rem">🔬</span>
+      <div><div>MediVision AI</div><span>Imaging Portal</span></div>
+    </div>
+    <div class="nav-links">
+      <button class="nav-btn active" onclick="imagingTab('requests',this)">Pending Requests</button>
+      <button class="nav-btn" onclick="imagingTab('upload',this)">Upload Image</button>
+    </div>
+    <div class="flex items-center gap-2">
+      <span style="font-size:.85rem;opacity:.8" id="specialistName">Specialist</span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="section-title" style="margin:0">Medical Imaging Workflow</h1>
+      <button class="btn btn-outline" onclick="loadImagingRequests()">🔄 Refresh</button>
+    </div>
+
+    <!-- ── REQUESTS TAB ── -->
+    <div id="tab-requests" class="tab-content active">
+      <div class="card">
+        <div class="card-header"><h2>Pending Imaging Requests</h2></div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table><thead><tr>
+              <th>MR Number</th><th>Patient Name</th><th>Doctor</th><th>Imaging Type</th><th>Reason</th><th>Status</th><th>Date</th><th>Action</th>
+            </tr></thead>
+            <tbody id="imagingRequestsBody">
+              <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">Loading requests...</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── UPLOAD TAB ── -->
+    <div id="tab-upload" class="tab-content">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><h2>Upload Medical Image</h2></div>
+          <div class="card-body">
+            <div id="uploadAlert"></div>
+            <form id="uploadForm" onsubmit="submitImageUpload(event)">
+              <div class="form-group">
+                <label>Select Imaging Request *</label>
+                <select id="upload_request_id" class="form-control" required onchange="onRequestSelect(this.value)">
+                  <option value="">Choose a request...</option>
+                </select>
+              </div>
+              <div id="uploadRequestInfo" class="alert alert-info hidden"></div>
+              <div class="form-group">
+                <label>Imaging Type *</label>
+                <select id="upload_imaging_type" class="form-control" required>
+                  <option value="">Select type...</option>
+                  <option value="xray">X-Ray</option>
+                  <option value="ct_scan">CT Scan</option>
+                  <option value="mri">MRI</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Medical Image *</label>
+                <div class="upload-zone" id="uploadZone" onclick="document.getElementById('upload_file').click()" 
+                     ondragover="event.preventDefault();this.classList.add('dragging')"
+                     ondragleave="this.classList.remove('dragging')"
+                     ondrop="handleDrop(event)">
+                  <div class="upload-zone-icon">📂</div>
+                  <div id="uploadZoneText">
+                    <strong>Click to select file</strong> or drag & drop here
+                    <div class="text-muted text-sm mt-4">Supported: JPEG, PNG, TIFF, DICOM · Max 50MB</div>
+                  </div>
+                  <input type="file" id="upload_file" accept=".jpg,.jpeg,.png,.tiff,.tif,.dcm" onchange="onFileSelect(this)"/>
+                </div>
+              </div>
+              <div class="flex justify-end gap-2">
+                <button type="reset" class="btn btn-outline" onclick="resetUploadForm()">Reset</button>
+                <button type="submit" class="btn btn-primary" id="uploadSubmitBtn">📤 Upload & Analyze</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-header"><h2>Upload Instructions</h2></div>
+            <div class="card-body">
+              <ol style="padding-left:20px;line-height:2;font-size:.9rem;color:var(--muted)">
+                <li>Select the imaging request from the dropdown</li>
+                <li>Verify the imaging type matches the request</li>
+                <li>Upload the medical image file</li>
+                <li>Click "Upload & Analyze" to submit</li>
+                <li>AI analysis will run automatically</li>
+                <li>A PDF report will be generated</li>
+                <li>The doctor will review the report</li>
+              </ol>
+              <div class="alert alert-warn mt-4">
+                ⚠️ Ensure the uploaded image matches the requested imaging type exactly.
+              </div>
+              <div class="alert alert-info mt-4">
+                🤖 <strong>AI Analysis:</strong> After upload, Vision AI and GenAI models will analyze the image and generate a preliminary report for doctor review.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════════════════════════ -->
+
+<!-- Imaging Request Modal -->
+<div id="imagingRequestModal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Request Medical Imaging</h3>
+      <button class="close-btn" onclick="closeModal('imagingRequestModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="imagingRequestAlert"></div>
+      <div id="selectedPatientInfo" class="alert alert-info mb-4"></div>
+      <form id="imagingRequestForm" onsubmit="submitImagingRequest(event)">
+        <input type="hidden" id="ir_patient_id"/>
+        <div class="form-group">
+          <label>Imaging Type *</label>
+          <select id="ir_type" class="form-control" required>
+            <option value="">Select...</option>
+            <option value="xray">X-Ray</option>
+            <option value="ct_scan">CT Scan</option>
+            <option value="mri">MRI</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Reason for Imaging *</label>
+          <textarea id="ir_reason" class="form-control" rows="2" required placeholder="Clinical reason for the imaging request..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Symptoms</label>
+          <textarea id="ir_symptoms" class="form-control" rows="2" placeholder="Patient's current symptoms..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Additional Notes</label>
+          <textarea id="ir_notes" class="form-control" rows="2" placeholder="Any additional notes for the specialist..."></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('imagingRequestModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="document.getElementById('imagingRequestForm').dispatchEvent(new Event('submit'))">Submit Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- Report View Modal -->
+<div id="reportModal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:780px">
+    <div class="modal-header">
+      <h3 id="reportModalTitle">Medical Report</h3>
+      <button class="close-btn" onclick="closeModal('reportModal')">×</button>
+    </div>
+    <div class="modal-body" id="reportModalBody">Loading...</div>
+    <div class="modal-footer" id="reportModalFooter"></div>
+  </div>
+</div>
+
+<!-- Doctor Assessment Modal -->
+<div id="assessmentModal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Final Clinical Assessment</h3>
+      <button class="close-btn" onclick="closeModal('assessmentModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="assessmentAlert"></div>
+      <div class="alert alert-info mb-4">
+        ℹ️ Your assessment will be clearly distinguished from the AI-generated findings. The AI analysis is a decision-support tool — your professional judgment is the final authority.
+      </div>
+      <form id="assessmentForm">
+        <input type="hidden" id="assess_report_id"/>
+        <div class="form-group">
+          <label>Conclusion *</label>
+          <textarea id="assess_conclusion" class="form-control" rows="3" required placeholder="Your overall clinical conclusion..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Final Diagnosis *</label>
+          <input type="text" id="assess_diagnosis" class="form-control" required placeholder="ICD-10 diagnosis or clinical diagnosis..."/>
+        </div>
+        <div class="form-group">
+          <label>Medications Prescribed</label>
+          <textarea id="assess_medications" class="form-control" rows="2" placeholder="Drug name, dosage, frequency, duration..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Recommendations</label>
+          <textarea id="assess_recommendations" class="form-control" rows="2" placeholder="Clinical recommendations..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Follow-up Instructions</label>
+          <textarea id="assess_followup" class="form-control" rows="2" placeholder="Follow-up plan, review date..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Additional Notes</label>
+          <textarea id="assess_notes" class="form-control" rows="2" placeholder="Any additional notes..."></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('assessmentModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitAssessment()">💾 Save Assessment</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════════ -->
+<script>
+// ── Config ────────────────────────────────────────────────────
+const API_BASE = 'http://localhost:8000';
+let currentRole = null;
+let authToken = null;
+let currentUser = null;
+
+// ── API Helper ────────────────────────────────────────────────
+async function api(method, path, body=null, isForm=false) {
+  const headers = {};
+  if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+  if (body && !isForm) headers['Content-Type'] = 'application/json';
+  const opts = { method, headers };
+  if (body) opts.body = isForm ? body : JSON.stringify(body);
+  const res = await fetch(API_BASE + path, opts);
+  const data = await res.json().catch(()=>({detail: res.statusText}));
+  if (!res.ok) throw new Error(data.detail || `HTTP ${res.status}`);
+  return data;
+}
+
+// ── UI Helpers ────────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id+'Page')?.classList.add('active');
+}
+function showLoading(v=true) { document.getElementById('loadingOverlay').classList.toggle('hidden', !v); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function setAlert(elId, msg, type='error') {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.innerHTML = msg ? `<div class="alert alert-${type}">${msg}</div>` : '';
+}
+function statusBadge(s) {
+  const map = {
+    requested:'blue', assigned:'blue', image_uploaded:'blue',
+    analysis_pending:'yellow', analyzed:'yellow', report_generated:'yellow',
+    doctor_review:'yellow', completed:'green',
+    pending:'yellow', confirmed:'blue', cancelled:'red',
+    generated:'yellow', under_review:'yellow', finalized:'teal', available_to_patient:'green'
+  };
+  const cls = map[s] || 'gray';
+  const label = s ? s.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()) : '—';
+  return `<span class="badge badge-${cls}">${label}</span>`;
+}
+function imagingTypeLabel(t) {
+  return {xray:'X-Ray',ct_scan:'CT Scan',mri:'MRI'}[t] || (t||'').toUpperCase();
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  try { return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
+  catch(e){ return d; }
+}
+
+// ── Auth ──────────────────────────────────────────────────────
+function showLogin(role) {
+  currentRole = role;
+  const labels = {patient:'Patient Portal', doctor:'Doctor Portal', specialist:'Imaging Portal'};
+  document.getElementById('loginRoleLabel').textContent = `Sign in — ${labels[role]||role}`;
+  showPage('login');
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('loginBtn');
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+  setAlert('loginAlert','');
+  try {
+    const data = await api('POST','/auth/login',{email,password});
+    authToken = data.access_token;
+    currentUser = data.user;
+    localStorage.setItem('mv_token', authToken);
+    localStorage.setItem('mv_user', JSON.stringify(currentUser));
+    routeByRole(data.user.role);
+  } catch(err) {
+    setAlert('loginAlert', '❌ ' + (err.message || 'Login failed'));
+  } finally {
+    btn.innerHTML = 'Sign In';
+    btn.disabled = false;
+  }
+}
+
+function routeByRole(role) {
+  if (role === 'doctor' || role === 'admin') { showPage('doctor'); initDoctorDashboard(); }
+  else if (role === 'specialist' || role === 'imaging_staff') { showPage('imaging'); initImagingPortal(); }
+  else { showPage('patient'); initPatientDashboard(); }
+}
+
+function logout() {
+  authToken = null; currentUser = null;
+  localStorage.removeItem('mv_token');
+  localStorage.removeItem('mv_user');
+  showPage('landing');
+}
+
+// ── Tab Navigation ────────────────────────────────────────────
+function switchTab(prefix, name, btn) {
+  document.querySelectorAll(`[id^="tab-${prefix}-"],#tab-${prefix}${name?'-'+name:''}`).forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const tabId = `tab-${name}`;
+  const el = document.getElementById(tabId);
+  if (el) el.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+function doctorTab(name, btn) {
+  document.querySelectorAll('[id^="tab-"]').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const el = document.getElementById(`tab-${name}`);
+  if(el) el.classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(name==='status') loadStatusTab();
+  if(name==='reports') loadAllReports();
+}
+function patientTab(name, btn) {
+  document.querySelectorAll('[id^="tab-"]').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const el = document.getElementById(`tab-${name}`);
+  if(el) el.classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(name==='records') loadPatientRecords();
+  if(name==='patient-reports') loadPatientReports();
+}
+function imagingTab(name, btn) {
+  document.querySelectorAll('[id^="tab-"]').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const el = document.getElementById(`tab-${name}`);
+  if(el) el.classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(name==='requests') loadImagingRequests();
+  if(name==='upload') loadUploadRequestList();
+}
+
+// ════════════════════════════════════════════════════════════════
+// DOCTOR DASHBOARD
+// ════════════════════════════════════════════════════════════════
+let allPatients = [];
+
+async function initDoctorDashboard() {
+  document.getElementById('doctorName').textContent = currentUser?.full_name || 'Doctor';
+  document.getElementById('doctorWelcomeName').textContent = currentUser?.full_name?.replace('Dr. ','') || 'Doctor';
+  document.getElementById('doctorDate').textContent = new Date().toDateString();
+  await loadPatientsList();
+  await updateDoctorStats();
+}
+
+async function updateDoctorStats() {
+  try {
+    const requests = await api('GET', '/imaging/requests');
+    const pending = requests.filter(r=>!['completed'].includes(r.status)).length;
+    const completed = requests.filter(r=>r.status==='completed').length;
+    const reports = requests.filter(r=>['report_generated','doctor_review','finalized','available_to_patient'].includes(r.status)).length;
+    document.getElementById('statPatients').textContent = allPatients.length;
+    document.getElementById('statPending').textContent = pending;
+    document.getElementById('statCompleted').textContent = completed;
+    document.getElementById('statReports').textContent = reports;
+  } catch(e) { console.warn('Stats error:', e); }
+}
+
+async function loadPatientsList() {
+  const tbody = document.getElementById('patientsTableBody');
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)"><div class="loading-spinner" style="margin:0 auto 8px"></div>Loading patients...</td></tr>';
+  try {
+    const patients = await api('GET', '/patients');
+    allPatients = patients;
+    renderPatientsTable(patients);
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--danger)">❌ ${e.message}</td></tr>`;
+  }
+}
+
+function renderPatientsTable(patients) {
+  const tbody = document.getElementById('patientsTableBody');
+  if (!patients.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">No patients found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = patients.map(p=>`
+    <tr>
+      <td><code style="background:#F1F5F9;padding:2px 8px;border-radius:4px;font-size:.8rem">${p.mr_number||'—'}</code></td>
+      <td><strong>${p.full_name||'—'}</strong></td>
+      <td>${p.age||'—'}</td>
+      <td><span class="badge badge-${p.gender==='female'?'teal':p.gender==='male'?'blue':'gray'}">${(p.gender||'—').charAt(0).toUpperCase()+(p.gender||'').slice(1)}</span></td>
+      <td style="max-width:220px;color:var(--muted);font-size:.85rem">${p.symptoms||'Refer to appointment records'}</td>
+      <td>${statusBadge('active')}</td>
+      <td>
+        <button class="btn btn-primary btn-sm" onclick="openImagingRequestModal('${p.id}','${p.full_name}','${p.mr_number}','')">📋 Request Imaging</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterPatients(q) {
+  const filtered = allPatients.filter(p=>
+    (p.full_name||'').toLowerCase().includes(q.toLowerCase()) ||
+    (p.mr_number||'').toLowerCase().includes(q.toLowerCase())
+  );
+  renderPatientsTable(filtered);
+}
+
+async function loadStatusTab() {
+  const tbody = document.getElementById('statusTableBody');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)"><div class="loading-spinner" style="margin:0 auto 8px"></div>Loading...</td></tr>';
+  try {
+    const requests = await api('GET', '/imaging/requests');
+    if (!requests.length) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">No imaging requests found</td></tr>';
+      return;
+    }
+    tbody.innerHTML = requests.map(r=>{
+      const patient = r.patients || {};
+      const isCompleted = ['report_generated','doctor_review','finalized','available_to_patient','completed'].includes(r.status);
+      const action = isCompleted
+        ? `<button class="btn btn-success btn-sm" onclick="openReportByMR('${patient.mr_number||r.mr_number}')">📄 View Report</button>`
+        : `<span class="badge badge-yellow">⏳ Pending</span>`;
+      return `
+        <tr>
+          <td><code style="background:#F1F5F9;padding:2px 8px;border-radius:4px;font-size:.8rem">${patient.mr_number||r.mr_number||'—'}</code></td>
+          <td>${patient.full_name||'—'}</td>
+          <td>${patient.age||'—'}</td>
+          <td>${(patient.gender||'—').charAt(0).toUpperCase()+(patient.gender||'').slice(1)}</td>
+          <td>${imagingTypeLabel(r.imaging_type)}</td>
+          <td>${statusBadge(r.status)}</td>
+          <td style="font-size:.8rem;color:var(--muted)">${fmtDate(r.requested_at||r.created_at)}</td>
+          <td>${action}</td>
+        </tr>
+      `;
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--danger)">❌ ${e.message}</td></tr>`;
+  }
+}
+
+async function openReportByMR(mr) {
+  if (!mr) return;
+  document.getElementById('reportSearchInput').value = mr;
+  doctorTab('reports', document.querySelectorAll('.nav-btn')[2]);
+  await searchReportByMR(mr);
+}
+
+async function searchReport() {
+  const mr = document.getElementById('reportSearchInput').value.trim();
+  if (!mr) return;
+  await searchReportByMR(mr);
+}
+
+async function searchReportByMR(mr) {
+  const container = document.getElementById('reportsContainer');
+  container.innerHTML = '<div style="text-align:center;padding:40px"><div class="loading-spinner" style="margin:0 auto 12px"></div><p style="color:var(--muted)">Searching...</p></div>';
+  try {
+    const reports = await api('GET', `/reports/search/${encodeURIComponent(mr)}`);
+    renderReportCards(reports, container, true);
+  } catch(e) {
+    container.innerHTML = `<div class="alert alert-error">${e.message}</div>`;
+  }
+}
+
+async function loadAllReports() {
+  const container = document.getElementById('reportsContainer');
+  container.innerHTML = '<div style="text-align:center;padding:40px"><div class="loading-spinner" style="margin:0 auto 12px"></div></div>';
+  try {
+    const reports = await api('GET', '/reports');
+    renderReportCards(reports, container, true);
+  } catch(e) {
+    container.innerHTML = `<div class="alert alert-error">${e.message}</div>`;
+  }
+}
+
+function renderReportCards(reports, container, isDoctor=false) {
+  if (!reports.length) {
+    container.innerHTML = '<div style="text-align:center;padding:60px;color:var(--muted)"><div style="font-size:2rem;margin-bottom:12px">📋</div><p>No reports found</p></div>';
+    return;
+  }
+  container.innerHTML = reports.map(r=>{
+    const patient = r.patients || {};
+    const study = r.imaging_studies || {};
+    const ai = r.ai_analysis_results || {};
+    const da = r.doctor_assessments || {};
+    return `
+      <div class="card mb-4">
+        <div class="card-header">
+          <div class="flex items-center gap-2">
+            <span style="font-size:1.3rem">${study.imaging_type==='xray'?'🫁':study.imaging_type==='ct_scan'?'🧠':'🔮'}</span>
+            <div>
+              <strong>${patient.full_name||'Patient'}</strong>
+              <div class="text-sm text-muted">MR: ${patient.mr_number||'—'} · ${imagingTypeLabel(study.imaging_type||'')} · ${fmtDate(r.generated_at)}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            ${statusBadge(r.report_status)}
+            <button class="btn btn-outline btn-sm" onclick="viewFullReport('${r.id}',${isDoctor})">👁 View Full Report</button>
+            ${isDoctor ? `<button class="btn btn-primary btn-sm" onclick="openAssessmentModal('${r.id}')">✏️ Add Assessment</button>` : ''}
+          </div>
+        </div>
+        <div class="card-body">
+          ${ai.finding ? `
+          <div class="report-ai-banner">
+            <h4>🤖 AI Finding (Demo — Not a Medical Diagnosis)</h4>
+            <p style="font-size:.85rem">${ai.finding}</p>
+            ${ai.confidence_score ? `<p style="font-size:.8rem;color:var(--muted);margin-top:4px">Confidence: ${(ai.confidence_score*100).toFixed(0)}%</p>` : ''}
+          </div>` : ''}
+          ${da.diagnosis ? `
+          <div class="report-doctor-banner">
+            <h4>✔ Doctor's Final Diagnosis</h4>
+            <p style="font-size:.85rem"><strong>${da.diagnosis}</strong></p>
+            ${da.conclusion ? `<p style="font-size:.85rem;margin-top:4px">${da.conclusion}</p>` : ''}
+          </div>` : (isDoctor ? '<div class="alert alert-warn">⚠️ Doctor assessment not yet submitted for this report.</div>' : '')}
+          ${isDoctor && r.report_status !== 'available_to_patient' ? `
+          <div class="flex justify-end gap-2 mt-4">
+            <button class="btn btn-success btn-sm" onclick="finalizeReport('${r.id}')">✔ Finalize Report</button>
+            <button class="btn btn-primary btn-sm" onclick="sendToPatient('${r.id}')">📤 Send to Patient</button>
+          </div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function viewFullReport(reportId, isDoctor=false) {
+  openModal('reportModal');
+  document.getElementById('reportModalBody').innerHTML = '<div style="text-align:center;padding:40px"><div class="loading-spinner" style="margin:0 auto 12px"></div></div>';
+  try {
+    const r = await api('GET', `/reports/${reportId}`);
+    const patient = r.patients || {};
+    const study = r.imaging_studies || {};
+    const ai = r.ai_analysis_results || {};
+    const da = r.doctor_assessments || {};
+
+    document.getElementById('reportModalTitle').textContent = `Report — ${patient.full_name||''} (${patient.mr_number||''})`;
+
+    let html = `
+      <div class="alert alert-info" style="font-size:.8rem">📋 Report Date: ${fmtDate(r.generated_at)} · Status: ${r.report_status?.replace(/_/g,' ')}</div>
+
+      <div class="report-section">
+        <h4>Patient Information</h4>
+        <div class="grid-2" style="gap:8px">
+          <div><strong>Name:</strong> ${patient.full_name||'—'}</div>
+          <div><strong>MR No:</strong> ${patient.mr_number||'—'}</div>
+          <div><strong>Age:</strong> ${patient.age||'—'}</div>
+          <div><strong>Gender:</strong> ${patient.gender||'—'}</div>
+          <div><strong>Imaging Type:</strong> ${imagingTypeLabel(study.imaging_type||'')}</div>
+          <div><strong>Study Date:</strong> ${fmtDate(study.uploaded_at)}</div>
+        </div>
+      </div>
+
+      ${ai.finding ? `
+      <div class="report-ai-banner">
+        <h4>🤖 AI-Generated Findings (Demo — Not a Medical Diagnosis)</h4>
+        <p style="font-size:.85rem;margin-top:8px"><strong>Finding:</strong> ${ai.finding}</p>
+        <p style="font-size:.85rem"><strong>Location:</strong> ${ai.location||'—'}</p>
+        <p style="font-size:.85rem"><strong>Confidence:</strong> ${ai.confidence_score ? (ai.confidence_score*100).toFixed(0)+'%' : '—'}</p>
+        <p style="font-size:.85rem"><strong>Model:</strong> ${ai.model_name||'—'} v${ai.model_version||'—'}</p>
+      </div>
+      <div class="report-section">
+        <h4>Clinical Context (AI)</h4>
+        <p>${ai.clinical_context||'—'}</p>
+      </div>
+      <div class="report-section">
+        <h4>AI Explanation</h4>
+        <p>${ai.explanation||'—'}</p>
+      </div>
+      <div class="report-section" style="border-left-color:var(--danger)">
+        <h4 style="color:var(--danger)">⚠ Limitations & Disclaimer</h4>
+        <p style="font-size:.8rem;color:var(--danger)">${ai.limitations||'—'}</p>
+      </div>` : '<div class="alert alert-warn">AI analysis not yet available</div>'}
+
+      ${da.diagnosis ? `
+      <div class="report-doctor-banner">
+        <h4>✔ Doctor's Final Clinical Assessment</h4>
+        <div style="display:grid;gap:8px;margin-top:8px;font-size:.9rem">
+          <div><strong>Diagnosis:</strong> ${da.diagnosis}</div>
+          <div><strong>Conclusion:</strong> ${da.conclusion||'—'}</div>
+          <div><strong>Medications:</strong> ${da.medications||'None specified'}</div>
+          <div><strong>Recommendations:</strong> ${da.recommendations||'—'}</div>
+          <div><strong>Follow-up:</strong> ${da.follow_up_instructions||'—'}</div>
+          ${da.additional_notes?`<div><strong>Notes:</strong> ${da.additional_notes}</div>`:''}
+          <div style="font-size:.8rem;color:var(--muted)">Finalized: ${fmtDate(da.finalized_at)}</div>
+        </div>
+      </div>` : (isDoctor ? '<div class="alert alert-warn">⚠️ No doctor assessment yet. Please add your assessment below.</div>' : '')}
+    `;
+
+    document.getElementById('reportModalBody').innerHTML = html;
+
+    const footer = document.getElementById('reportModalFooter');
+    let footerHtml = '';
+    if (r.report_pdf_path) {
+      footerHtml += `<button class="btn btn-outline" onclick="downloadPDF('${reportId}')">📄 Download PDF</button>`;
+    }
+    if (isDoctor) {
+      footerHtml += `<button class="btn btn-primary" onclick="closeModal('reportModal');openAssessmentModal('${reportId}')">✏️ Add/Edit Assessment</button>`;
+      if (['generated','under_review','finalized'].includes(r.report_status)) {
+        footerHtml += `<button class="btn btn-success" onclick="finalizeReport('${reportId}')">✔ Finalize</button>`;
+      }
+      if (r.report_status === 'finalized') {
+        footerHtml += `<button class="btn btn-primary" onclick="sendToPatient('${reportId}')">📤 Send to Patient</button>`;
+      }
+    }
+    footerHtml += `<button class="btn btn-outline" onclick="closeModal('reportModal')">Close</button>`;
+    footer.innerHTML = footerHtml;
+  } catch(e) {
+    document.getElementById('reportModalBody').innerHTML = `<div class="alert alert-error">❌ ${e.message}</div>`;
+  }
+}
+
+async function downloadPDF(reportId) {
+  try {
+    const data = await api('GET', `/reports/${reportId}/pdf-url`);
+    window.open(data.url, '_blank');
+  } catch(e) {
+    alert('Failed to get PDF: ' + e.message);
+  }
+}
+
+function openImagingRequestModal(patientId, name, mr, symptoms) {
+  document.getElementById('ir_patient_id').value = patientId;
+  document.getElementById('selectedPatientInfo').innerHTML = `<strong>Patient:</strong> ${name} · MR: ${mr}`;
+  document.getElementById('ir_symptoms').value = symptoms || '';
+  setAlert('imagingRequestAlert','');
+  openModal('imagingRequestModal');
+}
+
+async function submitImagingRequest(e) {
+  e.preventDefault();
+  const patientId = document.getElementById('ir_patient_id').value;
+  const imaging_type = document.getElementById('ir_type').value;
+  const reason = document.getElementById('ir_reason').value;
+  const symptoms = document.getElementById('ir_symptoms').value;
+  const notes = document.getElementById('ir_notes').value;
+  setAlert('imagingRequestAlert','');
+  try {
+    await api('POST', '/imaging/requests', {patient_id:patientId, imaging_type, reason, symptoms, notes});
+    setAlert('imagingRequestAlert','✅ Imaging request submitted successfully!','success');
+    setTimeout(()=>closeModal('imagingRequestModal'), 1500);
+    loadStatusTab();
+  } catch(e) {
+    setAlert('imagingRequestAlert','❌ ' + e.message);
+  }
+}
+
+function openAssessmentModal(reportId) {
+  document.getElementById('assess_report_id').value = reportId;
+  setAlert('assessmentAlert','');
+  ['conclusion','diagnosis','medications','recommendations','followup','notes'].forEach(f=>{
+    const el = document.getElementById(`assess_${f}`);
+    if(el) el.value = '';
+  });
+  openModal('assessmentModal');
+}
+
+async function submitAssessment() {
+  const reportId = document.getElementById('assess_report_id').value;
+  const body = {
+    conclusion: document.getElementById('assess_conclusion').value,
+    diagnosis: document.getElementById('assess_diagnosis').value,
+    medications: document.getElementById('assess_medications').value,
+    recommendations: document.getElementById('assess_recommendations').value,
+    follow_up_instructions: document.getElementById('assess_followup').value,
+    additional_notes: document.getElementById('assess_notes').value,
+  };
+  setAlert('assessmentAlert','');
+  try {
+    await api('POST', `/reports/${reportId}/assessment`, body);
+    setAlert('assessmentAlert','✅ Assessment saved!','success');
+    setTimeout(()=>closeModal('assessmentModal'), 1200);
+    loadAllReports();
+  } catch(e) {
+    setAlert('assessmentAlert','❌ ' + e.message);
+  }
+}
+
+async function finalizeReport(reportId) {
+  if (!confirm('Finalize this report? This will mark it as reviewed by you.')) return;
+  try {
+    await api('PATCH', `/reports/${reportId}/finalize`);
+    alert('✅ Report finalized!');
+    loadAllReports();
+    closeModal('reportModal');
+  } catch(e) {
+    alert('❌ ' + e.message);
+  }
+}
+
+async function sendToPatient(reportId) {
+  if (!confirm('Send this report to the patient? They will be able to view it in their portal.')) return;
+  try {
+    await api('PATCH', `/reports/${reportId}/send-to-patient`);
+    alert('✅ Report sent to patient!');
+    loadAllReports();
+    closeModal('reportModal');
+  } catch(e) {
+    alert('❌ ' + e.message);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// PATIENT DASHBOARD
+// ════════════════════════════════════════════════════════════════
+async function initPatientDashboard() {
+  document.getElementById('patientName').textContent = currentUser?.full_name || 'Patient';
+  document.getElementById('patientWelcomeName').textContent = currentUser?.full_name || '—';
+  document.getElementById('patientDate').textContent = new Date().toDateString();
+  // Set min appointment date
+  const dateInput = document.getElementById('apt_date');
+  if(dateInput) dateInput.min = new Date().toISOString().split('T')[0];
+  // Prefill patient name
+  const nameInput = document.getElementById('apt_name');
+  if(nameInput && currentUser?.full_name) nameInput.value = currentUser.full_name;
+  await loadMyAppointments();
+}
+
+async function submitAppointment(e) {
+  e.preventDefault();
+  setAlert('appointmentAlert','');
+  const btn = document.getElementById('aptSubmitBtn');
+  btn.innerHTML = '<span class="spinner"></span> Booking...';
+  btn.disabled = true;
+  const body = {
+    full_name: document.getElementById('apt_name').value,
+    mr_number: document.getElementById('apt_mr').value || null,
+    date_of_birth: document.getElementById('apt_dob').value || null,
+    gender: document.getElementById('apt_gender').value || null,
+    phone: document.getElementById('apt_phone').value,
+    email: document.getElementById('apt_email').value || null,
+    symptoms: document.getElementById('apt_symptoms').value,
+    department: document.getElementById('apt_dept').value || null,
+    preferred_doctor: document.getElementById('apt_doctor').value || null,
+    appointment_date: document.getElementById('apt_date').value,
+    appointment_time: document.getElementById('apt_time').value,
+    notes: document.getElementById('apt_notes').value || null,
+  };
+  try {
+    await api('POST', '/appointments', body);
+    setAlert('appointmentAlert','✅ Appointment booked successfully! We will confirm your appointment within 24 hours.','success');
+    document.getElementById('appointmentForm').reset();
+    if(document.getElementById('apt_name') && currentUser?.full_name) document.getElementById('apt_name').value = currentUser.full_name;
+    await loadMyAppointments();
+  } catch(e) {
+    setAlert('appointmentAlert','❌ ' + e.message);
+  } finally {
+    btn.innerHTML = '📅 Book Appointment';
+    btn.disabled = false;
+  }
+}
+
+async function loadMyAppointments() {
+  const tbody = document.getElementById('myAppointmentsBody');
+  try {
+    const apts = await api('GET', '/appointments');
+    if (!apts.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">No appointments yet</td></tr>';
+      return;
+    }
+    tbody.innerHTML = apts.map(a=>`
+      <tr>
+        <td>${fmtDate(a.appointment_date)}</td>
+        <td>${a.appointment_time||'—'}</td>
+        <td>${a.department||'—'}</td>
+        <td style="max-width:200px;font-size:.85rem">${a.symptoms||'—'}</td>
+        <td>${statusBadge(a.status)}</td>
+      </tr>
+    `).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--danger)">${e.message}</td></tr>`;
+  }
+}
+
+async function loadPatientRecords() {
+  const tbody = document.getElementById('recordsTableBody');
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px"><div class="loading-spinner" style="margin:0 auto 8px"></div></td></tr>';
+  try {
+    // Get patient ID
+    const me = await api('GET', '/patients/me');
+    const records = await api('GET', `/patients/${me.id}/records`);
+    if (!records.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--muted)">No medical records found</td></tr>';
+      return;
+    }
+    tbody.innerHTML = records.map(r=>`
+      <tr>
+        <td>${fmtDate(r.visit_date)}</td>
+        <td><strong>${r.diagnosis||'—'}</strong></td>
+        <td style="font-size:.85rem;color:var(--muted)">${r.summary||'—'}</td>
+        <td>${r.report_id ? `<button class="btn btn-outline btn-sm" onclick="viewPatientReport('${r.report_id}')">📄 View Report</button>` : '—'}</td>
+      </tr>
+    `).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--danger)">${e.message}</td></tr>`;
+  }
+}
+
+async function loadPatientReports() {
+  const container = document.getElementById('patientReportsContainer');
+  container.innerHTML = '<div style="text-align:center;padding:40px"><div class="loading-spinner" style="margin:0 auto 12px"></div></div>';
+  try {
+    const me = await api('GET', '/patients/me');
+    const reports = await api('GET', `/patients/${me.id}/reports`);
+    renderReportCards(reports, container, false);
+  } catch(e) {
+    container.innerHTML = `<div class="alert alert-error">❌ ${e.message}</div>`;
+  }
+}
+
+async function viewPatientReport(reportId) {
+  patientTab('patient-reports', null);
+  await viewFullReport(reportId, false);
+}
+
+// ════════════════════════════════════════════════════════════════
+// IMAGING PORTAL
+// ════════════════════════════════════════════════════════════════
+async function initImagingPortal() {
+  document.getElementById('specialistName').textContent = currentUser?.full_name || 'Specialist';
+  await loadImagingRequests();
+}
+
+async function loadImagingRequests() {
+  const tbody = document.getElementById('imagingRequestsBody');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px"><div class="loading-spinner" style="margin:0 auto 8px"></div></td></tr>';
+  try {
+    const requests = await api('GET', '/imaging/requests');
+    if (!requests.length) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">No imaging requests available</td></tr>';
+      return;
+    }
+    tbody.innerHTML = requests.map(r=>{
+      const patient = r.patients || {};
+      const doctor = r.doctors || {};
+      const canUpload = ['requested','assigned'].includes(r.status);
+      return `
+        <tr>
+          <td><code style="background:#F1F5F9;padding:2px 8px;border-radius:4px;font-size:.8rem">${patient.mr_number||r.mr_number||'—'}</code></td>
+          <td>${patient.full_name||'—'}</td>
+          <td style="font-size:.85rem">${doctor.doctor_name||'—'}</td>
+          <td><span class="badge badge-blue">${imagingTypeLabel(r.imaging_type)}</span></td>
+          <td style="max-width:180px;font-size:.85rem;color:var(--muted)">${r.reason||'—'}</td>
+          <td>${statusBadge(r.status)}</td>
+          <td style="font-size:.8rem;color:var(--muted)">${fmtDate(r.created_at)}</td>
+          <td>
+            ${canUpload ? `<button class="btn btn-primary btn-sm" onclick="prefillUpload('${r.id}','${r.imaging_type}')">📤 Upload Image</button>` : '—'}
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--danger)">${e.message}</td></tr>`;
+  }
+}
+
+async function loadUploadRequestList() {
+  const sel = document.getElementById('upload_request_id');
+  try {
+    const requests = await api('GET', '/imaging/requests');
+    const pending = requests.filter(r=>['requested','assigned'].includes(r.status));
+    sel.innerHTML = '<option value="">Choose a request...</option>' + pending.map(r=>{
+      const p = r.patients || {};
+      return `<option value="${r.id}" data-type="${r.imaging_type}">${p.mr_number||r.mr_number||'?'} — ${p.full_name||'Unknown'} (${imagingTypeLabel(r.imaging_type)})</option>`;
+    }).join('');
+  } catch(e) {
+    sel.innerHTML = '<option value="">Error loading requests</option>';
+  }
+}
+
+function onRequestSelect(id) {
+  const sel = document.getElementById('upload_request_id');
+  const opt = sel.options[sel.selectedIndex];
+  const type = opt?.dataset?.type;
+  const info = document.getElementById('uploadRequestInfo');
+  if (type) {
+    document.getElementById('upload_imaging_type').value = type;
+    info.classList.remove('hidden');
+    info.textContent = `ℹ️ This request requires: ${imagingTypeLabel(type)}. The imaging type is pre-selected.`;
+  } else {
+    info.classList.add('hidden');
+  }
+}
+
+function prefillUpload(requestId, imagingType) {
+  imagingTab('upload', document.querySelectorAll('.nav-btn')[1]);
+  setTimeout(()=>{
+    loadUploadRequestList().then(()=>{
+      document.getElementById('upload_request_id').value = requestId;
+      onRequestSelect(requestId);
+    });
+  }, 200);
+}
+
+function onFileSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const zone = document.getElementById('uploadZoneText');
+  const size = (file.size/1024/1024).toFixed(2);
+  zone.innerHTML = `
+    <div style="color:var(--success)">✅ <strong>${file.name}</strong></div>
+    <div class="text-muted text-sm mt-4">${size} MB · ${file.type}</div>
+  `;
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('dragging');
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    const input = document.getElementById('upload_file');
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+    onFileSelect(input);
+  }
+}
+
+function resetUploadForm() {
+  document.getElementById('uploadZoneText').innerHTML = '<strong>Click to select file</strong> or drag & drop here<div class="text-muted text-sm mt-4">Supported: JPEG, PNG, TIFF, DICOM · Max 50MB</div>';
+  setAlert('uploadAlert','');
+}
+
+async function submitImageUpload(e) {
+  e.preventDefault();
+  const requestId = document.getElementById('upload_request_id').value;
+  const imagingType = document.getElementById('upload_imaging_type').value;
+  const fileInput = document.getElementById('upload_file');
+  const file = fileInput.files[0];
+
+  if (!file) { setAlert('uploadAlert','Please select a file to upload'); return; }
+  setAlert('uploadAlert','');
+
+  const btn = document.getElementById('uploadSubmitBtn');
+  btn.innerHTML = '<span class="spinner"></span> Uploading & Analyzing...';
+  btn.disabled = true;
+
+  try {
+    const formData = new FormData();
+    formData.append('imaging_type', imagingType);
+    formData.append('file', file);
+
+    const result = await api('POST', `/imaging/${requestId}/upload`, formData, true);
+    setAlert('uploadAlert',`✅ Image uploaded! Study ID: ${result.study_id}. AI analysis is running in the background. A report will be generated shortly.`,'success');
+    document.getElementById('uploadForm').reset();
+    resetUploadForm();
+    await loadImagingRequests();
+  } catch(e) {
+    setAlert('uploadAlert','❌ ' + e.message);
+  } finally {
+    btn.innerHTML = '📤 Upload & Analyze';
+    btn.disabled = false;
+  }
+}
+
+// ── Init on load ──────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', ()=>{
+  const savedToken = localStorage.getItem('mv_token');
+  const savedUser = localStorage.getItem('mv_user');
+  if (savedToken && savedUser) {
+    authToken = savedToken;
+    currentUser = JSON.parse(savedUser);
+    routeByRole(currentUser.role);
+  } else {
+    showPage('landing');
+  }
+});
+</script>
+</body>
+</html>

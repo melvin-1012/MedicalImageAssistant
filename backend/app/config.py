@@ -8,15 +8,15 @@ class Settings(BaseSettings):
     app_name: str = "MediVision AI"
     app_version: str = "1.0.0"
     debug: bool = True
-    allowed_origins: str = "http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://localhost:8000,http://127.0.0.1:8000,http://localhost:8080,http://127.0.0.1:8080,http://localhost:5500,http://127.0.0.1:5500"
+    allowed_origins: str = "http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000"
 
-    # Supabase (default placeholders allow local app boot without crashing)
-    supabase_url: str = "https://your-project-id.supabase.co"
-    supabase_anon_key: str = "your-anon-key-here"
-    supabase_service_role_key: str = "your-service-role-key-here"
+    # Supabase
+    supabase_url: str
+    supabase_anon_key: str
+    supabase_service_role_key: str
 
     # JWT
-    jwt_secret: str = "your-supabase-jwt-secret-here"
+    jwt_secret: str
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
 

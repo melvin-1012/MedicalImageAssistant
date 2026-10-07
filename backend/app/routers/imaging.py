@@ -27,7 +27,7 @@ async def create_imaging_request(body: ImagingRequestCreate, user_id: str = Depe
 
     # Get patient MR number
     p = db.table("patients").select("mr_number").eq("id", body.patient_id).single().execute()
-    mr_number = p.data.get("mr_number") if (p.data and isinstance(p.data, dict)) else None
+    mr_number = p.data["mr_number"] if p.data else None
 
     data = {
         "patient_id": body.patient_id,

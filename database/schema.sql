@@ -46,7 +46,9 @@ CREATE TABLE IF NOT EXISTS public.patients (
     mr_number       TEXT UNIQUE NOT NULL,
     full_name       TEXT NOT NULL,
     date_of_birth   DATE,
-    age             INTEGER,
+    age             INTEGER GENERATED ALWAYS AS (
+                        EXTRACT(YEAR FROM AGE(date_of_birth))::INTEGER
+                    ) STORED,
     gender          TEXT CHECK (gender IN ('male', 'female', 'other')),
     phone           TEXT,
     email           TEXT,
