@@ -10,8 +10,8 @@ load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 class ExplanationGenerator:
     def __init__(self):
-        # Initialize the Gemini client. It automatically picks up GEMINI_API_KEY from the environment.
-        self.client = genai.Client()
+        # Initialize the Gemini client explicitly with the API key from the environment
+        self.client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
         # We use a model that supports structured outputs well.
         self.model_name = 'gemini-3.8-flash'
         

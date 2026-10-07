@@ -16,7 +16,7 @@ class NotesProcessor:
     such as symptoms and medical history using GenAI.
     """
     def __init__(self):
-        self.client = genai.Client()
+        self.client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
         self.model_name = 'gemini-3.8-flash'
         
         self.system_instruction = """
