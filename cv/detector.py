@@ -93,14 +93,22 @@ class YOLOMedicalDetector(MedicalDetector):
     def __init__(
         self,
         model_path: Optional[Path | str] = None,
-        confidence_threshold: float = 0.25,
-        iou_threshold: float = 0.45,
+        confidence_threshold: Optional[float] = None,
+        iou_threshold: Optional[float] = None,
         device: Optional[str] = None,
         target_label: str = DEFAULT_TARGET_LABEL,
     ) -> None:
         self.model_path = Path(model_path) if model_path else config.CONFIG.detector.model_path
-        self.confidence_threshold = confidence_threshold
-        self.iou_threshold = iou_threshold
+        self.confidence_threshold = (
+            confidence_threshold
+            if confidence_threshold is not None
+            else config.CONFIG.detector.confidence_threshold
+        )
+        self.iou_threshold = (
+            iou_threshold
+            if iou_threshold is not None
+            else config.CONFIG.detector.iou_threshold
+        )
         self.device = device
         self.target_label = target_label
         self._model: Any = None
@@ -255,7 +263,11 @@ def find_available_weights() -> Optional[Path]:
     return None
 
 
-def create_detector(model_path: Optional[Path | str] = None) -> MedicalDetector:
+def create_detector(
+    model_path: Optional[Path | str] = None,
+    confidence_threshold: Optional[float] = None,
+    iou_threshold: Optional[float] = None,
+) -> MedicalDetector:
     """Instantiate a ready MedicalDetector.
 
     If weights are available, instantiates YOLOMedicalDetector and loads the model.
@@ -264,7 +276,11 @@ def create_detector(model_path: Optional[Path | str] = None) -> MedicalDetector:
     weights = Path(model_path) if model_path else find_available_weights()
     if weights and weights.is_file():
         try:
-            det = YOLOMedicalDetector(model_path=weights)
+            det = YOLOMedicalDetector(
+                model_path=weights,
+                confidence_threshold=confidence_threshold,
+                iou_threshold=iou_threshold,
+            )
             det.load_model()
             return det
         except Exception as exc:

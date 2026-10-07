@@ -24,6 +24,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("image", nargs="?", type=Path, help="path to a medical image")
     parser.add_argument("--json", action="store_true", help="output full CVAnalysisResult JSON")
     parser.add_argument("--genai", action="store_true", help="output CV -> GenAI handshake JSON schema")
+    parser.add_argument("--conf", type=float, default=None, help="override detector confidence threshold")
     args = parser.parse_args(argv)
 
     print(f"{BAR}\n{config.PROJECT_NAME}\n{config.PROJECT_ID}\n{BAR}\n")
@@ -31,6 +32,8 @@ def main(argv: list[str] | None = None) -> int:
 
     pipeline = MedicalCVPipeline()
     pipeline.initialize()
+    if args.conf is not None and hasattr(pipeline.detector, "confidence_threshold"):
+        pipeline.detector.confidence_threshold = args.conf
     print("\nMedical CV pipeline initialized successfully.\n")
 
     if not pipeline.detector.is_loaded:

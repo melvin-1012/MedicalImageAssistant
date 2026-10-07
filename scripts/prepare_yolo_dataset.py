@@ -95,6 +95,8 @@ def prepare_yolo_dataset(
     print(f"  Val  : {len(splits['val'])} ({len(splits['val'])/len(cohort)*100:.1f}%)")
     print(f"  Test : {len(splits['test'])} ({len(splits['test'])/len(cohort)*100:.1f}%)")
 
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
     loader = ImageLoader()
 
     # Create directories
@@ -102,56 +104,62 @@ def prepare_yolo_dataset(
         (out_path / "images" / split_name).mkdir(parents=True, exist_ok=True)
         (out_path / "labels" / split_name).mkdir(parents=True, exist_ok=True)
 
-    print(f"\nConverting DICOMs and writing YOLO annotations...")
+    print(f"\nConverting DICOMs and writing YOLO annotations (multithreaded)...")
     total_converted = 0
+
+    def _convert_patient(pid: str, img_out_dir: Path, lbl_out_dir: Path) -> bool:
+        target_img_path = img_out_dir / f"{pid}.jpg"
+        lbl_file = lbl_out_dir / f"{pid}.txt"
+        if target_img_path.exists() and lbl_file.exists():
+            return True
+
+        dcm_path = images_dir / f"{pid}.dcm"
+        if not dcm_path.exists():
+            return False
+
+        try:
+            loaded = loader.load(dcm_path)
+        except Exception:
+            return False
+
+        orig_w, orig_h = loaded.metadata.width, loaded.metadata.height
+        img_arr = loaded.image
+
+        if img_arr.shape[:2] != (img_size, img_size):
+            resized = cv2.resize(img_arr, (img_size, img_size), interpolation=cv2.INTER_AREA)
+        else:
+            resized = img_arr
+
+        cv2.imwrite(str(target_img_path), resized, [cv2.IMWRITE_JPEG_QUALITY, 95])
+
+        ann = annotations.get(pid)
+        if ann is None or ann.target == 0 or not ann.boxes:
+            lbl_file.write_text("", encoding="utf-8")
+        else:
+            lines = [
+                RSNAtoYOLOConverter.box_to_yolo(box, image_width=orig_w, image_height=orig_h, class_id=0)
+                for box in ann.boxes
+            ]
+            lbl_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return True
 
     for split_name, patient_list in splits.items():
         img_out_dir = out_path / "images" / split_name
         lbl_out_dir = out_path / "labels" / split_name
+        print(f"  Converting split: {split_name} ({len(patient_list)} patients)...")
 
-        for pid in patient_list:
-            dcm_path = images_dir / f"{pid}.dcm"
-            if not dcm_path.exists():
-                continue
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            futures = [
+                executor.submit(_convert_patient, pid, img_out_dir, lbl_out_dir)
+                for pid in patient_list
+            ]
+            for idx, future in enumerate(as_completed(futures), 1):
+                if future.result():
+                    total_converted += 1
+                if idx % 1000 == 0:
+                    print(f"    Completed {idx}/{len(patient_list)} in {split_name}...")
 
-            # Load and standardize DICOM via ImageLoader
-            try:
-                loaded = loader.load(dcm_path)
-            except Exception as exc:
-                print(f"Error loading {pid}.dcm: {exc}")
-                continue
-
-            orig_w, orig_h = loaded.metadata.width, loaded.metadata.height
-            img_arr = loaded.image
-
-            # Resize to target size for YOLO
-            if img_arr.shape[:2] != (img_size, img_size):
-                resized = cv2.resize(img_arr, (img_size, img_size), interpolation=cv2.INTER_AREA)
-            else:
-                resized = img_arr
-
-            # Write image as JPEG
-            target_img_path = img_out_dir / f"{pid}.jpg"
-            cv2.imwrite(str(target_img_path), resized, [cv2.IMWRITE_JPEG_QUALITY, 95])
-
-            # Write label file (.txt)
-            ann = annotations.get(pid)
-            lbl_file = lbl_out_dir / f"{pid}.txt"
-
-            if ann is None or ann.target == 0 or not ann.boxes:
-                lbl_file.write_text("", encoding="utf-8")
-            else:
-                lines = [
-                    RSNAtoYOLOConverter.box_to_yolo(box, image_width=orig_w, image_height=orig_h, class_id=0)
-                    for box in ann.boxes
-                ]
-                lbl_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
-
-            total_converted += 1
-            if total_converted % 500 == 0:
-                print(f"  Processed {total_converted}/{len(cohort)} images...")
-
-    print(f"Successfully converted {total_converted} images into {out_path}")
+    print(f"Successfully processed {total_converted} images in {out_path}")
 
     # Generate dataset.yaml
     yaml_file = RSNAtoYOLOConverter.generate_yolo_yaml(out_path)
@@ -184,12 +192,19 @@ def main() -> None:
         default=640,
         help="Image size for training (default: 640)",
     )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Convert all available patients in dataset (no subsampling)",
+    )
     args = parser.parse_args()
+
+    max_samples = None if (args.all or (args.max_samples and args.max_samples <= 0)) else args.max_samples
 
     prepare_yolo_dataset(
         source_dir=args.source,
         output_dir=args.output,
-        max_samples=args.max_samples,
+        max_samples=max_samples,
         img_size=args.img_size,
     )
 

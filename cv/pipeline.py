@@ -55,7 +55,11 @@ class MedicalCVPipeline:
         self.quality = QualityAnalyzer(app_config.quality)
         self.preprocessor = Preprocessor(app_config.preprocess)
         # 2. Model inference (Phase 4): auto-detect weights or safe NullDetector fallback
-        self.detector: BaseDetector = detector or create_detector(app_config.detector.model_path)
+        self.detector: BaseDetector = detector or create_detector(
+            app_config.detector.model_path,
+            confidence_threshold=app_config.detector.confidence_threshold,
+            iou_threshold=app_config.detector.iou_threshold,
+        )
         # 3. Visual explainability (Phases 5-6)
         self.localizer = Localizer()
         self.heatmap: BaseHeatmapGenerator = heatmap or (

@@ -88,6 +88,20 @@ with st.sidebar:
     st.subheader("Phases")
     for num, name, done in PHASES:
         st.write(f"{'✅' if done else '⬜'} {num}. {name}")
+    st.divider()
+    st.subheader("Inference Settings")
+    current_conf = float(getattr(pipeline.detector, "confidence_threshold", config.CONFIG.detector.confidence_threshold))
+    conf_thresh = st.slider(
+        "Confidence Threshold",
+        min_value=0.005,
+        max_value=0.950,
+        value=current_conf,
+        step=0.005,
+        format="%.3f",
+        help="Confidence threshold for candidate opacity detections. The current 1-epoch checkpoint outputs raw confidences around ~0.015-0.018.",
+    )
+    if hasattr(pipeline.detector, "confidence_threshold"):
+        pipeline.detector.confidence_threshold = conf_thresh
 
 # ---- Main -----------------------------------------------------------------
 st.title(config.PROJECT_NAME)

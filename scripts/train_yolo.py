@@ -11,13 +11,18 @@ import shutil
 import sys
 from pathlib import Path
 
-# Prevent OpenBLAS thread allocation issues on Windows
+# Prevent OpenBLAS / OpenMP thread allocation issues on Windows
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
 
 # Ensure project root is in sys.path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
+
+import cv2
+cv2.setNumThreads(0)
 
 import torch
 from ultralytics import YOLO
@@ -27,9 +32,12 @@ import config
 
 def train_detector(
     dataset_yaml: Path | str = "datasets/rsna_yolo/dataset.yaml",
-    epochs: int = 25,
+    epochs: int = 30,
     batch_size: int = 8,
     img_size: int = 640,
+    patience: int = 10,
+    workers: int = 0,
+    cache: bool = False,
     base_model: str = "yolo11n.pt",
     seed: int = 42,
 ) -> Path:
@@ -49,8 +57,10 @@ def train_detector(
     print(f"Base Model     : {base_model}")
     print(f"Device         : {device_name} (device={device})")
     print(f"Epochs         : {epochs}")
+    print(f"Patience       : {patience}")
     print(f"Batch Size     : {batch_size}")
     print(f"Image Size     : {img_size}")
+    print(f"Workers        : {workers}")
     print(f"Random Seed    : {seed}")
     print("=" * 65)
 
@@ -63,15 +73,19 @@ def train_detector(
     results = model.train(
         data=str(yaml_path),
         epochs=epochs,
+        patience=patience,
         batch=batch_size,
         imgsz=img_size,
         device=device,
-        workers=2,
+        workers=workers,
         seed=seed,
+        amp=False,
+        cache=cache,
         project=str(output_project),
         name="train_run",
         exist_ok=True,
         verbose=True,
+        plots=True,
     )
 
     # Find best.pt
@@ -114,18 +128,26 @@ def train_detector(
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train YOLO detector on RSNA dataset.")
     parser.add_argument("--yaml", default="datasets/rsna_yolo/dataset.yaml", help="Path to dataset.yaml")
-    parser.add_argument("--epochs", type=int, default=25, help="Number of epochs (default: 25)")
+    parser.add_argument("--epochs", type=int, default=30, help="Number of epochs (default: 30)")
+    parser.add_argument("--patience", type=int, default=10, help="Early stopping patience (default: 10)")
     parser.add_argument("--batch", type=int, default=8, help="Batch size (default: 8)")
     parser.add_argument("--imgsz", type=int, default=640, help="Image size (default: 640)")
+    parser.add_argument("--workers", type=int, default=0, help="Dataloader workers (default: 0 for Windows)")
+    parser.add_argument("--cache", action="store_true", help="Cache images in RAM for faster training")
     args = parser.parse_args()
 
     train_detector(
         dataset_yaml=args.yaml,
         epochs=args.epochs,
+        patience=args.patience,
         batch_size=args.batch,
         img_size=args.imgsz,
+        workers=args.workers,
+        cache=args.cache,
     )
 
 
 if __name__ == "__main__":
     main()
+
+
