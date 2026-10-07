@@ -132,7 +132,7 @@ if upload is not None and st.button("Analyze", type="primary"):
 if notice:
     st.info(f"Not implemented yet: {notice}")
 
-tabs = st.tabs(["Original", "Processed", "Quality", "Detections",
+tabs = st.tabs(["Original", "Processed", "Quality", "Model Results",
                 "Heatmap", "Segmentation", "JSON"])
 
 with tabs[0]:
@@ -173,15 +173,23 @@ with tabs[2]:
         pending(3, "Quality report")
 
 with tabs[3]:
+    st.markdown('### DenseNet-121 Classification (Image-Level)')
+    if result and result.classification:
+        sorted_cls = sorted(result.classification.items(), key=lambda x: x[1], reverse=True)[:5]
+        st.dataframe([{'Pathology': label, 'Probability': f'{prob*100:.1f}%'} for label, prob in sorted_cls])
+    else:
+        st.caption('No classification results available.')
+
+    st.markdown('### YOLO Detections (Bounding Boxes)')
     if not pipeline.detector.is_loaded:
-        st.caption("No medical model loaded — detections available in Phase 4/5.")
+        st.caption('No medical detector loaded.')
     elif result and result.detections:
-        st.dataframe([{"label": d.label, "confidence": round(d.confidence, 3)}
+        st.dataframe([{'label': d.label, 'confidence': round(d.confidence, 3)}
                       for d in result.detections])
         show_image(result.visualization.overlay_path if result.visualization else None,
-                   5, "Overlay")
+                   5, 'Overlay')
     else:
-        st.caption("No findings reported.")
+        st.caption('No findings reported.')
 
 with tabs[4]:
     show_image(result.visualization.heatmap_path if result and result.visualization else None,
