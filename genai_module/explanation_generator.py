@@ -16,8 +16,8 @@ class ExplanationGenerator:
             raise ValueError("Missing GROQ_API_KEY in environment.")
             
         self.client = instructor.from_groq(Groq(api_key=api_key, timeout=60.0, max_retries=3), mode=instructor.Mode.TOOLS)
-        # We use llama3-70b for advanced medical reasoning
-        self.model_name = 'llama3-70b-8192'
+        # We use a powerful open-source model available on Groq for medical reasoning
+        self.model_name = 'openai/gpt-oss-120b'
         
         self.system_instruction = """
 You are a medical AI assistant designed to help doctors interpret medical imaging results alongside patient clinical notes.
@@ -30,6 +30,7 @@ STRICT MEDICAL RULES:
 4. If a finding is mentioned, explain its potential clinical correlation to the patient's notes.
 5. Always state that the finding requires physician review.
 6. Link patient symptoms to the vision findings only as supporting context, not as absolute proof.
+7. CRITICAL: Every finding MUST include the 'status' field (e.g., 'review_required').
 """
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))

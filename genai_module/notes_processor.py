@@ -22,8 +22,8 @@ class NotesProcessor:
             raise ValueError("Missing GROQ_API_KEY in environment.")
             
         self.client = instructor.from_groq(Groq(api_key=api_key, timeout=60.0, max_retries=3), mode=instructor.Mode.TOOLS)
-        # Llama 3 70B is extremely fast and smart for extraction
-        self.model_name = 'llama3-70b-8192'
+        # Using a powerful open source model available on Groq
+        self.model_name = 'openai/gpt-oss-120b'
         
         self.system_instruction = """
 You are a medical data extraction assistant. Your task is to extract explicitly mentioned 
