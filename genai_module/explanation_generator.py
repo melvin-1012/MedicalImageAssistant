@@ -15,7 +15,7 @@ class ExplanationGenerator:
         if not api_key:
             raise ValueError("Missing GROQ_API_KEY in environment.")
             
-        self.client = instructor.from_groq(Groq(api_key=api_key), mode=instructor.Mode.TOOLS)
+        self.client = instructor.from_groq(Groq(api_key=api_key, timeout=60.0, max_retries=3), mode=instructor.Mode.TOOLS)
         # We use llama3-70b for advanced medical reasoning
         self.model_name = 'llama3-70b-8192'
         
