@@ -14,3 +14,12 @@ venv/
 .pytest_cache/
 .coverage
 htmlcov/
+backend/assets/
+backend/css/
+backend/index.html
+backend/js/
+backend/package.json
+backend/serve.py
+backend/ts/
+backend/tsconfig.json
+backend/genai_module/

@@ -12,8 +12,21 @@ class Settings(BaseSettings):
 
     # Supabase (default placeholders allow local app boot without crashing)
     supabase_url: str = "https://your-project-id.supabase.co"
+    supabase_key: Optional[str] = None
     supabase_anon_key: str = "your-anon-key-here"
     supabase_service_role_key: str = "your-service-role-key-here"
+
+    @property
+    def effective_anon_key(self) -> str:
+        if self.supabase_anon_key and self.supabase_anon_key != "your-anon-key-here":
+            return self.supabase_anon_key
+        return self.supabase_key or self.supabase_anon_key
+
+    @property
+    def effective_service_role_key(self) -> str:
+        if self.supabase_service_role_key and self.supabase_service_role_key != "your-service-role-key-here":
+            return self.supabase_service_role_key
+        return self.supabase_key or self.supabase_service_role_key
 
     # JWT
     jwt_secret: str = "your-supabase-jwt-secret-here"
