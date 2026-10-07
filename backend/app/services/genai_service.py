@@ -64,18 +64,76 @@ async def generate_clinical_report(
     """
     logger.info(f"[GenAIService] Generating clinical report for {imaging_type}")
 
-    # ── TODO: Replace with real GenAI/Multimodal model call ──────────────────
-    # Example integration:
-    #   prompt = build_clinical_prompt(vision_finding, patient_symptoms, ...)
-    #   response = await call_genai_api(prompt, image_path)
-    #   return GenAIResult(
-    #       clinical_context=response["clinical_context"],
-    #       explanation=response["explanation"],
-    #       limitations=response["limitations"],
-    #       model_name="gemini-med-vision",
-    #       model_version="1.0.0",
-    #       is_mock=False,
-    #   )
+    # ── Multimodal GenAI Pipeline Integration (Person 4) ────────────────────
+    import os
+    import sys
+    from pathlib import Path
+
+    _REPO_ROOT = Path(__file__).resolve().parents[3]
+    if str(_REPO_ROOT) not in sys.path:
+        sys.path.insert(0, str(_REPO_ROOT))
+
+    try:
+        from genai_module.pipeline import GenAIPipeline
+        pipeline = GenAIPipeline()
+        modality_map = {"xray": "X-Ray", "ct_scan": "CT Scan", "mri": "MRI"}
+        modality = modality_map.get(imaging_type.lower(), imaging_type.upper())
+
+        notes_parts = []
+        if patient_age:
+            notes_parts.append(f"Age: {patient_age}")
+        if patient_gender:
+            notes_parts.append(f"Gender: {patient_gender}")
+        if patient_symptoms:
+            notes_parts.append(f"Symptoms: {patient_symptoms}")
+        if patient_history:
+            notes_parts.append(f"History/Reason: {patient_history}")
+        raw_notes = " | ".join(notes_parts) if notes_parts else "No specific clinical notes provided."
+
+        vision_data = {
+            "status": "success",
+            "modality": modality,
+            "findings": [
+                {
+                    "finding": vision_finding,
+                    "confidence": max(0.0, min(1.0, float(confidence_score))),
+                    "location": None,
+                    "heatmap_available": True,
+                    "requires_physician_review": True,
+                }
+            ],
+        }
+
+        analysis = pipeline.run_analysis(vision_data=vision_data, raw_notes=raw_notes)
+        summary = analysis.get("summary", "AI image analysis completed.")
+        findings = analysis.get("findings", [])
+        limitations_list = analysis.get("limitations", [])
+
+        explanations = []
+        supporting = []
+        for f in findings:
+            if f.get("explanation"):
+                explanations.append(f["explanation"])
+            for s in f.get("supporting_notes", []):
+                if s.get("text"):
+                    supporting.append(s["text"])
+
+        clinical_context = f"{summary} Context: {', '.join(supporting) if supporting else raw_notes}"
+        explanation = " ".join(explanations) if explanations else f"Detected {vision_finding} in {vision_location} with {int(confidence_score * 100)}% confidence."
+        limitations = " ".join(limitations_list) if limitations_list else "AI-generated decision support. Requires physician verification."
+        is_mock = not bool(os.getenv("GROQ_API_KEY"))
+
+        return GenAIResult(
+            clinical_context=clinical_context,
+            explanation=explanation,
+            limitations=limitations,
+            raw_output=analysis,
+            model_name="multimodal-groq-gpt-oss" if not is_mock else "demo-multimodal-v1",
+            model_version="1.0.0",
+            is_mock=is_mock,
+        )
+    except Exception as e:
+        logger.warning(f"[GenAIService] Multimodal pipeline fallback: {e}")
     # ─────────────────────────────────────────────────────────────────────────
 
     imaging_label = {"xray": "X-Ray", "ct_scan": "CT Scan", "mri": "MRI"}.get(imaging_type, imaging_type.upper())

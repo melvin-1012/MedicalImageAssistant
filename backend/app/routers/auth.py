@@ -2,12 +2,14 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel, EmailStr
 from app.database import get_supabase, get_supabase_admin
 from app.dependencies import get_current_user, get_current_user_id
+from app.config import settings
+import uuid
 
 router = APIRouter()
 
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    identifier: str
     password: str
 
 
@@ -58,12 +60,66 @@ async def get_current_user_profile(
 
 @router.post("/login")
 async def login(body: LoginRequest):
-    """Sign in with email + password. Returns Supabase session tokens."""
+    """Sign in with email/MRN + password. Returns Supabase session tokens."""
+    identifier = body.identifier.strip()
+    password = body.password
+    email = identifier
+    
+    # Offline Demo Mock
+    if "your-project-id" in settings.supabase_url:
+        import datetime
+        from jose import jwt
+        email_lower = email.lower()
+        role = "doctor" if ("doc" in email_lower or "joison" in email_lower or "melvin" in email_lower or "joseph" in email_lower or "ilakkiya" in email_lower) else ("specialist" if "specialist" in email_lower else "patient")
+        user_id = "00000000-0000-0000-0000-000000000001"
+        full_name = email.split("@")[0].replace(".", " ").title() if "@" in email else email
+        token_payload = {
+            "sub": user_id,
+            "email": email,
+            "role": role,
+            "user_metadata": {"role": role, "full_name": full_name},
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24),
+        }
+        token = jwt.encode(token_payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
+        return {
+            "access_token": token,
+            "refresh_token": "demo-refresh-token",
+            "token_type": "bearer",
+            "user": {
+                "id": user_id,
+                "email": email,
+                "role": role,
+                "full_name": full_name,
+            },
+        }
+
     try:
-        db = get_supabase()
-        response = db.auth.sign_in_with_password({"email": body.email, "password": body.password})
+        db = get_supabase_admin()
+        
+        # If identifier is not an email, assume it's an MRN
+        if "@" not in identifier:
+            p_resp = db.table("patients").select("profile_id, email").eq("mr_number", identifier).single().execute()
+            if not p_resp.data:
+                raise HTTPException(status_code=404, detail="Medical Record Number not found")
+            
+            # Use patient's stored email if exists, otherwise fallback to auth user via profile
+            if p_resp.data.get("email"):
+                email = p_resp.data["email"]
+            elif p_resp.data.get("profile_id"):
+                user_resp = db.auth.admin.get_user_by_id(p_resp.data["profile_id"])
+                if user_resp.user and user_resp.user.email:
+                    email = user_resp.user.email
+                else:
+                    raise HTTPException(status_code=404, detail="No email linked to this MR Number")
+            else:
+                raise HTTPException(status_code=404, detail="Patient profile is incomplete")
+
+        # Authenticate via Supabase Auth
+        auth_client = get_supabase()
+        response = auth_client.auth.sign_in_with_password({"email": email, "password": password})
         session = response.session
         user = response.user
+        
         if not session:
             raise HTTPException(status_code=401, detail="Invalid credentials")
 
@@ -82,7 +138,10 @@ async def login(body: LoginRequest):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=401, detail=str(e))
+        msg = str(e)
+        if "Invalid login credentials" in msg:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        raise HTTPException(status_code=401, detail=msg)
 
 
 @router.post("/signup")
@@ -91,21 +150,64 @@ async def signup(body: SignUpRequest):
     allowed_roles = {"patient", "doctor", "specialist"}
     if body.role not in allowed_roles:
         raise HTTPException(status_code=400, detail=f"Role must be one of: {allowed_roles}")
+
+    if "your-project-id" in settings.supabase_url:
+        import uuid
+        return {
+            "id": str(uuid.uuid4()),
+            "email": body.email,
+            "role": body.role,
+            "message": "User created successfully",
+        }
+
     try:
         db = get_supabase_admin()
-        response = db.auth.admin.create_user({
-            "email": body.email,
-            "password": body.password,
-            "user_metadata": {"role": body.role, "full_name": body.full_name},
-            "email_confirm": True,
-        })
-        user = response.user
+        
+        # Check if user already exists
+        # In a real app we might catch the exception, but Supabase will throw a 422 if email exists.
+        try:
+            response = db.auth.admin.create_user({
+                "email": body.email,
+                "password": body.password,
+                "user_metadata": {"role": body.role, "full_name": body.full_name},
+                "email_confirm": True,
+            })
+            user = response.user
+        except Exception as e:
+            if "already registered" in str(e).lower() or "already exists" in str(e).lower():
+                raise HTTPException(status_code=409, detail="User with this email already exists")
+            raise HTTPException(status_code=400, detail=str(e))
+
+        # Supabase trigger `on_auth_user_created` creates the `profiles` record automatically.
+        
+        if body.role == "patient":
+            import random
+            from datetime import datetime
+            import time
+            
+            # Wait briefly to ensure the trigger has committed the profile
+            time.sleep(0.5) 
+            
+            # Generate a unique MR Number
+            year = datetime.utcnow().year
+            mrn = f"MR-{year}-{random.randint(1000, 9999)}"
+            
+            # Insert into patients table
+            db.table("patients").insert({
+                "profile_id": user.id,
+                "full_name": body.full_name,
+                "mr_number": mrn,
+                "email": user.email
+            }).execute()
+
         return {
             "id": user.id,
             "email": user.email,
             "role": body.role,
             "message": "User created successfully",
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

@@ -31,6 +31,21 @@ app.include_router(reports.router,      prefix="/reports",          tags=["Repor
 app.include_router(analysis.router,     prefix="/analysis",         tags=["Analysis"])
 app.include_router(specialists.router,  prefix="/specialists",      tags=["Specialists"])
 
+# ── Multimodal GenAI Module (Person 4) ──────────────────────────
+import sys
+from pathlib import Path
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+try:
+    from genai_module.api_router import router as genai_router
+    app.include_router(genai_router)
+except Exception as e:
+    import logging
+    logging.getLogger(__name__).warning(f"Could not load genai_router: {e}")
+
 
 @app.get("/", tags=["Health"])
 async def root():

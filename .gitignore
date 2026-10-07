@@ -3,6 +3,10 @@ __pycache__/
 *$py.class
 *.env
 .env
+.env.*
+.env.local
+*.pem
+*.key
 .venv/
 env/
 venv/
@@ -10,3 +14,12 @@ venv/
 .pytest_cache/
 .coverage
 htmlcov/
+backend/assets/
+backend/css/
+backend/index.html
+backend/js/
+backend/package.json
+backend/serve.py
+backend/ts/
+backend/tsconfig.json
+backend/genai_module/
