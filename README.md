@@ -1,214 +1,363 @@
-﻿# MediSight AI  Frontend & Integration
-## Multimodal Medical Image Intelligence (Hospital Web Application)
+# MediSight AI — Multimodal Medical Image Intelligence System
 
-A modern, responsive, clinical decision-support web application for **MediSight AI**, designed to assist healthcare professionals in analyzing diagnostic medical images alongside patient clinical history.
+**HNX26 · Team: The Unscripted · Hacknex 2026**
 
-> **Project Scope & Attribution Notice:**
-> This README documents **strictly the Frontend Development and Client-Side Workflow Integration** for the MediSight AI project. Backend APIs, database infrastructure, user authentication services, and live machine learning model deployments are separate system components currently mocked or planned for subsequent integration phases.
+> An end-to-end AI-powered clinical decision support system for hospitals. Doctors request imaging studies, specialists upload X-rays, and a three-layer AI pipeline — Computer Vision, DenseNet-121 classification, and a Groq LLM — analyzes the scans and generates evidence-grounded clinical explanations. The attending physician reviews the AI findings, writes their own conclusion, and a secure PDF report is generated for the patient.
 
----
-
-##  Role & Contribution: Frontend + Integration
-
-As the **Frontend & Integration Developer** on this project, my core contributions encompass:
-- **Clinical User Experience Architecture:** Designing and implementing four cohesive medical web portals (Landing Page, Doctor Dashboard, Specialist Imaging Portal, and Patient Dashboard).
-- **Interactive Medical Workflows:** Building end-to-end user journeys connecting doctor consultations, specialist image uploads, assistive AI analysis previews, and patient record access.
-- **Client-Side State Synchronization:** Architecting a zero-dependency, browser-native state bridge using `localStorage` and URL query parameters to synchronize patient case updates, investigation statuses, and physician sign-offs across separate dashboard interfaces.
-- **Hospital Design System:** Establishing a consistent, accessible clinical design system with customized CSS variables, medical color palettes, typography, responsive breakpoints, and mobile navigation drawers.
-- **TypeScript & Native JavaScript Implementation:** Authoring both browser-executable vanilla JavaScript runtime files and strongly typed TypeScript source interfaces for clinical data models.
+**The AI does not replace the doctor. It acts as a second pair of eyes.**
 
 ---
 
-##  Implemented Frontend Modules
+## What This Project Does
 
-The frontend is divided into four primary modules:
-
-### 1. Landing Page (`index.html`)
-The public-facing portal for hospital information and clinical triage:
-- **Hospital Navbar:** MediSight AI branding, navigation links (*How It Works*, *AI Imaging*, *Patient Records*, *Security*), and quick-access portal buttons.
-- **Hero Radiology Console HUD:** Interactive medical imaging console featuring a digital chest radiograph (PA view) with a toggleable Region of Interest (ROI) bounding box and telemetry strip.
-- **Four-Step Clinical Pipeline:** Visual progression showing *Patient Consultation &rarr; Medical Imaging &rarr; AI Medical Image Intelligence &rarr; Doctor Verification*.
-- **Feature Cards:** Highlights multimodal evidence, explainable findings, secure records, and radiology tooling.
-- **Explainability Workflow:** Clear pipeline mapping scan intake to highlighted regions, probabilistic findings, confidence indicators, and physician review.
-- **Trust & Safety Principles:** Explicit disclaimers highlighting that AI is an assistive decision-support tool, not a diagnostic replacement for doctors.
-- **Accessible Authentication Modals:** Interactive modal dialogs for Doctor Login, Patient Login, and Registration, complete with simulated redirection to the respective dashboards.
-
----
-
-### 2. Doctor Dashboard (`doctor-dashboard.html`)
-The primary clinical workspace for attending physicians:
-- **Doctor Team Directory:** Pre-configured profiles and credentials for hospital team physicians (**Dr. Joison**, **Dr. Melvin**, **Dr. Joseph**, and **Dr. Ilakkiya**).
-- **Patients Directory:** Dynamic patient roster (MR001 Arun Kumar, MR002 Priya Devi, MR003 Rahul S) displaying MR numbers, demographic data, symptoms, and an action column.
-- **Patient Details Modal:** Interactive slide-over modal displaying presenting complaints, vitals, preliminary examination notes, and a **"Refer to Specialist"** button that seamlessly transfers the case to the imaging portal.
-- **Patient Status Board:** Real-time tracking of patient investigations (*Pending* vs. *Completed* status badges), with instant *"View Report"* actions for finalized cases.
-- **Clinical Report & Sign-Off Workspace:**
-  - Case lookup by MR Number.
-  - Displays patient demographics, investigation type, and AI preliminary findings.
-  - Probabilistic confidence estimates separated from supporting multimodal clinical evidence.
-  - Clinical editor for attending doctor conclusions, prescription medications, and follow-up advice.
-  - **"Approve & Send to Patient"** workflow that updates local storage and marks the report ready for the patient portal.
-
----
-
-### 3. Specialist Imaging Portal (`specialist-imaging.html`)
-The diagnostic intake portal for radiology specialists:
-- **Patient Case Intake Card:** Displays patient demographics, reported symptoms, assigned specialist, and clinical notes with a quick patient switcher (MR001, MR002, MR003).
-- **Modality Selection:** Selection interface supporting *X-Ray*, *CT Scan*, and *MRI* modalities.
-- **Diagnostic Dropzone Interface:** Accessible drag-and-drop zone and file picker supporting DICOM (.dcm), JPG, PNG, and TIFF formats.
-- **One-Click Sample Loader:** Button to instantly load a sample digital chest radiograph for fast demonstration.
-- **Scan Preview HUD:** Image inspection box with animated scanning line and DICOM readiness indicator.
-- **Simulated AI Processing Pipeline:** Visual multi-stage progress tracking (radiomic calibration, dense segmentation, confidence calculation).
-- **AI Analysis Results Card:** Displays generated findings, modality details, PACS status, and confidence levels.
-- **Printable Analysis Report Modal:** Medical report sheet with hospital letterhead, demographics, AI findings, and browser print/save trigger.
-- **Navigation Shortcuts:** Direct links to transition back to the Doctor Workspace reports.
-
----
-
-### 4. Patient Dashboard (`patient-dashboard.html`)
-A minimal, realistic hospital patient portal with strictly four sections:
-- **1. Book an Appointment:** Clinical booking form collecting Patient Name, MR No., Age, Gender, Contact Number, Preferred Date, Preferred Time, Department/Specialist, Reason for Visit, and Clinical Notes, featuring an instant booking confirmation card.
-- **2. Records:** Clean medical history row displaying Last Date of Visit, Patient Name, and a clickable **Previous Diagnosis** link that immediately routes to the Reports section.
-- **3. Reports:** Formal clinical report sheet displaying patient demographics and investigation details. Initially displays a clear *"Awaiting Physician Review"* notice without diagnosis; once finalized by the physician, it updates to display doctor comments, diagnosis, prescribed medications, and clinical recommendations.
-- **4. About Us:** Hospital History, Contact Information (24/7 emergency helpline, outpatient desk, address, email), Terms & Conditions, and Basic Hospital Information (accreditations & facilities).
-
----
-
-##  End-to-End Demo Workflow (How to Reproduce)
-
-You can reproduce the complete clinical workflow in a browser without any backend setup:
+MediSight AI handles the full clinical imaging workflow:
 
 ```
-[Landing Page] (index.html)
-
-       Doctor Login  [Doctor Dashboard] (doctor-dashboard.html)
-
-                                 1. View Patient Details (MR001 Arun Kumar)
-
-                                 2. Click "Refer to Specialist"
-
-
-                                [Specialist Imaging Portal] (specialist-imaging.html)
-
-                                              3. Click "Load Sample Chest Radiography"
-                                              4. Click "Submit for AI Analysis"
-                                              5. Review AI Findings & Click "Doctor Reports & Sign-off"
-
-
-                                [Doctor Dashboard Reports] (doctor-dashboard.html#reports)
-
-                                              6. Review AI preliminary observations
-                                              7. Edit doctor conclusion & prescriptions
-                                              8. Click "Approve & Send to Patient"
-
-
-       Patient Login  [Patient Dashboard] (patient-dashboard.html)
-
-                                  9. Book an Appointment (Fill form & submit)
-                                  10. Click "Records" & click "Previous Diagnosis"
-                                  11. View finalized report with Doctor Diagnosis & Meds
+Patient registers → Doctor requests scan → Specialist uploads X-ray
+                                                      ↓
+                              ┌───────────────────────────────────┐
+                              │         AI Pipeline               │
+                              │  1. Computer Vision (YOLO)        │
+                              │     → Bounding boxes + heatmap    │
+                              │  2. Classification (DenseNet-121) │
+                              │     → Disease probabilities       │
+                              │  3. GenAI (Groq LLM)             │
+                              │     → Clinical explanation        │
+                              └───────────────────────────────────┘
+                                                      ↓
+                    Doctor reviews AI findings → Writes conclusion
+                                                      ↓
+                              PDF Medical Report generated
+                                                      ↓
+                              Patient downloads report from portal
 ```
 
----
+### Key Features
 
-##  UI Design System & Responsiveness
-
-- **Clean Hospital Aesthetic:** Built with a clean white/light medical background, high-contrast typography, and hospital blue (`#0284c7`) and teal (`#0d9488`) accents.
-- **Design Tokens (`variables.css`):** Centralized CSS custom properties for colors, elevation shadows, border radii, and transitions.
-- **Responsive Layouts:** Grid and Flexbox layouts optimized for desktop workstations, clinical tablets, and mobile smartphones.
-- **Mobile Navigation:** Sliding drawer navigation bars for smaller screens across all four portals.
-- **Accessibility:** Uses semantic HTML5, keyboard navigation (`Enter`/`Space` handlers on dropzones), `aria-*` attributes, and high-visibility status tags.
-
----
-
-##  Technologies Actually Used
-
-| Technology | Purpose in Project |
-| :--- | :--- |
-| **HTML5** | Semantic markup across all 4 portal pages and interactive modal structures |
-| **CSS3** | Custom design system (`variables.css`, `styles.css`, `components.css`, dashboard-specific stylesheets), CSS Grid, Flexbox, media queries |
-| **JavaScript (ES6+)** | Browser-executable runtime files (`main.js`, `doctor-dashboard.js`, `specialist-imaging.js`, `patient-dashboard.js`, `modal.js`, `data.js`) |
-| **TypeScript** | Strongly typed interfaces and classes (`doctor-types.ts`, `doctor-dashboard.ts`, `specialist-imaging.ts`, `patient-types.ts`, `patient-dashboard.ts`, `tsconfig.json`) |
-| **Python (`serve.py`)** | Lightweight development HTTP server script for local testing |
-| **Local Storage API** | Browser-native client-side state bridge synchronizing data across interfaces |
+- **Role-Based Access Control** — Separate dashboards and permissions for Patients, Doctors, Specialists, and Admins
+- **Secure Medical Storage** — X-rays, CT scans, and MRIs stored in private Supabase Storage buckets with time-limited signed URLs
+- **Three-Layer AI Analysis** — YOLO detection + DenseNet-121 classification + LLM explanation running in sequence
+- **Evidence-Grounded Explanations** — The LLM links imaging findings directly to the patient's symptoms and clinical notes
+- **AI Safety Guarantees** — Confidence scores and bounding boxes are never altered by the LLM; every output explicitly requires physician review
+- **PDF Report Generation** — Auto-generated, printable medical reports combining AI findings and physician conclusions
+- **Full Audit Trail** — Permanent medical records created upon report finalization
 
 ---
 
-##  Frontend Project Structure
+## Technologies, Libraries, and Models
 
-```text
-The-Unscripted/
- index.html                     # MediSight AI Landing Page
- doctor-dashboard.html          # Doctor Clinical Workspace
- specialist-imaging.html        # Specialist Diagnostic Intake & AI Analysis Portal
- patient-dashboard.html         # Minimal 4-Section Patient Portal
- serve.py                       # Lightweight local Python development server
- package.json                   # NPM metadata & TypeScript build scripts
- tsconfig.json                  # TypeScript compiler configuration (strict mode)
+### Frontend
+| Component | Technology |
+|-----------|-----------|
+| UI | HTML5, CSS3, Vanilla JavaScript |
+| Layout | CSS Grid / Flexbox (responsive) |
+| Server | Python `http.server` (`serve.py`) |
 
- assets/
-    images/
-        chest_xray.jpg         # Sample chest radiograph scan (PA view)
-        doctor_consultation.jpg# Clinical team consultation visual
+### Backend & API
+| Component | Technology |
+|-----------|-----------|
+| API Framework | [FastAPI](https://fastapi.tiangolo.com/) |
+| Language | Python 3.10+ |
+| Data Validation | [Pydantic v2](https://docs.pydantic.dev/) |
+| PDF Generation | ReportLab |
+| Testing | Pytest (47+ tests) |
 
- css/
-    variables.css              # Design tokens, color palette, spacing, typography
-    styles.css                 # Base resets, typography, global layout grids
-    components.css             # Navigation, buttons, badges, modals, HUD console
-    doctor-dashboard.css       # Doctor & Specialist tables, slide-overs, report cards
-    patient-dashboard.css      # Patient booking form, records table, report sheet
+### Database, Auth & Storage
+| Component | Technology |
+|-----------|-----------|
+| Database | [Supabase](https://supabase.com/) (PostgreSQL) |
+| Authentication | Supabase Auth (JWT-based) |
+| Row Level Security | Supabase RLS policies (11 tables) |
+| File Storage | Supabase Storage (private buckets, signed URLs) |
 
- js/                            # Browser runtime JavaScript files
-    main.js                    # Landing page interactions & modal redirection
-    doctor-dashboard.js        # Doctor dashboard state, patient reviews & reports
-    specialist-imaging.js      # Image dropzone, modality intake & analysis workflow
-    patient-dashboard.js       # Minimal 4-tab patient portal logic & storage sync
-    data.js                    # Mock patient dataset
-    modal.js                   # Accessible modal window manager
-    app.js                     # Landing page HUD telemetry scripts
+### AI & Machine Learning
+| Model | Library | Purpose |
+|-------|---------|---------|
+| **YOLO** | Ultralytics | Object detection — bounding boxes for suspected abnormalities |
+| **DenseNet-121** | [TorchXRayVision](https://github.com/mlmed/torchxrayvision) | Image classification — probabilities for 18 chest pathologies |
+| **GPT-OSS-120B** (via Groq) | `groq` + `instructor` | Clinical explanation generation from imaging + patient notes |
+| Image Processing | OpenCV, NumPy, PyDicom | Preprocessing, quality assessment, heatmaps |
 
- ts/                            # TypeScript source files
-    doctor-types.ts            # Type definitions for patients, reports & doctors
-    doctor-dashboard.ts        # Typed Doctor Dashboard manager
-    specialist-imaging.ts      # Typed Specialist Imaging manager
-    patient-types.ts           # Type definitions for patient portal & appointments
-    patient-dashboard.ts       # Typed Patient Dashboard manager
-    types.ts                   # Landing page type definitions
-    data.ts                    # Strongly-typed clinical demo data
-    modal.ts                   # Strongly-typed modal manager
-    app.ts                     # Strongly-typed HUD controller
-    main.ts                    # Strongly-typed application entry point
+---
 
- README.md                      # Frontend & Integration Documentation
+## Repository Structure
+
+```
+MedicalImageAssistant/
+├── backend/
+│   ├── app/
+│   │   ├── main.py                  # FastAPI app entrypoint & middleware
+│   │   ├── config.py                # Environment config (Pydantic BaseSettings)
+│   │   ├── database.py              # Supabase client
+│   │   ├── dependencies.py          # JWT verification & role authorization
+│   │   ├── routers/                 # REST API endpoints
+│   │   │   ├── auth.py              # Login, token validation
+│   │   │   ├── patients.py          # Patient directory
+│   │   │   ├── doctors.py           # Doctor registry
+│   │   │   ├── specialists.py       # Specialist operations
+│   │   │   ├── appointments.py      # Appointment scheduling
+│   │   │   ├── imaging.py           # Imaging request lifecycle & uploads
+│   │   │   ├── analysis.py          # AI analysis trigger & lookup
+│   │   │   └── reports.py           # PDF report generation & finalization
+│   │   ├── services/
+│   │   │   ├── vision_service.py    # Interface for CV module (Person 3)
+│   │   │   ├── genai_service.py     # Interface for GenAI module (Person 4)
+│   │   │   ├── imaging_service.py   # Imaging pipeline orchestration
+│   │   │   ├── pdf_service.py       # PDF compilation
+│   │   │   └── storage_service.py   # Supabase Storage operations
+│   │   └── schemas/                 # Pydantic request/response schemas
+│   ├── tests/                       # Pytest test suite
+│   ├── requirements.txt
+│   ├── .env.example
+│   └── API_DOCUMENTATION.md         # Full REST API spec for frontend
+│
+├── database/
+│   ├── schema.sql                   # 11 PostgreSQL tables, indexes & triggers
+│   ├── rls_policies.sql             # Row Level Security policies per role
+│   ├── storage_setup.sql            # Supabase Storage buckets & access policies
+│   └── seed_data.sql                # Demo patients, doctors & cases
+│
+├── genai_module/                    # GenAI reasoning module (Person 4)
+│   ├── pipeline.py                  # Main orchestrator
+│   ├── notes_processor.py           # Extracts symptoms from clinical notes
+│   ├── explanation_generator.py     # LLM-based clinical explanation
+│   ├── evidence_validator.py        # Safety validation
+│   ├── ai_response_schema.py        # Pydantic schemas (data contracts)
+│   ├── api_router.py                # FastAPI router for Person 2
+│   ├── test_cases.py                # 4 end-to-end test scenarios
+│   └── requirements.txt
+│
+└── frontend/                        # HTML/CSS/JS UI (Person 1)
+    ├── index.html
+    ├── dashboard.html
+    └── serve.py
 ```
 
 ---
 
-##  How to Install and Run the Frontend
+## How to Install Dependencies
 
-The frontend is completely zero-dependency and does not require Node.js or a build step to preview.
+### Prerequisites
+- Python 3.10+
+- A [Supabase](https://supabase.com/) project (free tier works)
+- A [Groq Cloud](https://console.groq.com/) API key (free tier works)
+- Git
 
-### Option 1: Open Directly in Any Web Browser (No Server Needed)
-Simply open any of the HTML files directly in your web browser (Google Chrome, Microsoft Edge, Mozilla Firefox, or Apple Safari):
-- Double-click [`index.html`](index.html) to start from the Landing Page.
-- Double-click [`doctor-dashboard.html`](doctor-dashboard.html) to enter the Doctor Workspace directly.
-- Double-click [`specialist-imaging.html`](specialist-imaging.html) to enter the Specialist Imaging Portal.
-- Double-click [`patient-dashboard.html`](patient-dashboard.html) to enter the Patient Portal.
+### Step 1: Clone the Repository
 
-### Option 2: Run Using Local Python Server
-If you prefer running through a local web server (recommended for testing clean URLs):
+```bash
+git clone https://github.com/melvin-1012/MedicalImageAssistant.git
+cd MedicalImageAssistant
+```
+
+### Step 2: Create a Virtual Environment (Recommended)
+
+```bash
+python -m venv venv
+
+# Windows:
+venv\Scripts\activate
+
+# Mac/Linux:
+source venv/bin/activate
+```
+
+### Step 3: Install Backend Dependencies
+
+```bash
+cd backend
+pip install -r requirements.txt
+```
+
+### Step 4: Install GenAI Module Dependencies
+
+```bash
+cd ../genai_module
+pip install -r requirements.txt
+```
+
+### Step 5: Install Computer Vision Dependencies (for CV module only)
+
+```bash
+pip install torch torchvision torchxrayvision ultralytics opencv-python numpy pydicom streamlit
+```
+
+---
+
+## How to Configure and Run the System
+
+### Step 1: Set Up the Supabase Database
+
+Run the following SQL scripts in your **Supabase SQL Editor** in this exact order:
+
+```
+1. database/schema.sql          ← Creates 11 tables, indexes & triggers
+2. database/rls_policies.sql    ← Applies Row Level Security per role
+3. database/storage_setup.sql   ← Creates private storage buckets
+4. database/seed_data.sql       ← (Optional) Seeds demo accounts
+```
+
+### Step 2: Configure Environment Variables
+
+Copy the example `.env` file in the `backend/` folder:
+
+```bash
+cp backend/.env.example backend/.env
+```
+
+Edit `backend/.env` with your credentials:
+
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your-supabase-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
+GROQ_API_KEY=your-groq-api-key
+```
+
+Also create `genai_module/.env`:
+
+```env
+GROQ_API_KEY=your-groq-api-key
+```
+
+### Step 3: Start the Backend API
+
+```bash
+cd backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+- Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
+- ReDoc: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+
+### Step 4: Start the Frontend
+
+Open a new terminal in the project root:
+
 ```bash
 python serve.py
-# or
-py serve.py
 ```
-Then open your browser at:
- **`http://localhost:8000`**
+
+- Frontend Portal: [http://localhost:8080](http://localhost:8080)
 
 ---
 
-##  Backend, Database & AI Model Status (Future Work)
+## How to Reproduce the Demonstrated Results
 
-The current implementation focuses on client-side interface architecture, clinical user flows, and state coordination. The following areas represent planned future integrations:
-- **Backend API Integration:** Connecting REST endpoints to a live backend service for persistent server-side storage and session management.
-- **Database & Cloud Storage:** Replacing browser `localStorage` with a persistent relational database (e.g., PostgreSQL / Supabase) and authenticated DICOM cloud storage.
-- **Authentication:** Implementing secure, role-based authentication (OAuth2 / JWT) for doctor, specialist, and patient roles.
+Follow the full end-to-end clinical workflow:
+
+### 1. Patient Registration
+- Navigate to `http://localhost:8080`
+- Click **Patient Registration** and create an account
+- The system auto-generates a unique MR Number (e.g. `MR-2024-1234`)
+
+### 2. Doctor Orders an Imaging Study
+- Log in as a Doctor (create a user in Supabase Auth dashboard, set role to `doctor`, link in `doctors` table)
+- In the Doctor Dashboard, locate the patient and click **Refer to Specialist**
+- Enter symptoms and select imaging type (e.g., `Chest X-Ray`)
+
+### 3. Specialist Uploads the Scan
+- Log in as a Specialist
+- View the pending imaging request in the queue
+- Upload a chest X-ray (JPEG/PNG/DICOM — max 50MB)
+- File is securely stored in the Supabase `medical-images` bucket
+
+### 4. AI Pipeline Runs Automatically
+The backend triggers the full 3-layer AI analysis:
+
+| Layer | What Happens |
+|-------|-------------|
+| **YOLO** | Detects bounding boxes around suspected opacities in the X-ray |
+| **DenseNet-121** | Classifies probabilities for 18 chest pathologies |
+| **Groq LLM** | Generates a clinical explanation linking findings to patient symptoms |
+
+Results are saved to the `ai_analysis_results` table in Supabase.
+
+### 5. Doctor Reviews AI Findings
+- Switch back to the Doctor Dashboard
+- Open the patient's pending report
+- Review AI findings, bounding boxes, confidence scores, and the LLM explanation
+- Write your **Physician Conclusion** and submit the assessment
+
+### 6. PDF Report Generated
+- The backend merges patient data, AI findings, and the physician assessment
+- A PDF Medical Report is generated and stored in the `medical-reports` bucket
+- The patient can now log in to their portal and securely download their report
+
+---
+
+### Testing the GenAI Module Independently
+
+```bash
+python -m genai_module.test_cases
+```
+
+**Expected:** 4 structured JSON responses, all with `"is_valid": true`:
+- Test 1: Standard run with findings + clinical notes
+- Test 2: Poor quality image (fast-fail, no LLM called)
+- Test 3: Normal image with no findings
+- Test 4: Multiple findings with no clinical notes
+
+### Running the Backend Tests
+
+```bash
+cd backend
+pytest -v
+```
+
+**Expected:** 47+ tests passing.
+
+---
+
+## Database Schema Overview
+
+The database has 11 normalized PostgreSQL tables:
+
+| Table | Purpose |
+|-------|---------|
+| `profiles` | Linked to Supabase Auth users; stores role (`patient`, `doctor`, `specialist`, `admin`) |
+| `patients` | Demographics, MR number, medical alerts |
+| `doctors` | Registry with specialization, department, license |
+| `specialists` | Imaging technicians for scan intake |
+| `appointments` | Patient-doctor scheduling with status tracking |
+| `imaging_requests` | Doctor's prescription for imaging (X-ray, CT, MRI) |
+| `imaging_studies` | Uploaded scan metadata and Supabase Storage path |
+| `ai_analysis_results` | Vision findings, confidence scores, GenAI explanation |
+| `medical_reports` | Master report record, PDF path, review status |
+| `doctor_assessments` | Physician's conclusion, diagnosis, prescriptions |
+| `medical_records` | Permanent visit history upon finalization |
+
+---
+
+## Medical Safety Guarantees
+
+- ✅ **No hallucination** — LLM cannot add findings not detected by the CV model
+- ✅ **Confidence scores preserved** — Never altered by the LLM
+- ✅ **Bounding boxes preserved** — Coordinates passed through exactly from YOLO
+- ✅ **Physician review mandatory** — Every AI output explicitly requires human review
+- ✅ **Quality gate** — Poor quality images are rejected before any AI model is invoked
+- ✅ **Schema validation** — All outputs validated against strict Pydantic schemas
+- ✅ **RLS enforced** — Patients can only see their own records at the database level
+
+---
+
+## Branch Guide
+
+| Branch | Owner | Status |
+|--------|-------|--------|
+| `main` | All | Stable, merged code |
+| `Multimodal-AI` | Person 4 | GenAI reasoning module |
+| `Computer-Vision-V1` | Person 3 | YOLO + DenseNet-121 CV pipeline |
+| `ilakkiya-frontend` | Person 1 | HTML/CSS/JS frontend UI |
+| `Database` | Person 2 | FastAPI backend + Supabase database |
+
+---
+
+## Team
+
+| Person | Role |
+|--------|------|
+| Person 1 | Frontend (HTML/CSS/JS Portal) |
+| Person 2 | Backend API + Supabase Database + PDF Generation |
+| Person 3 | Computer Vision (YOLO + DenseNet-121) |
+| Person 4 | GenAI Reasoning Module (Groq LLM + Instructor) |
