@@ -34,7 +34,7 @@ st.set_page_config(page_title=config.PROJECT_NAME, page_icon="🩻", layout="wid
 
 @st.cache_resource
 def get_pipeline() -> MedicalCVPipeline:
-    # Hackathon demo default threshold: 0.17 (not clinically validated)
+    # Hackathon demo default threshold: 0.017 (not clinically validated)
     pipeline = MedicalCVPipeline()
     pipeline.initialize()
     return pipeline
@@ -94,10 +94,10 @@ with st.sidebar:
     current_conf = float(getattr(pipeline.detector, "confidence_threshold", config.CONFIG.detector.confidence_threshold))
     conf_thresh = st.slider(
         "Confidence Threshold",
-        min_value=0.005,
+        min_value=0.001,
         max_value=0.950,
         value=current_conf,
-        step=0.005,
+        step=0.001,
         format="%.3f",
         help="Confidence threshold for candidate opacity detections. The current 1-epoch checkpoint outputs raw confidences around ~0.015-0.018.",
     )
